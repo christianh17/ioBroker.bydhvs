@@ -1,0 +1,37 @@
+{
+    "cli": true,
+    "adapterName": "bydhvs",
+    "title": "BYD HVS Battery",
+    "description": "BYD HVS Battery poll data",
+    "keywords": [
+        "byd hvs battery pv"
+    ],
+    "expert": "yes",
+    "features": [
+        "adapter"
+    ],
+    "adminFeatures": [],
+    "type": "climate-control",
+    "startMode": "daemon",
+    "connectionType": "local",
+    "dataSource": "poll",
+    "connectionIndicator": "yes",
+    "language": "JavaScript",
+    "adminReact": "no",
+    "tools": [
+        "ESLint",
+        "type checking"
+    ],
+    "indentation": "Space (4)",
+    "quotes": "double",
+    "es6class": "no",
+    "authorName": "Christian",
+    "authorGithub": "christianh17",
+    "authorEmail": "github@familie-herrmann.de",
+    "gitRemoteProtocol": "HTTPS",
+    "gitCommit": "yes",
+    "license": "MIT License",
+    "ci": "gh-actions",
+    "dependabot": "yes",
+    "creatorVersion": "1.31.0"
+}

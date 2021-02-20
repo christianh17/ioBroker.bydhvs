@@ -1,0 +1,98 @@
+{
+    "common": {
+        "name": "bydhvs",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "BYD HVS Battery",
+        "titleLang": {
+            "en": "BYD HVS Battery",
+            "de": "BYD HVS Battery",
+            "ru": "BYD HVS Battery",
+            "pt": "BYD HVS Battery",
+            "nl": "BYD HVS Battery",
+            "fr": "BYD HVS Battery",
+            "it": "BYD HVS Battery",
+            "es": "BYD HVS Battery",
+            "pl": "BYD HVS Battery",
+            "zh-cn": "BYD HVS Battery"
+        },
+        "desc": {
+            "en": "BYD HVS Battery poll data",
+            "de": "BYD HVS Battery poll data",
+            "ru": "BYD HVS Battery poll data",
+            "pt": "BYD HVS Battery poll data",
+            "nl": "BYD HVS Battery poll data",
+            "fr": "BYD HVS Battery poll data",
+            "it": "BYD HVS Battery poll data",
+            "es": "BYD HVS Battery poll data",
+            "pl": "BYD HVS Battery poll data",
+            "zh-cn": "BYD HVS Battery poll data"
+        },
+        "authors": [
+            "Christian <github@familie-herrmann.de>"
+        ],
+        "keywords": [
+            "byd hvs battery pv"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "bydhvs.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/christianh17/ioBroker.bydhvs/master/admin/bydhvs.png",
+        "readme": "https://github.com/christianh17/ioBroker.bydhvs/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "climate-control",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "poll",
+        "materialize": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ]
+    },
+    "native": {
+        "option1": true,
+        "option2": "42"
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}
