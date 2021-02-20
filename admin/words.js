@@ -14,28 +14,29 @@ systemDictionary = {
         "pl": "Ustawienia adaptera dla bydhvs",
         "zh-cn": "bydhvs的适配器设置"
     },
-    "option1": {
-        "en": "option1",
-        "de": "option1",
-        "ru": "option1",
-        "pt": "option1",
-        "nl": "option1",
-        "fr": "option1",
-        "it": "option1",
-        "es": "option1",
-        "pl": "option1",
-        "zh-cn": "option1"
+    "Interval (s)": {
+        "en": "Interval (s)",
+        "de": "Intervall (s)",
+        "ru": "Интервал (с)",
+        "pt": "Intervalo (s)",
+        "nl": "Interval (en)",
+        "fr": "Intervalle (s)",
+        "it": "Intervallo (i)",
+        "es": "Intervalo (s)",
+        "pl": "Odstęp (y)",
+        "zh-cn": "间隔"
     },
-    "option2": {
-        "en": "option2",
-        "de": "option2",
-        "ru": "option2",
-        "pt": "option2",
-        "nl": "option2",
-        "fr": "option2",
-        "it": "option2",
-        "es": "option2",
-        "pl": "option2",
-        "zh-cn": "option2"
+
+    "IP Address": {
+        "en": "IP Address",
+        "de": "IP Adresse",
+        "ru": "Айпи адрес",
+        "pt": "Endereço de IP",
+        "nl": "IP adres",
+        "fr": "Adresse IP",
+        "it": "Indirizzo IP",
+        "es": "Dirección IP",
+        "pl": "Adres IP",
+        "zh-cn": "IP地址"
     }
 };
