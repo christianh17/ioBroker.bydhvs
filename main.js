@@ -4,6 +4,9 @@
  * Created with @iobroker/create-adapter v1.31.0
  */
 
+// battery icon from
+// https://freepsdfiles.net/graphics/battery-icon-psd
+
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core"); // Get common adapter utils
@@ -21,22 +24,34 @@ const IPClient = new net.Socket();
  * @type {ioBroker.Adapter}
  */
 let adapter;
+const hvsBatteryVoltsperCell = [];
+const hvsBatteryTempperCell = [];
 // globale Variablen
 /** @type {number | undefined} */
 let myState; // Aktueller Status
 let hvsSOC;
 let hvsMaxVolt;
 let hvsMinVolt;
+let hvsMaxmVolt;
+let hvsMinmVolt;
+let hvsMaxmVoltCell;
+let hvsMinmVoltCell;
 let hvsA;
 let hvsBattVolt;
 let hvsMaxTemp;
 let hvsMinTemp;
+let hvsMaxTempCell;
+let hvsMinTempCell;
 let hvsBatTemp;
 let hvsOutVolt;
 let hvsError;
 let hvsModules;
 let hvsDiffVolt;
 let hvsPower;
+let ConfBatDetailshowoften;
+let confBatPollTime;
+let myNumberforDetails;
+
 
 
 /** @type {string} */
@@ -47,6 +62,8 @@ let hvsGrid;
 let hvsErrorString;
 let hvsParamT;
 
+/** @type {boolean} */
+let ConfBatDetails;
 
 
 /*const myStates = [
@@ -139,15 +156,15 @@ function startAdapter(options) {
         // },
 
         // is called if a subscribed state changes
-        stateChange: (id, state) => {
-            if (state) {
-                // The state was changed
-                adapter.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-            } else {
-                // The state was deleted
-                adapter.log.info(`state ${id} deleted`);
-            }
-        },
+        /*        stateChange: (id, state) => {
+                    if (state) {
+                        // The state was changed
+                        adapter.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+                    } else {
+                        // The state was deleted
+                        adapter.log.info(`state ${id} deleted`);
+                    }
+                },*/
 
         // If you need to accept messages in your adapter, uncomment the following block.
         // /**
@@ -170,247 +187,96 @@ function startAdapter(options) {
 
 
 function setObjects() {
-    adapter.setObjectNotExists("System.Serial", {
-        type: "state",
-        common: {
-            name: "Serial number",
-            type: "string",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("System.BMU", {
-        type: "state",
-        common: {
-            name: "F/W BMU",
-            type: "string",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("System.BMS", {
-        type: "state",
-        common: {
-            name: "F/W BMS",
-            type: "string",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("System.Modules", {
-        type: "state",
-        common: {
-            name: "modules (count)",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("System.Grid", {
-        type: "state",
-        common: {
-            name: "Grid-State",
-            type: "string",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("System.ParamT", {
-        type: "state",
-        common: {
-            name: "Parameter Table",
-            type: "string",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
+    const myObjects = [
+        ["System.Serial", "state", "Serial number", "string", "", true, false, ""],
+        ["System.BMU", "state", "F/W BMU", "string", "", true, false, ""],
+        ["System.BMS", "state", "F/W BMS", "string", "", true, false, ""],
+        ["System.Modules", "state", "modules (count)", "number", "", true, false, ""],
+        ["System.Grid", "state", "Parameter Table", "string", "", true, false, ""],
+        ["System.ParamT", "state", "F/W BMU", "string", "", true, false, ""],
+        ["State.SOC", "state", "SOC", "number", "", true, false, ""],
+        ["State.VoltMax", "state", "Max Cell Voltage", "number", "", true, false, ""],
+        ["State.VoltMin", "state", "Min Cell Voltage", "number", "", true, false, ""],
+        ["State.Current", "state", "Charge / Discharge Current", "number", "", true, false, ""],
+        ["State.VoltBatt", "state", "Battery Voltage", "number", "", true, false, ""],
+        ["State.TempMax", "state", "Max Cell Temp", "number", "", true, false, ""],
+        ["State.TempMin", "state", "Min Cell Temp", "number", "", true, false, ""],
+        ["State.VoltDiff", "state", "Max - Min Cell Voltage", "number", "", true, false, ""],
+        ["State.Power", "state", "Power", "number", "", true, false, ""],
+        ["State.TempBatt", "state", "Battery Temperature", "number", "", true, false, ""],
+        ["State.VoltOut", "state", "Output Voltage", "number", "", true, false, ""],
+        ["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""],
+        ["System.ErrorStr", "state", "Error (string)", "string", "", true, false, ""],
+        ["State.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "", true, false, ""],
+        ["State.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "", true, false, ""],
+        ["State.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "", true, false, ""],
+        ["State.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "", true, false, ""],
+        ["State.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "", true, false, ""],
+        ["State.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "", true, false, ""],
+    ];
 
-    adapter.setObjectNotExists("State.SOC", {
-        type: "state",
-        common: {
-            name: "SOC",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.VoltMax", {
-        type: "state",
-        common: {
-            name: "Max Cell Voltage",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.VoltMin", {
-        type: "state",
-        common: {
-            name: "Min Cell Voltage",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.Current", {
-        type: "state",
-        common: {
-            name: "Charge / Discharge Current",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.VoltBatt", {
-        type: "state",
-        common: {
-            name: "Battery Voltage",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.TempMax", {
-        type: "state",
-        common: {
-            name: "Max Cell Temp",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.TempMin", {
-        type: "state",
-        common: {
-            name: "Min Cell Temp",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.VoltDiff", {
-        type: "state",
-        common: {
-            name: "Max - Min Cell Voltage",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.Power", {
-        type: "state",
-        common: {
-            name: "Power",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.TempBatt", {
-        type: "state",
-        common: {
-            name: "Battery Temperature",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.VoltOut", {
-        type: "state",
-        common: {
-            name: "Output Voltage",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.ErrorNum", {
-        type: "state",
-        common: {
-            name: "Error (numeric)",
-            type: "number",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-    adapter.setObjectNotExists("State.ErrorStr", {
-        type: "state",
-        common: {
-            name: "Error (string)",
-            type: "string",
-            role: "",
-            read: true,
-            write: false,
-            unit: ""
-        },
-        native: {}
-    });
-
+    for (let i = 0; i < myObjects.length; i++) {
+        adapter.setObjectNotExists(myObjects[i][0], {
+            type: myObjects[i][1],
+            common: {
+                name: myObjects[i][2],
+                type: myObjects[i][3],
+                role: myObjects[i][4],
+                read: myObjects[i][5],
+                write: myObjects[i][6],
+                unit: myObjects[i][7],
+            },
+            native: {}
+        });
+    }
+    for (let i = 1; i < 65; i++) {
+        adapter.setObjectNotExists("BatteryDetails.CellVolt" + pad(i, 3), {
+            type: "state",
+            common: {
+                name: "Voltage Cell: " + pad(i, 3),
+                type: "number",
+                role: "",
+                read: true,
+                write: false,
+                unit: ""
+            },
+            native: {}
+        });
+    }
+    for (let i = 1; i < 25; i++) {
+        adapter.setObjectNotExists("BatteryDetails.CellTemp" + pad(i, 3), {
+            type: "state",
+            common: {
+                name: "Temp Cell: " + pad(i, 3),
+                type: "number",
+                role: "",
+                read: true,
+                write: false,
+                unit: ""
+            },
+            native: {}
+        });
+    }
 }
 
 function checkPacket(data) {
     const byteArray = new Uint8Array(data);
     const packetLength = data[2] + 5;// 3 header, 2 crc
     if (byteArray[0] != 1) { return false; }
-    if (byteArray[1] != 3) { return false; }
-    if (packetLength != byteArray.length) {
-        return (false);
+    if (byteArray[1] === 3) { //habe die Kodierung der Antwort mit 1 an zweiter Stelle nicht verstanden, daher hier keine Längenprüfung
+        if (packetLength != byteArray.length) {
+            return (false);
+        }
+    } else {
+        if (byteArray[1] != 16) { return false; }
     }
     return (crc.crc16modbus(byteArray) === 0);
+}
+
+function pad(n, width, z) {
+    z = z || "0";
+    n = n + "";
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
 function buf2int16(byteArray, pos) {
@@ -422,7 +288,7 @@ function buf2int16(byteArray, pos) {
     return result;
 }
 
-function decode1stPacket(data) {
+function decodePacket1(data) {
     const byteArray = new Uint8Array(data);
     hvsSerial = "";
     for (let i = 3; i < 22; i++) {
@@ -438,7 +304,7 @@ function decode1stPacket(data) {
     }
 }
 
-function decode2ndPacket(data) {
+function decodePacket2(data) {
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16(byteArray, 3);
     hvsMaxVolt = (buf2int16(byteArray, 5) * 1.0 / 100.0).toFixed(2);
@@ -466,6 +332,40 @@ function decode2ndPacket(data) {
     if (hvsErrorString.length === 0) { hvsErrorString = "no Error"; }
 }
 
+function decodePacketNOP(data) {
+    adapter.log.silly("Packet NOP");
+}
+
+function decodePacket7(data) {
+    const byteArray = new Uint8Array(data);
+    hvsMaxmVolt = buf2int16(byteArray, 5);
+    hvsMinmVolt = buf2int16(byteArray, 7);
+    hvsMaxmVoltCell = byteArray[9];
+    hvsMinmVoltCell = byteArray[10];
+    hvsMaxTempCell = byteArray[15];
+    hvsMinTempCell = byteArray[16];
+    for (let i = 101; i < 132; i = i + 2) {
+        adapter.log.silly("Battery Voltage-" + pad((i - 99) / 2, 3) + " :" + buf2int16(byteArray, i));
+        hvsBatteryVoltsperCell[(i - 99) / 2] = buf2int16(byteArray, i);
+    }
+}
+
+function decodePacket8(data) {
+    const byteArray = new Uint8Array(data);
+    for (let i = 5; i < 100; i = i + 2) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 29) / 2, 3) + " :" + buf2int16(byteArray, i));
+        hvsBatteryVoltsperCell[(i + 29) / 2] = buf2int16(byteArray, i);
+    }
+}
+
+function decodePacket9(data) {
+    const byteArray = new Uint8Array(data);
+    for (let i = 103; i < 127; i++) {
+        adapter.log.silly("Battery Temp " + pad(i - 102, 3) + " :" + byteArray[i]);
+        hvsBatteryTempperCell[i - 102] = byteArray[i];
+    }
+}
+
 function setConnected(adapter, isConnected) {
     if (adapter._connected !== isConnected) {
         adapter._connected = isConnected;
@@ -476,28 +376,31 @@ function setConnected(adapter, isConnected) {
     }
 }
 
+
+
+
+
 function setStates() {
-    adapter.log.silly("hvsSerial  >" + hvsSerial + "<");
 
-    adapter.log.silly("hvsBMU     >" + hvsBMU + "<");
-    adapter.log.silly("hvsBMS     >" + hvsBMS + "<");
-    adapter.log.silly("hvsModules >" + hvsModules + "<");
-    adapter.log.silly("hvsGrid    >" + hvsGrid + "<");
-
-    adapter.log.silly("hvsSOC     >" + hvsSOC + "<");
-    adapter.log.silly("hvsMaxVolt >" + hvsMaxVolt + "<");
-    adapter.log.silly("hvsMinVolt >" + hvsMinVolt + "<");
-    adapter.log.silly("hvsA       >" + hvsA + "<");
-    adapter.log.silly("hvsBattVolt>" + hvsBattVolt + "<");
-    adapter.log.silly("hvsMaxTemp >" + hvsMaxTemp + "<");
-    adapter.log.silly("hvsMinTemp >" + hvsMinTemp + "<");
-    adapter.log.silly("hvsDiffVolt>" + hvsDiffVolt + "<");
-    adapter.log.silly("hvsPower   >" + hvsPower + "<");
-    adapter.log.silly("hvsParamT  >" + hvsParamT + "<");
-    adapter.log.silly("hvsBatTemp >" + hvsBatTemp + "<");
-    adapter.log.silly("hvsOutVolt >" + hvsOutVolt + "<");
-    adapter.log.silly("hvsError   >" + hvsError + "<");
-    adapter.log.silly("hvsErrorSt >" + hvsErrorString + "<");
+    adapter.log.silly("hvsSerial       >" + hvsSerial + "<");
+    adapter.log.silly("hvsBMU          >" + hvsBMU + "<");
+    adapter.log.silly("hvsBMS          >" + hvsBMS + "<");
+    adapter.log.silly("hvsModules      >" + hvsModules + "<");
+    adapter.log.silly("hvsGrid         >" + hvsGrid + "<");
+    adapter.log.silly("hvsSOC          >" + hvsSOC + "<");
+    adapter.log.silly("hvsMaxVolt      >" + hvsMaxVolt + "<");
+    adapter.log.silly("hvsMinVolt      >" + hvsMinVolt + "<");
+    adapter.log.silly("hvsA            >" + hvsA + "<");
+    adapter.log.silly("hvsBattVolt     >" + hvsBattVolt + "<");
+    adapter.log.silly("hvsMaxTemp      >" + hvsMaxTemp + "<");
+    adapter.log.silly("hvsMinTemp      >" + hvsMinTemp + "<");
+    adapter.log.silly("hvsDiffVolt     >" + hvsDiffVolt + "<");
+    adapter.log.silly("hvsPower        >" + hvsPower + "<");
+    adapter.log.silly("hvsParamT       >" + hvsParamT + "<");
+    adapter.log.silly("hvsBatTemp      >" + hvsBatTemp + "<");
+    adapter.log.silly("hvsOutVolt      >" + hvsOutVolt + "<");
+    adapter.log.silly("hvsError        >" + hvsError + "<");
+    adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
 
     adapter.setState("System.Serial", hvsSerial);
     adapter.setState("System.BMU", hvsBMU);
@@ -517,13 +420,35 @@ function setStates() {
     adapter.setState("State.TempBatt", hvsBatTemp);
     adapter.setState("State.VoltOut", hvsOutVolt);
     adapter.setState("State.ErrorNum", hvsError);
-    adapter.setState("State.ErrorStr", hvsErrorString);
+    adapter.setState("System.ErrorStr", hvsErrorString);
+    adapter.setState("State.mVoltMax", hvsMaxmVolt);
+    if (myNumberforDetails == 0) {
+
+        adapter.setState("State.mVoltMin", hvsMinmVolt);
+        adapter.setState("State.mVoltMaxCell", hvsMaxmVoltCell);
+        adapter.setState("State.mVoltMinCell", hvsMinmVoltCell);
+        adapter.setState("State.TempMaxCell", hvsMaxTempCell);
+        adapter.setState("State.TempMinCell", hvsMinTempCell);
+
+        for (let i = 1; i < 65; i++) {
+            adapter.setState("BatteryDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i]);
+        }
+        for (let i = 1; i < 25; i++) {
+            adapter.setState("BatteryDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i],);
+        }
+        adapter.log.silly("hvsMaxmVolt     >" + hvsMaxmVolt + "<");
+        adapter.log.silly("hvsMinmVolt     >" + hvsMinmVolt + "<");
+        adapter.log.silly("hvsMaxmVoltCell >" + hvsMaxmVoltCell + "<");
+        adapter.log.silly("hvsMinmVoltCell >" + hvsMinmVoltCell + "<");
+        adapter.log.silly("hvsMaxTempCell  >" + hvsMaxTempCell + "<");
+        adapter.log.silly("hvsMinTempCell  >" + hvsMinTempCell + "<");
+    }
 }
 
 function startPoll(adapter) {
     //erster Start sofort (500ms), dann entsprechend der Config - dann muss man nicht beim Entwickeln warten bis der erste Timer durch ist.
     setTimeout(() => { Poll(adapter); }, 500);
-    idInterval1 = setInterval(() => Poll(adapter), adapter.config.ConfPollInterval * 1000);
+    idInterval1 = setInterval(() => Poll(adapter), confBatPollTime * 1000);
     adapter.log.info("gestartet: " + adapter.config.ConfPollInterval + " " + idInterval1);
 }
 
@@ -542,15 +467,80 @@ IPClient.on("data", function (data) {
     setConnected(adapter, true);
     switch (myState) {
         case 2:
-            decode1stPacket(data);
+            decodePacket1(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 3;
                 IPClient.write(myRequests[1]);
             }, 200);
             break;
-        case 3:
-            decode2ndPacket(data);
+        case 3: //test if it is time for reading all data. If not stop here
+            decodePacket2(data);
+            adapter.log.silly("a: " + myNumberforDetails + " b: " + ConfBatDetailshowoften + " c: " + ConfBatDetails);
+            if ((myNumberforDetails < ConfBatDetailshowoften) || (ConfBatDetails == false)) {
+                setStates();
+                IPClient.destroy();
+                myState = 0;
+            } else {
+                myNumberforDetails = 0; //restart counting
+                IPClient.setTimeout(1000);
+                setTimeout(() => {
+                    myState = 4;
+                    IPClient.write(myRequests[2]);
+                }, 200);
+            }
+            break;
+        case 4:
+            decodePacketNOP(data);
+            IPClient.setTimeout(1000);
+            myState = 5;
+            setTimeout(() => {
+                IPClient.write(myRequests[3]);
+            }, 200);
+            break;
+        case 5:
+            decodePacketNOP(data);
+            IPClient.setTimeout(8000);
+            myState = 6;
+            adapter.log.silly("waiting 4 seconds to measure cells");
+            setTimeout(() => {
+                IPClient.write(myRequests[4]);
+            }, 4000);
+            break;
+        case 6:
+            decodePacketNOP(data);
+            IPClient.setTimeout(1000);
+            myState = 7;
+            setTimeout(() => {
+                IPClient.write(myRequests[5]);
+            }, 200);
+            break;
+        case 7:
+            decodePacket7(data);
+            IPClient.setTimeout(1000);
+            setTimeout(() => {
+                myState = 8;
+                IPClient.write(myRequests[6]);
+            }, 200);
+            break;
+        case 8:
+            decodePacket8(data);
+            IPClient.setTimeout(1000);
+            setTimeout(() => {
+                myState = 9;
+                IPClient.write(myRequests[7]);
+            }, 200);
+            break;
+        case 9:
+            decodePacket9(data);
+            IPClient.setTimeout(1000);
+            setTimeout(() => {
+                myState = 10;
+                IPClient.write(myRequests[8]);
+            }, 200);
+            break;
+        case 10:
+            decodePacketNOP(data);
             setStates();
             IPClient.destroy();
             myState = 0;
@@ -571,6 +561,8 @@ IPClient.on("timeout", function () {
 function Poll(adapter) {
     myState = 1;
     IPClient.setTimeout(1000);
+    myNumberforDetails += 1;
+    adapter.log.silly("myNumberforDetails:" + myNumberforDetails);
     adapter.log.silly("Poll start, IP:" + adapter.config.ConfIPAdress);
     IPClient.connect(8080, adapter.config.ConfIPAdress, function () {
         myState = 2;
@@ -590,7 +582,21 @@ async function main() {
     // The adapters config (in the instance object everything under the attribute "native") is accessible via
     // adapter.config:
     adapter.log.info("Poll Interval: " + adapter.config.ConfPollInterval);
+    confBatPollTime = parseInt(adapter.config.ConfPollInterval);
+    if (confBatPollTime < 60) {
+        confBatPollTime = 60;
+        adapter.log.error("polling to often - max once per minute ");
+    }
     adapter.log.info("BYD IP Adress: " + adapter.config.ConfIPAdress);
+    ConfBatDetails = (adapter.config.ConfBatDetails ? true : false);
+    adapter.log.info("Bat Details  : " + adapter.config.ConfBatDetails);
+    ConfBatDetailshowoften = parseInt(adapter.config.ConfDetailshowoften);
+    if (ConfBatDetailshowoften < 10) {
+        ConfBatDetails = false;
+        adapter.log.error("Details polling to often - disabling ");
+    }
+    adapter.log.info("BatDetailshowoften: " + ConfBatDetailshowoften);
+    myNumberforDetails = ConfBatDetailshowoften;
     //    adapter.config.ConfPollInterval = parseInt(adapter.config.ConfPollInterval, 10) || 60;
 
     adapter.log.info("starte poll");
@@ -600,7 +606,6 @@ async function main() {
     /*    adapter.checkPassword("admin", "iobroker", (res) => {
             adapter.log.info("check user admin pw iobroker: " + res);
         });
-
         adapter.checkGroup("admin", "admin", (res) => {
             adapter.log.info("check group user admin group admin: " + res);
         });*/

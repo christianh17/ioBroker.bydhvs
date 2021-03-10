@@ -38,5 +38,17 @@ systemDictionary = {
         "es": "Dirección IP",
         "pl": "Adres IP",
         "zh-cn": "IP地址"
+    },
+    "Batterie Details - only two modules": {
+        "en": "Batterie Details - only two modules",
+        "de": "Batteriedetails - nur zwei Module",
+        "ru": "Детали батареи - всего два модуля",
+        "pt": "Detalhes da bateria - apenas dois módulos",
+        "nl": "Batterijdetails - slechts twee modules",
+        "fr": "Détails de la batterie - seulement deux modules",
+        "it": "Dettagli della batteria - solo due moduli",
+        "es": "Detalles de la batería: solo dos módulos",
+        "pl": "Batterie Details - tylko dwa moduły",
+        "zh-cn": "电池详细信息-仅两个模块"
     }
 };
