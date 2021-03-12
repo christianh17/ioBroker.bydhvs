@@ -51,7 +51,6 @@ let hvsPower;
 let ConfBatDetailshowoften;
 let confBatPollTime;
 let myNumberforDetails;
-let hvsModuleCount;
 
 
 
@@ -200,7 +199,6 @@ function setObjects() {
         ["State.VoltMin", "state", "Min Cell Voltage", "number", "", true, false, ""],
         ["State.Current", "state", "Charge / Discharge Current", "number", "", true, false, ""],
         ["State.VoltBatt", "state", "Battery Voltage", "number", "", true, false, ""],
-        ["State.ModuleCount", "state", "Module Count", "number", "", true, false, ""],
         ["State.TempMax", "state", "Max Cell Temp", "number", "", true, false, ""],
         ["State.TempMin", "state", "Min Cell Temp", "number", "", true, false, ""],
         ["State.VoltDiff", "state", "Max - Min Cell Voltage", "number", "", true, false, ""],
@@ -299,18 +297,12 @@ function decodePacket1(data) {
     hvsBMU = "V" + byteArray[29].toString() + "." + byteArray[30].toString() + "-" + String.fromCharCode(byteArray[33] + 65);
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
     hvsModules = (byteArray[36] - 16).toString();
-    if ((byteArray[36] == 18) && (byteArray[37] == 2)) {
-        hvsModuleCount = 2;
-    } else {
-        hvsModuleCount = 99;
-
-    }
     if (byteArray[38] === 1) {
         hvsGrid = "OnGrid";
     } else {
         hvsGrid = "OffGrid";
     }
-    if ((ConfBatDetails) && (hvsModuleCount > 2)) {
+    if ((ConfBatDetails) && (hvsModules > 2)) {
         adapter.log.error("Sorry, Details at the moment only for two modules. I need a wireshark dump from bigger systems to adjust the adapter.");
         ConfBatDetails = false;
     }
@@ -402,7 +394,6 @@ function setStates() {
     adapter.log.silly("hvsSOC          >" + hvsSOC + "<");
     adapter.log.silly("hvsMaxVolt      >" + hvsMaxVolt + "<");
     adapter.log.silly("hvsMinVolt      >" + hvsMinVolt + "<");
-    adapter.log.silly("hvsModuleCount  >" + hvsModuleCount + "<");
     adapter.log.silly("hvsA            >" + hvsA + "<");
     adapter.log.silly("hvsBattVolt     >" + hvsBattVolt + "<");
     adapter.log.silly("hvsMaxTemp      >" + hvsMaxTemp + "<");
@@ -425,7 +416,6 @@ function setStates() {
     adapter.setState("State.VoltMin", hvsMinVolt);
     adapter.setState("State.Current", hvsA);
     adapter.setState("State.VoltBatt", hvsBattVolt);
-    adapter.setState("State.ModuleCount", hvsModuleCount);
     adapter.setState("State.TempMax", hvsMaxTemp);
     adapter.setState("State.TempMin", hvsMinTemp);
     adapter.setState("State.VoltDiff", hvsDiffVolt);
