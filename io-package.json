@@ -64,7 +64,7 @@
     "readme": "https://github.com/ChristianH17/ioBroker.bydhvs/blob/master/README.md",
     "loglevel": "info",
     "mode": "daemon",
-    "type": "climate-control",
+    "type": "energy",
     "compact": true,
     "connectionType": "local",
     "dataSource": "poll",
