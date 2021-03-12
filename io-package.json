@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "0.0.3",
+    "version": "0.1.0",
     "news": {
+      "0.1.0": {
+        "en": "First release with limited public announcement",
+        "de": "Erste Veröffentlichung mit begrenzter öffentlicher Ankündigung",
+        "ru": "Первый выпуск с ограниченным публичным объявлением",
+        "pt": "Primeiro lançamento com anúncio público limitado",
+        "nl": "Eerste uitgave met beperkte openbare aankondiging",
+        "fr": "Première version avec annonce publique limitée",
+        "it": "Primo rilascio con annuncio pubblico limitato",
+        "es": "Primer lanzamiento con anuncio público limitado",
+        "pl": "Pierwsza wersja z ograniczonym publicznym ogłoszeniem",
+        "zh-cn": "首次发布，并发布了有限的公告"
+      },
       "0.0.3": {
         "en": "initial release",
         "de": "Erstveröffentlichung",

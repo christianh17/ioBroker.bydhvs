@@ -26,6 +26,9 @@ For later updates, the above procedure is not necessary. Just do the following:
 ### 0.0.1
 * (Christian) initial release
 
+### 0.1.0
+* (Christian) first testing release with (limited) public announcement
+
 ## License
 MIT License
 
