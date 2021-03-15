@@ -1,6 +1,6 @@
 {
   "name": "iobroker.bydhvs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "BYD HVS Battery poll data",
   "author": {
     "name": "Christian",

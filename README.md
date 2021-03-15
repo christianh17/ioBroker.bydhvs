@@ -1,33 +1,33 @@
 ![Logo](admin/bydhvs.png)
-# ioBroker.bydhvs
-
-[![NPM version](http://img.shields.io/npm/v/iobroker.bydhvs.svg)](https://www.npmjs.com/package/iobroker.bydhvs)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.bydhvs.svg)](https://www.npmjs.com/package/iobroker.bydhvs)
-![Number of Installations (latest)](http://iobroker.live/badges/bydhvs-installed.svg)
-![Number of Installations (stable)](http://iobroker.live/badges/bydhvs-stable.svg)
-[![Dependency Status](https://img.shields.io/david/christianh17/iobroker.bydhvs.svg)](https://david-dm.org/christianh17/iobroker.bydhvs)
-[![Known Vulnerabilities](https://snyk.io/test/github/christianh17/ioBroker.bydhvs/badge.svg)](https://snyk.io/test/github/christianh17/ioBroker.bydhvs)
-
-[![NPM](https://nodei.co/npm/iobroker.bydhvs.png?downloads=true)](https://nodei.co/npm/iobroker.bydhvs/)
-
-**Tests:** ![Test and Release](https://github.com/christianh17/ioBroker.bydhvs/workflows/Test%20and%20Release/badge.svg)
 
 ## bydhvs adapter for ioBroker
 
 BYD HVS Battery poll data
 
 
-For later updates, the above procedure is not necessary. Just do the following:
-1. Overwrite the changed files in the adapter directory (`/opt/iobroker/node_modules/iobroker.bydhvs`)
-1. Execute `iobroker upload bydhvs` on the ioBroker host
+# Ein wenig Erklärungen:
+
+Prinzipiell ist der Adapter durch Anaylse der Datenpakete zwischen der BYD-App und dem BYD-Akku-System entstanden. Es werden im Wesentlichen die Daten aus dem TAB System Info und aus dem TAB Diagnosis dargestellt. Offensichtlich sind die Daten für "System Info" sofort in der Batterie bereit zum abholen, für die Diagnose-Daten sieht es so aus als wäre ein Messvorgang erforderlich, zwischen der Abfrage und den Werten muss ein Zeitintervall von gut 3 Sekunden eingehalten werden. 
+
+Daher lasse ich die Diagnose-Daten auch nicht bei jeder Abfrage der Daten mit ermitteln.
+
+# Zu den Einstellungen:
+Intervall: Zeitlicher Abstand zwischen den Abfragen des Adapters
+IP-Adresse: Eigentlich logisch, damit ist die IP-Adresse des Adapters gemeint. Dafür gibt es zwei Möglichkeiten: Entweder hält man sich an die Anleitung von Becker3 aus dem Photovoltaik-Forum, ist hier verlinkt: https://www.photovoltaikforum.com/thread/150898-byd-hvs-firmware-update/?postID=2215343#post2215343 . Das hat den Vorteil das auch die BYD-APP läuft und man mit dieser direkt an die Daten, auch zum Vergleich, herankommt. Oder man trägt "nur" die IP-Adresse die die BYD-Box per DHCP erhalten hat ein. Ausdrücklich waren möchte ich vor Änderungen an den IP-Einstellungen der BOX! Im Forum kann man Berichte von Leute lesen die sich die Erreichbarkeit der Box dauerhaft ruiniert haben. 
+Batterie-Details: Steuerung, ob die Details zu den Zellen gelesen werden sollen
+Lesezyklen zu Batterie-Details: Anzahl der "Normal-Lese-Zyklen" bis wieder einmal die Diagnose-Daten gelesen werden. Hier die Warnung dazu: Ich habe keine Idee ob man sich durch häufige Diagnose-Messungen Nachteile einhandelt, daher empfehle ich den Wert möglichst hoch zu setzen. Ich wüsste auch nicht was man mit den Diagnose-Daten im regelmäßigen Poll anfangen sollte.
+
+Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die Daten für größere Anlagen! Das Einzige was ich dafür benötige ist ein Wireshark-Mittschnitt des Datenverkehrs und einen Screenshot aus der BYD-App (Be-Connect).
+
 
 ## Changelog
 
 ### 0.0.1
 * (Christian) initial release
-
 ### 0.1.0
 * (Christian) first testing release with (limited) public announcement
+### 0.1.1
+* start of documentation (German)
 
 ## License
 MIT License

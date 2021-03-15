@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+          "en": "Documentation (only German)",
+          "de": "Dokumentation (nur deutsch)",
+          "ru": "Документация (только на немецком языке)",
+          "pt": "Documentação (somente alemão)",
+          "nl": "Documentatie (alleen Duits)",
+          "fr": "Documentation (uniquement en allemand)",
+          "it": "Documentazione (solo tedesco)",
+          "es": "Documentación (solo en alemán)",
+          "pl": "Dokumentacja (tylko w języku niemieckim)",
+          "zh-cn": "文档（仅德语）"
+      },
       "0.1.0": {
         "en": "First release with limited public announcement",
         "de": "Erste Veröffentlichung mit begrenzter öffentlicher Ankündigung",

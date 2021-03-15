@@ -127,12 +127,6 @@ function startAdapter(options) {
         unload: (callback) => {
             adapter.log.silly("got unload event");
             try {
-                // Here you must clear all timeouts or intervals that may still be active
-                // clearTimeout(timeout1);
-                // clearTimeout(timeout2);
-                // ...
-                // clearInterval(interval1);
-
                 clearInterval(idInterval1);
                 stopPoll();
                 IPClient.destroy();
@@ -142,46 +136,6 @@ function startAdapter(options) {
                 callback();
             }
         },
-
-        // If you need to react to object changes, uncomment the following method.
-        // You also need to subscribe to the objects with `adapter.subscribeObjects`, similar to `adapter.subscribeStates`.
-        // objectChange: (id, obj) => {
-        //     if (obj) {
-        //         // The object was changed
-        //         adapter.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-        //     } else {
-        //         // The object was deleted
-        //         adapter.log.info(`object ${id} deleted`);
-        //     }
-        // },
-
-        // is called if a subscribed state changes
-        /*        stateChange: (id, state) => {
-                    if (state) {
-                        // The state was changed
-                        adapter.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-                    } else {
-                        // The state was deleted
-                        adapter.log.info(`state ${id} deleted`);
-                    }
-                },*/
-
-        // If you need to accept messages in your adapter, uncomment the following block.
-        // /**
-        //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-        //  * Using this method requires "common.messagebox" property to be set to true in io-package.json
-        //  */
-        // message: (obj) => {
-        //     if (typeof obj === "object" && obj.message) {
-        //         if (obj.command === "send") {
-        //             // e.g. send email or pushover or whatever
-        //             adapter.log.info("send command");
-
-        //             // Send response in callback if required
-        //             if (obj.callback) adapter.sendTo(obj.from, obj.command, "Message received", obj.callback);
-        //         }
-        //     }
-        // },
     }));
 }
 
