@@ -13,8 +13,11 @@ Daher lasse ich die Diagnose-Daten auch nicht bei jeder Abfrage der Daten mit er
 
 # Zu den Einstellungen:
 Intervall: Zeitlicher Abstand zwischen den Abfragen des Adapters
+
 IP-Adresse: Eigentlich logisch, damit ist die IP-Adresse des Adapters gemeint. Dafür gibt es zwei Möglichkeiten: Entweder hält man sich an die Anleitung von Becker3 aus dem Photovoltaik-Forum, ist hier verlinkt: https://www.photovoltaikforum.com/thread/150898-byd-hvs-firmware-update/?postID=2215343#post2215343 . Das hat den Vorteil das auch die BYD-APP läuft und man mit dieser direkt an die Daten, auch zum Vergleich, herankommt. Oder man trägt "nur" die IP-Adresse die die BYD-Box per DHCP erhalten hat ein. Ausdrücklich waren möchte ich vor Änderungen an den IP-Einstellungen der BOX! Im Forum kann man Berichte von Leute lesen die sich die Erreichbarkeit der Box dauerhaft ruiniert haben. 
+
 Batterie-Details: Steuerung, ob die Details zu den Zellen gelesen werden sollen
+
 Lesezyklen zu Batterie-Details: Anzahl der "Normal-Lese-Zyklen" bis wieder einmal die Diagnose-Daten gelesen werden. Hier die Warnung dazu: Ich habe keine Idee ob man sich durch häufige Diagnose-Messungen Nachteile einhandelt, daher empfehle ich den Wert möglichst hoch zu setzen. Ich wüsste auch nicht was man mit den Diagnose-Daten im regelmäßigen Poll anfangen sollte.
 
 Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die Daten für größere Anlagen! Das Einzige was ich dafür benötige ist ein Wireshark-Mittschnitt des Datenverkehrs und einen Screenshot aus der BYD-App (Be-Connect).
