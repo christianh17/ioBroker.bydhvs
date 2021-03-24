@@ -5,13 +5,13 @@
 BYD HVS Battery poll data
 
 
-# Ein wenig Erklärungen:
+## Ein wenig Erklärungen:
 
 Prinzipiell ist der Adapter durch Anaylse der Datenpakete zwischen der BYD-App und dem BYD-Akku-System entstanden. Es werden im Wesentlichen die Daten aus dem TAB System Info und aus dem TAB Diagnosis dargestellt. Offensichtlich sind die Daten für "System Info" sofort in der Batterie bereit zum abholen, für die Diagnose-Daten sieht es so aus als wäre ein Messvorgang erforderlich, zwischen der Abfrage und den Werten muss ein Zeitintervall von gut 3 Sekunden eingehalten werden. 
 
 Daher lasse ich die Diagnose-Daten auch nicht bei jeder Abfrage der Daten mit ermitteln.
 
-# Zu den Einstellungen:
+## Zu den Einstellungen:
 Intervall: Zeitlicher Abstand zwischen den Abfragen des Adapters
 
 IP-Adresse: Eigentlich logisch, damit ist die IP-Adresse des Adapters gemeint. Dafür gibt es zwei Möglichkeiten: Entweder hält man sich an die Anleitung von Becker3 aus dem Photovoltaik-Forum, ist hier verlinkt: https://www.photovoltaikforum.com/thread/150898-byd-hvs-firmware-update/?postID=2215343#post2215343 . Das hat den Vorteil das auch die BYD-APP läuft und man mit dieser direkt an die Daten, auch zum Vergleich, herankommt. Oder man trägt "nur" die IP-Adresse die die BYD-Box per DHCP erhalten hat ein. Ausdrücklich waren möchte ich vor Änderungen an den IP-Einstellungen der BOX! Im Forum kann man Berichte von Leute lesen die sich die Erreichbarkeit der Box dauerhaft ruiniert haben. 
@@ -31,6 +31,8 @@ Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die
 * (Christian) first testing release with (limited) public announcement
 ### 0.1.1
 * start of documentation (German)
+### 0.1.2
+* Voltage is unsigned, should now work with 4 modules
 
 ## License
 MIT License

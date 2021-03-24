@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "news": {
+      "0.1.2": {
+        "en": "voltage is unsigned - should now work",
+        "de": "Spannung ist ohne Vorzeichen - sollte jetzt funktionieren",
+        "ru": "напряжение без знака - теперь должно работать",
+        "pt": "a tensão não está sinalizada - agora deve funcionar",
+        "nl": "spanning is niet ondertekend - zou nu moeten werken",
+        "fr": "la tension n'est pas signée - devrait maintenant fonctionner",
+        "it": "la tensione non è firmata - ora dovrebbe funzionare",
+        "es": "el voltaje no está firmado - ahora debería funcionar",
+        "pl": "napięcie jest niepodpisane - powinno teraz działać",
+        "zh-cn": "电压无符号-现在应该可以工作"
+    },
       "0.1.1": {
           "en": "Documentation (only German)",
           "de": "Dokumentation (nur deutsch)",
