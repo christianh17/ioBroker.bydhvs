@@ -233,12 +233,18 @@ function pad(n, width, z) {
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-function buf2int16(byteArray, pos) {
+function buf2int16(byteArray, pos) { //signed
     let result = 0;
     result = byteArray[pos] * 256 + byteArray[pos + 1];
     if (result > 32768) {
         result -= 65536;
     }
+    return result;
+}
+
+function buf2int16US(byteArray, pos) { //unsigned
+    let result = 0;
+    result = byteArray[pos] * 256 + byteArray[pos + 1];
     return result;
 }
 
@@ -268,13 +274,13 @@ function decodePacket2(data) {
     hvsMaxVolt = (buf2int16(byteArray, 5) * 1.0 / 100.0).toFixed(2);
     hvsMinVolt = (buf2int16(byteArray, 7) * 1.0 / 100.0).toFixed(2);
     hvsA = (buf2int16(byteArray, 11) * 1.0 / 10.0).toFixed(1);
-    hvsBattVolt = (buf2int16(byteArray, 13) * 1.0 / 100.0).toFixed(1);
+    hvsBattVolt = (buf2int16US(byteArray, 13) * 1.0 / 100.0).toFixed(1);
     hvsMaxTemp = buf2int16(byteArray, 15);
     hvsMinTemp = buf2int16(byteArray, 17);
     hvsBatTemp = buf2int16(byteArray, 19);
     hvsError = buf2int16(byteArray, 29);
     hvsParamT = byteArray[31].toString() + "." + byteArray[32].toString();
-    hvsOutVolt = (buf2int16(byteArray, 35) * 1.0 / 100.0).toFixed(1);
+    hvsOutVolt = (buf2int16US(byteArray, 35) * 1.0 / 100.0).toFixed(1);
     hvsPower = (parseFloat(hvsA) * parseFloat(hvsOutVolt)).toFixed(2);
     hvsDiffVolt = (parseFloat(hvsMaxVolt) - parseFloat(hvsMinVolt)).toFixed(2);
     hvsErrorString = "";
