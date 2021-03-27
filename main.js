@@ -274,9 +274,7 @@ function decodePacket1(data) {
     } else {
         hvsGrid = "OffGrid";
     }
-    adapter.log.error("setobjectCells before " + ConfBatDetails + " " + FirstRun);
     if (ConfBatDetails && FirstRun) {
-        adapter.log.error("setobjectCells");
         FirstRun = false;
         setObjectsCells(hvsModules);
     }
