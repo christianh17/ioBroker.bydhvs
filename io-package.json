@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "news": {
+      "0.1.3": {
+        "en": "Test Mode for getting hex data easily",
+        "de": "Testmodus zum einfachen Abrufen von Hex-Daten",
+        "ru": "Тестовый режим для легкого получения шестнадцатеричных данных",
+        "pt": "Modo de teste para obter dados hexadecimais facilmente",
+        "nl": "Testmodus om gemakkelijk hexadecimale gegevens te verkrijgen",
+        "fr": "Mode test pour obtenir facilement des données hexadécimales",
+        "it": "Modalità test per ottenere facilmente dati esadecimali",
+        "es": "Modo de prueba para obtener datos hexadecimales fácilmente",
+        "pl": "Tryb testowy do łatwego uzyskiwania danych szesnastkowych",
+        "zh-cn": "测试模式可轻松获取十六进制数据"
+    },
       "0.1.2": {
         "en": "voltage is unsigned - should now work",
         "de": "Spannung ist ohne Vorzeichen - sollte jetzt funktionieren",

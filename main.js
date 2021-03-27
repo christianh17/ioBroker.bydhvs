@@ -51,7 +51,7 @@ let hvsPower;
 let ConfBatDetailshowoften;
 let confBatPollTime;
 let myNumberforDetails;
-
+let ConfTestMode;
 
 
 /** @type {string} */
@@ -161,12 +161,12 @@ function setObjects() {
         ["State.VoltOut", "state", "Output Voltage", "number", "", true, false, ""],
         ["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""],
         ["System.ErrorStr", "state", "Error (string)", "string", "", true, false, ""],
-        ["State.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "", true, false, ""],
-        ["State.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "", true, false, ""],
-        ["State.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "", true, false, ""],
-        ["State.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "", true, false, ""],
-        ["State.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "", true, false, ""],
-        ["State.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "", true, false, ""],
+        ["Diagnosis.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "", true, false, ""],
+        ["Diagnosis.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "", true, false, ""],
+        ["Diagnosis.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "", true, false, ""],
+        ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "", true, false, ""],
+        ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "", true, false, ""],
+        ["Diagnosis.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "", true, false, ""],
     ];
 
     for (let i = 0; i < myObjects.length; i++) {
@@ -233,7 +233,7 @@ function pad(n, width, z) {
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-function buf2int16(byteArray, pos) { //signed
+function buf2int16SI(byteArray, pos) { //signed
     let result = 0;
     result = byteArray[pos] * 256 + byteArray[pos + 1];
     if (result > 32768) {
@@ -262,23 +262,23 @@ function decodePacket1(data) {
     } else {
         hvsGrid = "OffGrid";
     }
-    if ((ConfBatDetails) && (hvsModules > 2)) {
+/*    if ((ConfBatDetails) && (hvsModules > 2)) {
         adapter.log.error("Sorry, Details at the moment only for two modules. I need a wireshark dump from bigger systems to adjust the adapter.");
         ConfBatDetails = false;
-    }
+    }*/
 }
 
 function decodePacket2(data) {
     const byteArray = new Uint8Array(data);
-    hvsSOC = buf2int16(byteArray, 3);
-    hvsMaxVolt = (buf2int16(byteArray, 5) * 1.0 / 100.0).toFixed(2);
-    hvsMinVolt = (buf2int16(byteArray, 7) * 1.0 / 100.0).toFixed(2);
-    hvsA = (buf2int16(byteArray, 11) * 1.0 / 10.0).toFixed(1);
+    hvsSOC = buf2int16SI(byteArray, 3);
+    hvsMaxVolt = (buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2);
+    hvsMinVolt = (buf2int16SI(byteArray, 7) * 1.0 / 100.0).toFixed(2);
+    hvsA = (buf2int16SI(byteArray, 11) * 1.0 / 10.0).toFixed(1);
     hvsBattVolt = (buf2int16US(byteArray, 13) * 1.0 / 100.0).toFixed(1);
-    hvsMaxTemp = buf2int16(byteArray, 15);
-    hvsMinTemp = buf2int16(byteArray, 17);
-    hvsBatTemp = buf2int16(byteArray, 19);
-    hvsError = buf2int16(byteArray, 29);
+    hvsMaxTemp = buf2int16SI(byteArray, 15);
+    hvsMinTemp = buf2int16SI(byteArray, 17);
+    hvsBatTemp = buf2int16SI(byteArray, 19);
+    hvsError = buf2int16SI(byteArray, 29);
     hvsParamT = byteArray[31].toString() + "." + byteArray[32].toString();
     hvsOutVolt = (buf2int16US(byteArray, 35) * 1.0 / 100.0).toFixed(1);
     hvsPower = (parseFloat(hvsA) * parseFloat(hvsOutVolt)).toFixed(2);
@@ -302,23 +302,23 @@ function decodePacketNOP(data) {
 
 function decodePacket7(data) {
     const byteArray = new Uint8Array(data);
-    hvsMaxmVolt = buf2int16(byteArray, 5);
-    hvsMinmVolt = buf2int16(byteArray, 7);
+    hvsMaxmVolt = buf2int16SI(byteArray, 5);
+    hvsMinmVolt = buf2int16SI(byteArray, 7);
     hvsMaxmVoltCell = byteArray[9];
     hvsMinmVoltCell = byteArray[10];
     hvsMaxTempCell = byteArray[15];
     hvsMinTempCell = byteArray[16];
     for (let i = 101; i < 132; i = i + 2) {
-        adapter.log.silly("Battery Voltage-" + pad((i - 99) / 2, 3) + " :" + buf2int16(byteArray, i));
-        hvsBatteryVoltsperCell[(i - 99) / 2] = buf2int16(byteArray, i);
+        adapter.log.silly("Battery Voltage-" + pad((i - 99) / 2, 3) + " :" + buf2int16SI(byteArray, i));
+        hvsBatteryVoltsperCell[(i - 99) / 2] = buf2int16SI(byteArray, i);
     }
 }
 
 function decodePacket8(data) {
     const byteArray = new Uint8Array(data);
     for (let i = 5; i < 100; i = i + 2) {
-        adapter.log.silly("Battery Voltage-" + pad((i + 29) / 2, 3) + " :" + buf2int16(byteArray, i));
-        hvsBatteryVoltsperCell[(i + 29) / 2] = buf2int16(byteArray, i);
+        adapter.log.silly("Battery Voltage-" + pad((i + 29) / 2, 3) + " :" + buf2int16SI(byteArray, i));
+        hvsBatteryVoltsperCell[(i + 29) / 2] = buf2int16SI(byteArray, i);
     }
 }
 
@@ -385,14 +385,14 @@ function setStates() {
     adapter.setState("State.VoltOut", hvsOutVolt);
     adapter.setState("State.ErrorNum", hvsError);
     adapter.setState("System.ErrorStr", hvsErrorString);
-    adapter.setState("State.mVoltMax", hvsMaxmVolt);
-    if (myNumberforDetails == 0) {
 
-        adapter.setState("State.mVoltMin", hvsMinmVolt);
-        adapter.setState("State.mVoltMaxCell", hvsMaxmVoltCell);
-        adapter.setState("State.mVoltMinCell", hvsMinmVoltCell);
-        adapter.setState("State.TempMaxCell", hvsMaxTempCell);
-        adapter.setState("State.TempMinCell", hvsMinTempCell);
+    if (myNumberforDetails == 0) {
+        adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt);
+        adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt);
+        adapter.setState("Diagnosis.mVoltMaxCell", hvsMaxmVoltCell);
+        adapter.setState("Diagnosis.mVoltMinCell", hvsMinmVoltCell);
+        adapter.setState("Diagnosis.TempMaxCell", hvsMaxTempCell);
+        adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell);
 
         for (let i = 1; i < 65; i++) {
             adapter.setState("BatteryDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i]);
@@ -407,6 +407,7 @@ function setStates() {
         adapter.log.silly("hvsMaxTempCell  >" + hvsMaxTempCell + "<");
         adapter.log.silly("hvsMinTempCell  >" + hvsMinTempCell + "<");
     }
+    
 }
 
 function startPoll(adapter) {
@@ -422,6 +423,10 @@ function stopPoll() {
 
 IPClient.on("data", function (data) {
     adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
+    if (ConfTestMode) {
+        let PacketNumber = myState -1;
+        adapter.log.error("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
+    }
     if (checkPacket(data) == false) {
         adapter.log.error("error: no valid data");
         IPClient.destroy();
@@ -559,7 +564,9 @@ async function main() {
         ConfBatDetails = false;
         adapter.log.error("Details polling to often - disabling ");
     }
+    ConfTestMode = (adapter.config.ConfTestMode ? true : false);
     adapter.log.info("BatDetailshowoften: " + ConfBatDetailshowoften);
+    adapter.log.silly ("TestMode= " + ConfTestMode);
     myNumberforDetails = ConfBatDetailshowoften;
     //    adapter.config.ConfPollInterval = parseInt(adapter.config.ConfPollInterval, 10) || 60;
 

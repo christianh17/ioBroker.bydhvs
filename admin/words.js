@@ -39,16 +39,29 @@ systemDictionary = {
         "pl": "Adres IP",
         "zh-cn": "IP地址"
     },
-    "Batterie Details - only two modules": {
-        "en": "Batterie Details - only two modules",
-        "de": "Batteriedetails - nur zwei Module",
-        "ru": "Детали батареи - всего два модуля",
-        "pt": "Detalhes da bateria - apenas dois módulos",
-        "nl": "Batterijdetails - slechts twee modules",
-        "fr": "Détails de la batterie - seulement deux modules",
-        "it": "Dettagli della batteria - solo due moduli",
-        "es": "Detalles de la batería: solo dos módulos",
-        "pl": "Batterie Details - tylko dwa moduły",
-        "zh-cn": "电池详细信息-仅两个模块"
-    }
+    "Diagnosis Data from Battery (only tested with two modules)": {
+        "en": "Diagnosis Data from Battery (only tested with two modules)",
+        "de": "Diagnosedaten von der Batterie (nur mit zwei Modulen getestet)",
+        "ru": "Данные диагностики от аккумулятора (проверено только с двумя модулями)",
+        "pt": "Dados de diagnóstico da bateria (testado apenas com dois módulos)",
+        "nl": "Diagnosegegevens van batterij (alleen getest met twee modules)",
+        "fr": "Données de diagnostic de la batterie (testées uniquement avec deux modules)",
+        "it": "Dati di diagnosi dalla batteria (testato solo con due moduli)",
+        "es": "Datos de diagnóstico de la batería (solo probado con dos módulos)",
+        "pl": "Dane diagnostyczne z akumulatora (testowane tylko z dwoma modułami)",
+        "zh-cn": "来自电池的诊断数据（仅在两个模块上进行了测试）"
+      },
+
+    "Test Mode - show data in error log": {
+        "en": "Test Mode - show data in error log",
+        "de": "Testmodus - Daten im Fehlerprotokoll anzeigen",
+        "ru": "Тестовый режим - показывать данные в журнале ошибок",
+        "pt": "Modo de teste - mostra os dados no registro de erros",
+        "nl": "Testmodus - toon gegevens in foutenlogboek",
+        "fr": "Mode test - afficher les données dans le journal des erreurs",
+        "it": "Modalità test: mostra i dati nel registro degli errori",
+        "es": "Modo de prueba: muestra datos en el registro de errores",
+        "pl": "Tryb testowy - pokaż dane w dzienniku błędów",
+        "zh-cn": "测试模式-在错误日志中显示数据"
+      }
 };
