@@ -36,6 +36,8 @@ Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die
 ### 0.1.3
 * Test Mode for getting hex data easily, removed check for 2 modules, moved "diagnosis-states" to extra folder
 
+###
+
 ## License
 MIT License
 
