@@ -27,7 +27,7 @@ let adapter;
 const hvsBatteryVoltsperCell = [];
 const hvsBatteryTempperCell = [];
 // globale Variablen
-/** @type {number | undefined} */
+/** @type {number | any } */
 let myState; // Aktueller Status
 let hvsSOC;
 let hvsMaxVolt;
@@ -52,6 +52,7 @@ let ConfBatDetailshowoften;
 let confBatPollTime;
 let myNumberforDetails;
 let ConfTestMode;
+let FirstRun;
 
 
 /** @type {string} */
@@ -139,6 +140,45 @@ function startAdapter(options) {
     }));
 }
 
+/**
+ * @param {number} ModuleCount
+ */
+function setObjectsCells(ModuleCount) {
+
+    const maxCellVolts = ModuleCount * 32 + 1;
+    const maxCellTemps = ModuleCount * 12 + 1;
+
+    for (let i = 1; i < maxCellVolts; i++) {
+        adapter.setObjectNotExists("CellDetails.CellVolt" + pad(i, 3), {
+            type: "state",
+            common: {
+                name: "Voltage Cell: " + pad(i, 3),
+                type: "number",
+                role: "",
+                read: true,
+                write: false,
+                unit: ""
+            },
+            native: {}
+        });
+    }
+    for (let i = 1; i < maxCellTemps; i++) {
+        adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
+            type: "state",
+            common: {
+                name: "Temp Cell: " + pad(i, 3),
+                type: "number",
+                role: "",
+                read: true,
+                write: false,
+                unit: ""
+            },
+            native: {}
+        });
+
+    }
+}
+
 
 function setObjects() {
     const myObjects = [
@@ -179,34 +219,6 @@ function setObjects() {
                 read: myObjects[i][5],
                 write: myObjects[i][6],
                 unit: myObjects[i][7],
-            },
-            native: {}
-        });
-    }
-    for (let i = 1; i < 65; i++) {
-        adapter.setObjectNotExists("BatteryDetails.CellVolt" + pad(i, 3), {
-            type: "state",
-            common: {
-                name: "Voltage Cell: " + pad(i, 3),
-                type: "number",
-                role: "",
-                read: true,
-                write: false,
-                unit: ""
-            },
-            native: {}
-        });
-    }
-    for (let i = 1; i < 25; i++) {
-        adapter.setObjectNotExists("BatteryDetails.CellTemp" + pad(i, 3), {
-            type: "state",
-            common: {
-                name: "Temp Cell: " + pad(i, 3),
-                type: "number",
-                role: "",
-                read: true,
-                write: false,
-                unit: ""
             },
             native: {}
         });
@@ -262,10 +274,16 @@ function decodePacket1(data) {
     } else {
         hvsGrid = "OffGrid";
     }
-/*    if ((ConfBatDetails) && (hvsModules > 2)) {
-        adapter.log.error("Sorry, Details at the moment only for two modules. I need a wireshark dump from bigger systems to adjust the adapter.");
-        ConfBatDetails = false;
-    }*/
+    adapter.log.error("setobjectCells before " + ConfBatDetails + " " + FirstRun);
+    if (ConfBatDetails && FirstRun) {
+        adapter.log.error("setobjectCells");
+        FirstRun = false;
+        setObjectsCells(hvsModules);
+    }
+    /*    if ((ConfBatDetails) && (hvsModules > 2)) {
+            adapter.log.error("Sorry, Details at the moment only for two modules. I need a wireshark dump from bigger systems to adjust the adapter.");
+            ConfBatDetails = false;
+        }*/
 }
 
 function decodePacket2(data) {
@@ -341,9 +359,6 @@ function setConnected(adapter, isConnected) {
 }
 
 
-
-
-
 function setStates() {
 
     adapter.log.silly("hvsSerial       >" + hvsSerial + "<");
@@ -395,10 +410,10 @@ function setStates() {
         adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell);
 
         for (let i = 1; i < 65; i++) {
-            adapter.setState("BatteryDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i]);
+            adapter.setState("CellDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i]);
         }
         for (let i = 1; i < 25; i++) {
-            adapter.setState("BatteryDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i],);
+            adapter.setState("CellDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i],);
         }
         adapter.log.silly("hvsMaxmVolt     >" + hvsMaxmVolt + "<");
         adapter.log.silly("hvsMinmVolt     >" + hvsMinmVolt + "<");
@@ -407,11 +422,12 @@ function setStates() {
         adapter.log.silly("hvsMaxTempCell  >" + hvsMaxTempCell + "<");
         adapter.log.silly("hvsMinTempCell  >" + hvsMinTempCell + "<");
     }
-    
+
 }
 
 function startPoll(adapter) {
     //erster Start sofort (500ms), dann entsprechend der Config - dann muss man nicht beim Entwickeln warten bis der erste Timer durch ist.
+    FirstRun = true;
     setTimeout(() => { Poll(adapter); }, 500);
     idInterval1 = setInterval(() => Poll(adapter), confBatPollTime * 1000);
     adapter.log.info("gestartet: " + adapter.config.ConfPollInterval + " " + idInterval1);
@@ -424,7 +440,7 @@ function stopPoll() {
 IPClient.on("data", function (data) {
     adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
     if (ConfTestMode) {
-        let PacketNumber = myState -1;
+        let PacketNumber = myState - 1;
         adapter.log.error("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
     }
     if (checkPacket(data) == false) {
@@ -566,7 +582,7 @@ async function main() {
     }
     ConfTestMode = (adapter.config.ConfTestMode ? true : false);
     adapter.log.info("BatDetailshowoften: " + ConfBatDetailshowoften);
-    adapter.log.silly ("TestMode= " + ConfTestMode);
+    adapter.log.silly("TestMode= " + ConfTestMode);
     myNumberforDetails = ConfBatDetailshowoften;
     //    adapter.config.ConfPollInterval = parseInt(adapter.config.ConfPollInterval, 10) || 60;
 
