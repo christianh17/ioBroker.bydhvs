@@ -65,7 +65,7 @@ let hvsParamT;
 
 /** @type {boolean} */
 let ConfBatDetails;
-
+const ConfUseTestData = false;
 
 /*const myStates = [
     "no state",
@@ -92,6 +92,18 @@ const myRequests = [
     Buffer.from("01030558004104e5", "hex"),
     Buffer.from("01030558004104e5", "hex"),
 ];
+
+const myTestData = [ //Testdaten von 4 Modulen Seriennummern sind auf 0 gesetzt (2 mal enthalten), CRC ist bei den verfälschten Paketen neu gerechnet
+    Buffer.from("0103cc503030303030303030303030303030303030307878787878030f030f031601000314020101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000015031c0e080cF740", "hex"),
+    Buffer.from("01033200640153015200640000a94c0016001300140000030f00040000000007020004aa6e15f9000011560000000207020000042c31de", "hex"),
+    Buffer.from("01030603140201010040ad", "hex"),
+    Buffer.from("0110055000024115", "hex"),
+    Buffer.from("01030288011f84", "hex"),
+    Buffer.from("01038200800d400d34217600160013012a0000000000000000000000000000000095760008c59c0006000001ea10ee00000018110b03e8006400000004000000001603150300005030303030303030303030303030303030303078787878780207020700000d3f0d3c0d3b0d3c0d3e0d3c0d3a0d3d0d3f0d3b0d390d3d0d3b0d390d3b0d3b867d", "hex"),
+    Buffer.from("01038200800d3a0d3d0d3b0d3b0d3b0d3b0d3b0d3a0d3c0d3b0d3d0d390d3b0d3e0d3c0d3c0d400d3b0d370d3a0d3d0d380d3e0d3d0d3e0d380d3b0d3d0d380d3c0d360d370d380d390d3d0d3f0d3b0d3a0d3c0d3b0d3a0d3e0d3d0d3b0d3c0d3d0d3c0d370d380d390d370d3a0d3c0d3d0d3d0d3a0d3b0d3d0d380d3c0d3a0d3b0d370d37fd67", "hex"),
+    Buffer.from("01038200800d3a0d360d360d3c0d3b0d380d370d3f0d3d0d3d0d390d380d3d0d380d3a0d3d0d3b0d350d3c0d360d3c0d380d3d0d350d370d3e0d350d3b0d3c0d3a0d3d0d380d370d370d3c0d350d3a0d340d380d340d3c0d3a0d390d360d390d370d370d3400001616161616151516161616151516151515141515151516151415151515144f43", "hex"),
+    Buffer.from("010382008014151515151413141414141313141414141300000000000000000000000000000000a2780000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bdbc", "hex"),
+]
 
 const myErrors = [
     "High Temperature Charging (Cells)",
@@ -332,7 +344,19 @@ function decodePacket7(data) {
 
 function decodePacket8(data) {
     const byteArray = new Uint8Array(data);
-    for (let i = 5; i < 100; i = i + 2) {
+    let MaxCounter = 0;
+    switch (hvsModules) {
+        case '2':
+            MaxCounter = 100;
+            break;
+        case '3':
+            MaxCounter = 132;
+            break;
+        case '4':
+            MaxCounter = 132;
+            break;
+    }
+    for (let i = 5; i < MaxCounter; i = i + 2) {
         adapter.log.silly("Battery Voltage-" + pad((i + 29) / 2, 3) + " :" + buf2int16SI(byteArray, i));
         hvsBatteryVoltsperCell[(i + 29) / 2] = buf2int16SI(byteArray, i);
     }
@@ -340,9 +364,49 @@ function decodePacket8(data) {
 
 function decodePacket9(data) {
     const byteArray = new Uint8Array(data);
-    for (let i = 103; i < 127; i++) {
+    let MaxCounterV = 0;
+    let MaxCounterT = 0;
+    switch (hvsModules) {
+        case '2':
+            MaxCounterV = 0;
+            MaxCounterT = 127;
+            break;
+        case '3':
+            MaxCounterV = 36;
+            MaxCounterT = 133;
+            break;
+        case '4':
+            MaxCounterV = 100;
+            MaxCounterT = 133;
+            break;
+    }
+    for (let i = 5; i < MaxCounterV; i = i + 2) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 157) / 2, 3) + " :" + buf2int16SI(byteArray, i));
+        hvsBatteryVoltsperCell[(i + 157) / 2] = buf2int16SI(byteArray, i);
+    }
+    for (let i = 103; i < MaxCounterT; i++) {
         adapter.log.silly("Battery Temp " + pad(i - 102, 3) + " :" + byteArray[i]);
         hvsBatteryTempperCell[i - 102] = byteArray[i];
+    }
+}
+
+function decodePacket10(data) {
+    const byteArray = new Uint8Array(data);
+    let MaxCounterT = 0;
+    switch (hvsModules) {
+        case '2':
+            MaxCounterT = 0;
+            break;
+        case '3':
+            MaxCounterT = 12;
+            break;
+        case '4':
+            MaxCounterT = 23;
+            break;
+    }
+    for (let i = 5; i < MaxCounterT; i++) {
+        adapter.log.silly("Battery Temp " + pad(i + 26, 3) + " :" + byteArray[i]);
+        hvsBatteryTempperCell[i + 26] = byteArray[i];
     }
 }
 
@@ -400,6 +464,8 @@ function setStates() {
     adapter.setState("System.ErrorStr", hvsErrorString);
 
     if (myNumberforDetails == 0) {
+        const maxCellVolts = hvsModules * 32 + 1;
+        const maxCellTemps = hvsModules * 12 + 1;
         adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt);
         adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt);
         adapter.setState("Diagnosis.mVoltMaxCell", hvsMaxmVoltCell);
@@ -407,10 +473,10 @@ function setStates() {
         adapter.setState("Diagnosis.TempMaxCell", hvsMaxTempCell);
         adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell);
 
-        for (let i = 1; i < 65; i++) {
+        for (let i = 1; i < maxCellVolts; i++) {
             adapter.setState("CellDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i]);
         }
-        for (let i = 1; i < 25; i++) {
+        for (let i = 1; i < maxCellTemps; i++) {
             adapter.setState("CellDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i],);
         }
         adapter.log.silly("hvsMaxmVolt     >" + hvsMaxmVolt + "<");
@@ -450,6 +516,7 @@ IPClient.on("data", function (data) {
     setConnected(adapter, true);
     switch (myState) {
         case 2:
+            if (ConfUseTestData) {data = myTestData[0]}
             decodePacket1(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -458,8 +525,8 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 3: //test if it is time for reading all data. If not stop here
+        if (ConfUseTestData) {data = myTestData[1]}
             decodePacket2(data);
-            adapter.log.silly("a: " + myNumberforDetails + " b: " + ConfBatDetailshowoften + " c: " + ConfBatDetails);
             if ((myNumberforDetails < ConfBatDetailshowoften) || (ConfBatDetails == false)) {
                 setStates();
                 IPClient.destroy();
@@ -499,6 +566,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 7:
+            if (ConfUseTestData) {data = myTestData[5]}
             decodePacket7(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -507,6 +575,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 8:
+            if (ConfUseTestData) {data = myTestData[6]}
             decodePacket8(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -515,6 +584,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 9:
+            if (ConfUseTestData) {data = myTestData[7]}
             decodePacket9(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -523,7 +593,8 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 10:
-            decodePacketNOP(data);
+            if (ConfUseTestData) {data = myTestData[8]}
+            decodePacket10(data);
             setStates();
             IPClient.destroy();
             myState = 0;
