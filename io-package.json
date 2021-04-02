@@ -1,144 +1,160 @@
 {
-  "common": {
-    "name": "bydhvs",
-    "version": "0.1.3",
-    "news": {
-      "0.1.3": {
-        "en": "Test Mode for getting hex data easily",
-        "de": "Testmodus zum einfachen Abrufen von Hex-Daten",
-        "ru": "Тестовый режим для легкого получения шестнадцатеричных данных",
-        "pt": "Modo de teste para obter dados hexadecimais facilmente",
-        "nl": "Testmodus om gemakkelijk hexadecimale gegevens te verkrijgen",
-        "fr": "Mode test pour obtenir facilement des données hexadécimales",
-        "it": "Modalità test per ottenere facilmente dati esadecimali",
-        "es": "Modo de prueba para obtener datos hexadecimales fácilmente",
-        "pl": "Tryb testowy do łatwego uzyskiwania danych szesnastkowych",
-        "zh-cn": "测试模式可轻松获取十六进制数据"
+    "common": {
+        "name": "bydhvs",
+        "version": "0.1.4-beta.0",
+        "news": {
+            "0.1.4-beta.0": {
+                "en": "1st change with release-script",
+                "de": "1. Änderung mit Release-Skript",
+                "ru": "1-е изменение с релиз-скриптом",
+                "pt": "1ª alteração com script de lançamento",
+                "nl": "1e wijziging met release-script",
+                "fr": "1er changement avec release-script",
+                "it": "1a modifica con lo script di rilascio",
+                "es": "1er cambio con el script de lanzamiento",
+                "pl": "Pierwsza zmiana ze skryptem wydania",
+                "zh-cn": "发布脚本的第一个变化"
+            },
+            "0.1.3": {
+                "en": "Test Mode for getting hex data easily",
+                "de": "Testmodus zum einfachen Abrufen von Hex-Daten",
+                "ru": "Тестовый режим для легкого получения шестнадцатеричных данных",
+                "pt": "Modo de teste para obter dados hexadecimais facilmente",
+                "nl": "Testmodus om gemakkelijk hexadecimale gegevens te verkrijgen",
+                "fr": "Mode test pour obtenir facilement des données hexadécimales",
+                "it": "Modalità test per ottenere facilmente dati esadecimali",
+                "es": "Modo de prueba para obtener datos hexadecimales fácilmente",
+                "pl": "Tryb testowy do łatwego uzyskiwania danych szesnastkowych",
+                "zh-cn": "测试模式可轻松获取十六进制数据"
+            },
+            "0.1.2": {
+                "en": "voltage is unsigned - should now work",
+                "de": "Spannung ist ohne Vorzeichen - sollte jetzt funktionieren",
+                "ru": "напряжение без знака - теперь должно работать",
+                "pt": "a tensão não está sinalizada - agora deve funcionar",
+                "nl": "spanning is niet ondertekend - zou nu moeten werken",
+                "fr": "la tension n'est pas signée - devrait maintenant fonctionner",
+                "it": "la tensione non è firmata - ora dovrebbe funzionare",
+                "es": "el voltaje no está firmado - ahora debería funcionar",
+                "pl": "napięcie jest niepodpisane - powinno teraz działać",
+                "zh-cn": "电压无符号-现在应该可以工作"
+            },
+            "0.1.1": {
+                "en": "Documentation (only German)",
+                "de": "Dokumentation (nur deutsch)",
+                "ru": "Документация (только на немецком языке)",
+                "pt": "Documentação (somente alemão)",
+                "nl": "Documentatie (alleen Duits)",
+                "fr": "Documentation (uniquement en allemand)",
+                "it": "Documentazione (solo tedesco)",
+                "es": "Documentación (solo en alemán)",
+                "pl": "Dokumentacja (tylko w języku niemieckim)",
+                "zh-cn": "文档（仅德语）"
+            },
+            "0.1.0": {
+                "en": "First release with limited public announcement",
+                "de": "Erste Veröffentlichung mit begrenzter öffentlicher Ankündigung",
+                "ru": "Первый выпуск с ограниченным публичным объявлением",
+                "pt": "Primeiro lançamento com anúncio público limitado",
+                "nl": "Eerste uitgave met beperkte openbare aankondiging",
+                "fr": "Première version avec annonce publique limitée",
+                "it": "Primo rilascio con annuncio pubblico limitato",
+                "es": "Primer lanzamiento con anuncio público limitado",
+                "pl": "Pierwsza wersja z ograniczonym publicznym ogłoszeniem",
+                "zh-cn": "首次发布，并发布了有限的公告"
+            },
+            "0.0.3": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "BYD HVS Battery",
+        "titleLang": {
+            "en": "BYD HVS Battery",
+            "de": "BYD HVS Batterie",
+            "ru": "BYD HVS аккумулятор",
+            "pt": "Bateria BYD HVS",
+            "nl": "BYD HVS-batterij",
+            "fr": "Batterie BYD HVS",
+            "it": "Batteria BYD HVS",
+            "es": "Batería BYD HVS",
+            "pl": "Akumulator BYD HVS",
+            "zh-cn": "比亚迪HVS电池"
+        },
+        "desc": {
+            "en": "BYD HVS Battery poll data",
+            "de": "BYD HVS Batterieabfragedaten",
+            "ru": "BYD HVS Данные опроса аккумулятора",
+            "pt": "Dados de sondagem da bateria BYD HVS",
+            "nl": "BYD HVS Battery poll-gegevens",
+            "fr": "BYD HVS Battery poll data",
+            "it": "BYD HVS Dati di polling della batteria",
+            "es": "Datos de sondeo de la batería BYD HVS",
+            "pl": "Dane ankietowe dotyczące baterii BYD HVS",
+            "zh-cn": "比亚迪HVS电池民意调查数据"
+        },
+        "authors": [
+            "Christian <github@familie-herrmann.de>"
+        ],
+        "keywords": [
+            "byd hvs battery pv"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "bydhvs.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/ChristianH17/ioBroker.bydhvs/master/admin/bydhvs.png",
+        "readme": "https://github.com/ChristianH17/ioBroker.bydhvs/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "energy",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "poll",
+        "materialize": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ]
     },
-      "0.1.2": {
-        "en": "voltage is unsigned - should now work",
-        "de": "Spannung ist ohne Vorzeichen - sollte jetzt funktionieren",
-        "ru": "напряжение без знака - теперь должно работать",
-        "pt": "a tensão não está sinalizada - agora deve funcionar",
-        "nl": "spanning is niet ondertekend - zou nu moeten werken",
-        "fr": "la tension n'est pas signée - devrait maintenant fonctionner",
-        "it": "la tensione non è firmata - ora dovrebbe funzionare",
-        "es": "el voltaje no está firmado - ahora debería funcionar",
-        "pl": "napięcie jest niepodpisane - powinno teraz działać",
-        "zh-cn": "电压无符号-现在应该可以工作"
+    "native": {
+        "ConfPollInterval": "60",
+        "ConfIPAdress": "192.168.16.254",
+        "ConfDetailshowoften": 60,
+        "pingInterval": 15000
     },
-      "0.1.1": {
-          "en": "Documentation (only German)",
-          "de": "Dokumentation (nur deutsch)",
-          "ru": "Документация (только на немецком языке)",
-          "pt": "Documentação (somente alemão)",
-          "nl": "Documentatie (alleen Duits)",
-          "fr": "Documentation (uniquement en allemand)",
-          "it": "Documentazione (solo tedesco)",
-          "es": "Documentación (solo en alemán)",
-          "pl": "Dokumentacja (tylko w języku niemieckim)",
-          "zh-cn": "文档（仅德语）"
-      },
-      "0.1.0": {
-        "en": "First release with limited public announcement",
-        "de": "Erste Veröffentlichung mit begrenzter öffentlicher Ankündigung",
-        "ru": "Первый выпуск с ограниченным публичным объявлением",
-        "pt": "Primeiro lançamento com anúncio público limitado",
-        "nl": "Eerste uitgave met beperkte openbare aankondiging",
-        "fr": "Première version avec annonce publique limitée",
-        "it": "Primo rilascio con annuncio pubblico limitato",
-        "es": "Primer lanzamiento con anuncio público limitado",
-        "pl": "Pierwsza wersja z ograniczonym publicznym ogłoszeniem",
-        "zh-cn": "首次发布，并发布了有限的公告"
-      },
-      "0.0.3": {
-        "en": "initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Начальная версия",
-        "pt": "lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "zh-cn": "首次出版"
-      }
-    },
-    "title": "BYD HVS Battery",
-    "titleLang": {
-      "en": "BYD HVS Battery",
-      "de": "BYD HVS Batterie",
-      "ru": "BYD HVS аккумулятор",
-      "pt": "Bateria BYD HVS",
-      "nl": "BYD HVS-batterij",
-      "fr": "Batterie BYD HVS",
-      "it": "Batteria BYD HVS",
-      "es": "Batería BYD HVS",
-      "pl": "Akumulator BYD HVS",
-      "zh-cn": "比亚迪HVS电池"
-    },
-    "desc": {
-      "en": "BYD HVS Battery poll data",
-      "de": "BYD HVS Batterieabfragedaten",
-      "ru": "BYD HVS Данные опроса аккумулятора",
-      "pt": "Dados de sondagem da bateria BYD HVS",
-      "nl": "BYD HVS Battery poll-gegevens",
-      "fr": "BYD HVS Battery poll data",
-      "it": "BYD HVS Dati di polling della batteria",
-      "es": "Datos de sondeo de la batería BYD HVS",
-      "pl": "Dane ankietowe dotyczące baterii BYD HVS",
-      "zh-cn": "比亚迪HVS电池民意调查数据"
-    },
-    "authors": ["Christian <github@familie-herrmann.de>"],
-    "keywords": ["byd hvs battery pv"],
-    "license": "MIT",
-    "platform": "Javascript/Node.js",
-    "main": "main.js",
-    "icon": "bydhvs.png",
-    "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/ChristianH17/ioBroker.bydhvs/master/admin/bydhvs.png",
-    "readme": "https://github.com/ChristianH17/ioBroker.bydhvs/blob/master/README.md",
-    "loglevel": "info",
-    "mode": "daemon",
-    "type": "energy",
-    "compact": true,
-    "connectionType": "local",
-    "dataSource": "poll",
-    "materialize": true,
-    "dependencies": [
-      {
-        "js-controller": ">=2.0.0"
-      }
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
     ]
-  },
-  "native": {
-    "ConfPollInterval": "60",
-    "ConfIPAdress": "192.168.16.254",
-    "ConfDetailshowoften": 60,
-    "pingInterval": 15000
-  },
-  "objects": [],
-  "instanceObjects": [
-    {
-      "_id": "info",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.connection",
-      "type": "state",
-      "common": {
-        "role": "indicator.connected",
-        "name": "Device or service connected",
-        "type": "boolean",
-        "read": true,
-        "write": false,
-        "def": false
-      },
-      "native": {}
-    }
-  ]
 }
