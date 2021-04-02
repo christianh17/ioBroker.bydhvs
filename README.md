@@ -24,6 +24,10 @@ Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die
 
 
 ## Changelog
+<!--
+	Placeholder for the next version (at the beginning of the line):
+	### __WORK IN PROGRESS__
+-->
 ### 0.1.3
 - Test Mode for getting hex data easily, removed check for 2 modules, moved "diagnosis-states" to extra folder, renaming CellStates
 ### 0.1.2
