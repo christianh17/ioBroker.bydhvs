@@ -1,6 +1,4 @@
 version: 2
-registries:
-  *:
   token: ${{secrets.DEPENDABOT_SECRET}}
 updates:
 - package-ecosystem: npm
