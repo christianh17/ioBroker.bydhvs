@@ -28,6 +28,9 @@ Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* Update all dependencies
+* first public version
 ### 0.1.4-beta.0 (2021-04-02)
 * 1st change with release-script
 ### 0.1.3
