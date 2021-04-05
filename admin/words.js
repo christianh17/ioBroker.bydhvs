@@ -39,17 +39,17 @@ systemDictionary = {
         "pl": "Adres IP",
         "zh-cn": "IP地址"
     },
-    "Diagnosis Data from Battery (only tested with two modules)": {
-        "en": "Diagnosis Data from Battery (only tested with two modules)",
-        "de": "Diagnosedaten von der Batterie (nur mit zwei Modulen getestet)",
-        "ru": "Данные диагностики от аккумулятора (проверено только с двумя модулями)",
-        "pt": "Dados de diagnóstico da bateria (testado apenas com dois módulos)",
-        "nl": "Diagnosegegevens van batterij (alleen getest met twee modules)",
-        "fr": "Données de diagnostic de la batterie (testées uniquement avec deux modules)",
-        "it": "Dati di diagnosi dalla batteria (testato solo con due moduli)",
-        "es": "Datos de diagnóstico de la batería (solo probado con dos módulos)",
-        "pl": "Dane diagnostyczne z akumulatora (testowane tylko z dwoma modułami)",
-        "zh-cn": "来自电池的诊断数据（仅在两个模块上进行了测试）"
+    "Diagnosis Data from Battery (only tested with two and four modules)": {
+        "en": "Diagnosis Data from Battery (only tested with two and four modules)",
+        "de": "Diagnosedaten von der Batterie (nur mit zwei und vier Modulen getestet)",
+        "ru": "Данные диагностики от аккумулятора (проверено только с двумя и четырьмя модулями)",
+        "pt": "Dados de diagnóstico da bateria (testado apenas com dois e quatro módulos)",
+        "nl": "Diagnosegegevens van batterij (alleen getest met twee en vier modules)",
+        "fr": "Données de diagnostic de la batterie (testées uniquement avec deux et quatre modules)",
+        "it": "Dati di diagnosi dalla batteria (testato solo con due e quattro moduli)",
+        "es": "Datos de diagnóstico de la batería (solo probado con dos y cuatro módulos)",
+        "pl": "Dane diagnostyczne z akumulatora (testowane tylko z dwoma i czterema modułami)",
+        "zh-cn": "来自电池的诊断数据（仅使用两个和四个模块进行了测试）"
       },
 
     "Test Mode - show data in error log": {

@@ -20,7 +20,7 @@ Batterie-Details: Steuerung, ob die Details zu den Zellen gelesen werden sollen
 
 Lesezyklen zu Batterie-Details: Anzahl der "Normal-Lese-Zyklen" bis wieder einmal die Diagnose-Daten gelesen werden. Hier die Warnung dazu: Ich habe keine Idee ob man sich durch häufige Diagnose-Messungen Nachteile einhandelt, daher empfehle ich den Wert möglichst hoch zu setzen. Ich wüsste auch nicht was man mit den Diagnose-Daten im regelmäßigen Poll anfangen sollte.
 
-Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die Daten für größere Anlagen! Das Einzige was ich dafür benötige ist ein Wireshark-Mittschnitt des Datenverkehrs und einen Screenshot aus der BYD-App (Be-Connect).
+Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die Daten für größere Anlagen! Zusätzlich hat ein netter User mir Daten aus seiner Kommunikation mit einer 4-Block-Batterie zur Verfügung gestellt. Insofern sind die beiden Größen getestet. Für andere Kombinationen: Das Einzige was ich dafür benötige ist ein Wireshark-Mittschnitt des Datenverkehrs und einen Screenshot aus der BYD-App (Be-Connect).
 
 
 ## Changelog
