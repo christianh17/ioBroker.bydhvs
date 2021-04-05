@@ -28,7 +28,7 @@ Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 1.0.0 (2021-04-05)
 * Update all dependencies
 * first public version
 ### 0.1.4-beta.0 (2021-04-02)
@@ -39,8 +39,6 @@ Ich habe selber nur eine Box mit zwei Batterie-Blöcken. Ich erweitere gerne die
 - Battery Voltage is unsigned, should now work with 4 modules
 ### 0.1.1
 - start of documentation (German)
-### 0.1.0
-- (Christian) first testing release with (limited) public announcement
 ###
 
 ## License

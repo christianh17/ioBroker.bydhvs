@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "0.1.4-beta.0",
+        "version": "1.0.0",
         "news": {
+            "1.0.0": {
+                "en": "Update all dependencies\nfirst public version",
+                "de": "Aktualisieren Sie alle Abhängigkeiten\nerste öffentliche Version",
+                "ru": "Обновите все зависимости\nпервая публичная версия",
+                "pt": "Atualize todas as dependências\nprimeira versão pública",
+                "nl": "Werk alle afhankelijkheden bij\neerste openbare versie",
+                "fr": "Mettre à jour toutes les dépendances\npremière version publique",
+                "it": "Aggiorna tutte le dipendenze\nprima versione pubblica",
+                "es": "Actualizar todas las dependencias\nprimera versión pública",
+                "pl": "Zaktualizuj wszystkie zależności\npierwsza publiczna wersja",
+                "zh-cn": "更新所有依赖项\n首次公开发行"
+            },
             "0.1.4-beta.0": {
                 "en": "1st change with release-script",
                 "de": "1. Änderung mit Release-Skript",
