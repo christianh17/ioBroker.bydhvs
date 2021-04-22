@@ -58,6 +58,8 @@ let FirstRun;
 /** @type {string} */
 let hvsSerial;
 let hvsBMU;
+let hvsBMUA;
+let hvsBMUB;
 let hvsBMS;
 let hvsGrid;
 let hvsErrorString;
@@ -65,7 +67,6 @@ let hvsParamT;
 
 /** @type {boolean} */
 let ConfBatDetails;
-const ConfUseTestData = false;
 
 /*const myStates = [
     "no state",
@@ -82,29 +83,25 @@ let idInterval1;
 
 
 const myRequests = [
-    Buffer.from("010300000066c5e0", "hex"),
-    Buffer.from("01030500001984cc", "hex"),
-    Buffer.from("010300100003040e", "hex"),
-    Buffer.from("0110055000020400018100f853", "hex"),
-    Buffer.from("010305510001d517", "hex"),
-    Buffer.from("01030558004104e5", "hex"),
-    Buffer.from("01030558004104e5", "hex"),
-    Buffer.from("01030558004104e5", "hex"),
-    Buffer.from("01030558004104e5", "hex"),
+    Buffer.from("010300000066c5e0", "hex"), //0
+    Buffer.from("01030500001984cc", "hex"), //1
+    Buffer.from("010300100003040e", "hex"), //2
+    Buffer.from("0110055000020400018100f853", "hex"), //3
+    Buffer.from("010305510001d517", "hex"), //4
+    Buffer.from("01030558004104e5", "hex"), //5
+    Buffer.from("01030558004104e5", "hex"), //6
+    Buffer.from("01030558004104e5", "hex"), //7
+    Buffer.from("01030558004104e5", "hex"), //8
 ];
 
-const myTestData = [ //Testdaten von 4 Modulen Seriennummern sind auf 0 gesetzt (2 mal enthalten), CRC ist bei den verfälschten Paketen neu gerechnet
-    Buffer.from("0103cc503030303030303030303030303030303030307878787878030f030f031601000314020101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000015031c0e080cF740", "hex"),
-    Buffer.from("01033200640153015200640000a94c0016001300140000030f00040000000007020004aa6e15f9000011560000000207020000042c31de", "hex"),
-    Buffer.from("01030603140201010040ad", "hex"),
-    Buffer.from("0110055000024115", "hex"),
-    Buffer.from("01030288011f84", "hex"),
-    Buffer.from("01038200800d400d34217600160013012a0000000000000000000000000000000095760008c59c0006000001ea10ee00000018110b03e8006400000004000000001603150300005030303030303030303030303030303030303078787878780207020700000d3f0d3c0d3b0d3c0d3e0d3c0d3a0d3d0d3f0d3b0d390d3d0d3b0d390d3b0d3b867d", "hex"),
-    Buffer.from("01038200800d3a0d3d0d3b0d3b0d3b0d3b0d3b0d3a0d3c0d3b0d3d0d390d3b0d3e0d3c0d3c0d400d3b0d370d3a0d3d0d380d3e0d3d0d3e0d380d3b0d3d0d380d3c0d360d370d380d390d3d0d3f0d3b0d3a0d3c0d3b0d3a0d3e0d3d0d3b0d3c0d3d0d3c0d370d380d390d370d3a0d3c0d3d0d3d0d3a0d3b0d3d0d380d3c0d3a0d3b0d370d37fd67", "hex"),
-    Buffer.from("01038200800d3a0d360d360d3c0d3b0d380d370d3f0d3d0d3d0d390d380d3d0d380d3a0d3d0d3b0d350d3c0d360d3c0d380d3d0d350d370d3e0d350d3b0d3c0d3a0d3d0d380d370d370d3c0d350d3a0d340d380d340d3c0d3a0d390d360d390d370d370d3400001616161616151516161616151516151515141515151516151415151515144f43", "hex"),
-    Buffer.from("010382008014151515151413141414141313141414141300000000000000000000000000000000a2780000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bdbc", "hex"),
-]
 
+/* Während des Updates des BMS funktioniert das Auslesen offensichtlich nicht, hier die Antworten des Speichers (Seriennummer verfälscht und CRC des ersten Paketes nicht neu berechnet)
+0103cc503030303030303030303030303030303030307878787878030d030f031401000312020101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000015040c12382b82b2
+0103320043014a014a0063fff852a80015001400140000030f0000000000000902000252761703000013840000000209020000042c925b
+010306031202010100c8ad
+0190044dc3 <- Das scheint eine Fehlercondition zu sein.
+5 min. später klappte es wieder und dann war auch die neue F/W-Version in der Antwort enthalten
+*/
 const myErrors = [
     "High Temperature Charging (Cells)",
     "Low Temperature Charging (Cells)",
@@ -169,10 +166,11 @@ function setObjectsCells(ModuleCount) {
                 role: "",
                 read: true,
                 write: false,
-                unit: ""
+                unit: "mV"
             },
             native: {}
         });
+        checkandrepairUnit("CellDetails.CellVolt" + pad(i, 3), "mV"); //repair forgotten units in first version
     }
     for (let i = 1; i < maxCellTemps; i++) {
         adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
@@ -183,10 +181,11 @@ function setObjectsCells(ModuleCount) {
                 role: "",
                 read: true,
                 write: false,
-                unit: ""
+                unit: "°C"
             },
             native: {}
         });
+        checkandrepairUnit("CellDetails.CellTemp" + pad(i, 3), "°C"); //repair forgotten units in first version
 
     }
 }
@@ -197,24 +196,29 @@ function setObjects() {
         ["System.Serial", "state", "Serial number", "string", "", true, false, ""],
         ["System.BMU", "state", "F/W BMU", "string", "", true, false, ""],
         ["System.BMS", "state", "F/W BMS", "string", "", true, false, ""],
+        ["System.BMUBankA", "state", "F/W BMU-BankA", "string", "", true, false, ""],
+        ["System.BMUBankB", "state", "F/W BMU-BankB", "string", "", true, false, ""],
         ["System.Modules", "state", "modules (count)", "number", "", true, false, ""],
         ["System.Grid", "state", "Parameter Table", "string", "", true, false, ""],
         ["System.ParamT", "state", "F/W BMU", "string", "", true, false, ""],
-        ["State.SOC", "state", "SOC", "number", "", true, false, ""],
-        ["State.VoltMax", "state", "Max Cell Voltage", "number", "", true, false, ""],
-        ["State.VoltMin", "state", "Min Cell Voltage", "number", "", true, false, ""],
-        ["State.Current", "state", "Charge / Discharge Current", "number", "", true, false, ""],
-        ["State.VoltBatt", "state", "Battery Voltage", "number", "", true, false, ""],
-        ["State.TempMax", "state", "Max Cell Temp", "number", "", true, false, ""],
-        ["State.TempMin", "state", "Min Cell Temp", "number", "", true, false, ""],
-        ["State.VoltDiff", "state", "Max - Min Cell Voltage", "number", "", true, false, ""],
-        ["State.Power", "state", "Power", "number", "", true, false, ""],
-        ["State.TempBatt", "state", "Battery Temperature", "number", "", true, false, ""],
-        ["State.VoltOut", "state", "Output Voltage", "number", "", true, false, ""],
-        ["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""],
+        ["State.SOC", "state", "SOC", "number", "", true, false, "%"],
+        ["State.VoltMax", "state", "Max Cell Voltage", "number", "", true, false, "V"],
+        ["State.VoltMin", "state", "Min Cell Voltage", "number", "", true, false, "V"],
+        ["State.Current", "state", "Charge / Discharge Current", "number", "", true, false, "A"],
+        ["State.Power_Consumption", "state", "Discharge Power", "number", "", true, false, "W"],
+        ["State.Power_Delivery", "state", "Charge Power", "number", "", true, false, "W"],
+        ["State.VoltBatt", "state", "Battery Voltage", "number", "", true, false, "V"],
+        ["State.TempMax", "state", "Max Cell Temp", "number", "", true, false, "°C"],
+        ["State.TempMin", "state", "Min Cell Temp", "number", "", true, false, "°C"],
+        ["State.VoltDiff", "state", "Max - Min Cell Voltage", "number", "", true, false, "V"],
+        ["State.Power", "state", "Power", "number", "", true, false, "W"],
+        ["State.TempBatt", "state", "Battery Temperature", "number", "", true, false, "°C"],
+        ["State.VoltOut", "state", "Output Voltage", "number", "", true, false, "V"],
+        ["System.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""],
+        //["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""], // ERROR ERROR ERROR
         ["System.ErrorStr", "state", "Error (string)", "string", "", true, false, ""],
-        ["Diagnosis.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "", true, false, ""],
-        ["Diagnosis.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "", true, false, ""],
+        ["Diagnosis.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "", true, false, "mV"],
+        ["Diagnosis.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "", true, false, "mV"],
         ["Diagnosis.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "", true, false, ""],
         ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "", true, false, ""],
         ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "", true, false, ""],
@@ -230,10 +234,56 @@ function setObjects() {
                 role: myObjects[i][4],
                 read: myObjects[i][5],
                 write: myObjects[i][6],
-                unit: myObjects[i][7],
+                unit: myObjects[i][7], //works only for new objects, so check later for existing objects
             },
             native: {}
         });
+    }
+    //repair forgotten units in first version
+    for (let i = 0; i < myObjects.length; i++) {
+        //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
+        if (myObjects[i][7] != "") { //unit is not empty
+            checkandrepairUnit(myObjects[i][0], myObjects[i][7]);
+        }
+    }
+
+    /*    setTimeout(() => {
+            adapter.log.error("deleting State State.ErrorNum");
+            adapter.deleteState("State.ErrorNum", "", function (err, obj) {
+                adapter.log.error("callback deletestate called: " + err + " " + obj);
+            });
+        }, 4000);*/
+    changeErrorNum(); //not a really good idea but I do not know how to delete
+
+}
+
+async function changeErrorNum() {
+    //want to test and understand async and await, so it's introduced here.
+    //check for forgotten unit in first version and if it's missing add unit.
+    try {
+        const obj = await adapter.getObjectAsync("State.ErrorNum");
+        adapter.extendObject("State.ErrorNum", { common: { type: "string", name: "deprecated" } });
+        setTimeout(() => {
+            adapter.setState("State.ErrorNum", "moved to System.ErrorNum");
+        }, 4000);
+    }
+    catch (err) {
+        //dann eben nicht.
+    }
+}
+
+
+async function checkandrepairUnit(id, NewUnit) {
+    //want to test and understand async and await, so it's introduced here.
+    //check for forgotten unit in first version and if it's missing add unit.
+    try {
+        const obj = await adapter.getObjectAsync(id);
+        if (obj.common.unit != NewUnit) {
+            adapter.extendObject(id, { common: { unit: NewUnit } });
+        }
+    }
+    catch (err) {
+        //dann eben nicht.
     }
 }
 
@@ -278,7 +328,13 @@ function decodePacket1(data) {
     for (let i = 3; i < 22; i++) {
         hvsSerial += String.fromCharCode(byteArray[i]);
     }
-    hvsBMU = "V" + byteArray[29].toString() + "." + byteArray[30].toString() + "-" + String.fromCharCode(byteArray[33] + 65);
+    hvsBMUA = "V" + byteArray[27].toString() + "." + byteArray[28].toString();
+    hvsBMUB = "V" + byteArray[29].toString() + "." + byteArray[30].toString();
+    if (byteArray[33] === 0) {
+        hvsBMU = hvsBMUA + "-A";
+    } else {
+        hvsBMU = hvsBMUB + "-B";
+    }
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
     hvsModules = (byteArray[36] - 16).toString();
     if (byteArray[38] === 1) {
@@ -288,6 +344,7 @@ function decodePacket1(data) {
     }
     if (ConfBatDetails && FirstRun) {
         FirstRun = false;
+        console.log("decodePacket1 + firstrun " + FirstRun + " modules " + hvsModules);
         setObjectsCells(hvsModules);
     }
     /*    if ((ConfBatDetails) && (hvsModules > 2)) {
@@ -346,13 +403,16 @@ function decodePacket8(data) {
     const byteArray = new Uint8Array(data);
     let MaxCounter = 0;
     switch (hvsModules) {
-        case '2':
+        case "2":
             MaxCounter = 100;
             break;
-        case '3':
+        case "3":
             MaxCounter = 132;
             break;
-        case '4':
+        case "4":
+            MaxCounter = 132;
+            break;
+        case "5":
             MaxCounter = 132;
             break;
     }
@@ -367,15 +427,19 @@ function decodePacket9(data) {
     let MaxCounterV = 0;
     let MaxCounterT = 0;
     switch (hvsModules) {
-        case '2':
+        case "2":
             MaxCounterV = 0;
             MaxCounterT = 127;
             break;
-        case '3':
+        case "3":
             MaxCounterV = 36;
             MaxCounterT = 133;
             break;
-        case '4':
+        case "4":
+            MaxCounterV = 100;
+            MaxCounterT = 133;
+            break;
+        case "5":
             MaxCounterV = 100;
             MaxCounterT = 133;
             break;
@@ -403,6 +467,9 @@ function decodePacket10(data) {
         case '4':
             MaxCounterT = 23;
             break;
+        case '5':
+            MaxCounterT = 35;
+            break;
     }
     for (let i = 5; i < MaxCounterT; i++) {
         adapter.log.silly("Battery Temp " + pad(i + 26, 3) + " :" + byteArray[i]);
@@ -425,6 +492,8 @@ function setStates() {
 
     adapter.log.silly("hvsSerial       >" + hvsSerial + "<");
     adapter.log.silly("hvsBMU          >" + hvsBMU + "<");
+    adapter.log.silly("hvsBMUA         >" + hvsBMUA + "<");
+    adapter.log.silly("hvsBMUB         >" + hvsBMUB + "<");
     adapter.log.silly("hvsBMS          >" + hvsBMS + "<");
     adapter.log.silly("hvsModules      >" + hvsModules + "<");
     adapter.log.silly("hvsGrid         >" + hvsGrid + "<");
@@ -445,6 +514,8 @@ function setStates() {
 
     adapter.setState("System.Serial", hvsSerial);
     adapter.setState("System.BMU", hvsBMU);
+    adapter.setState("System.BMUBankA", hvsBMUA);
+    adapter.setState("System.BMUBankB", hvsBMUB);
     adapter.setState("System.BMS", hvsBMS);
     adapter.setState("System.Modules", hvsModules);
     adapter.setState("System.Grid", hvsGrid);
@@ -460,8 +531,15 @@ function setStates() {
     adapter.setState("System.ParamT", hvsParamT);
     adapter.setState("State.TempBatt", hvsBatTemp);
     adapter.setState("State.VoltOut", hvsOutVolt);
-    adapter.setState("State.ErrorNum", hvsError);
+    adapter.setState("System.ErrorNum", hvsError);
     adapter.setState("System.ErrorStr", hvsErrorString);
+    if (hvsPower >= 0) {
+        adapter.setState("State.Power_Consumption", hvsPower);
+        adapter.setState("State.Power_Delivery", 0);
+    } else {
+        adapter.setState("State.Power_Consumption", 0);
+        adapter.setState("State.Power_Delivery", -hvsPower);
+    }
 
     if (myNumberforDetails == 0) {
         const maxCellVolts = hvsModules * 32 + 1;
@@ -516,7 +594,6 @@ IPClient.on("data", function (data) {
     setConnected(adapter, true);
     switch (myState) {
         case 2:
-            if (ConfUseTestData) {data = myTestData[0]}
             decodePacket1(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -525,7 +602,6 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 3: //test if it is time for reading all data. If not stop here
-        if (ConfUseTestData) {data = myTestData[1]}
             decodePacket2(data);
             if ((myNumberforDetails < ConfBatDetailshowoften) || (ConfBatDetails == false)) {
                 setStates();
@@ -566,7 +642,6 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 7:
-            if (ConfUseTestData) {data = myTestData[5]}
             decodePacket7(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -575,7 +650,6 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 8:
-            if (ConfUseTestData) {data = myTestData[6]}
             decodePacket8(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -584,7 +658,6 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 9:
-            if (ConfUseTestData) {data = myTestData[7]}
             decodePacket9(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -593,7 +666,6 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 10:
-            if (ConfUseTestData) {data = myTestData[8]}
             decodePacket10(data);
             setStates();
             IPClient.destroy();
