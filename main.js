@@ -48,6 +48,10 @@ let hvsError;
 let hvsModules;
 let hvsDiffVolt;
 let hvsPower;
+let hvsBattType;
+let hvsInvType;
+let hvsNumCells; //number of cells in system
+let hvsNumTemps; // number of temperatures to count with
 let ConfBatDetailshowoften;
 let confBatPollTime;
 let myNumberforDetails;
@@ -120,6 +124,38 @@ const myErrors = [
     "High Temperature Discharging (Cells)",
     "Low Temperature Discharging (Cells)"
 ];
+
+const myINVs = [
+    "Fronius HV",
+    "Goodwe HV",
+    "Fronius HV",
+    "Kostal HV",
+    "Goodwe HV",
+    "SMA SBS3.7/5.0",
+    "Kostal HV",
+    "SMA SBS3.7/5.0",
+    "Sungrow HV",
+    "Sungrow HV",
+    "Kaco HV",
+    "Kaco HV",
+    "Ingeteam HV",
+    "Ingeteam HV",
+    "SMA SBS 2.5 HV",
+    "",
+    "SMA SBS 2.5 HV",
+    "Fronius HV"
+];
+
+const myBattTypes = [
+    "HVL",
+    "HVM",
+    "HVS"
+]
+/* HVM: 16 cells per module
+   HVS: 32 cells per module
+   HVL: unknown so I count 0 cells per module
+*/
+
 /**
  * Starts the adapter instance
  * @param {Partial<utils.AdapterOptions>} [options]
@@ -201,6 +237,8 @@ function setObjects() {
         ["System.Modules", "state", "modules (count)", "number", "", true, false, ""],
         ["System.Grid", "state", "Parameter Table", "string", "", true, false, ""],
         ["System.ParamT", "state", "F/W BMU", "string", "", true, false, ""],
+        ["System.BattType", "state", "Battery Type", "string", "", true, false, ""],
+        ["System.InvType", "state", "Inverter Type", "string", "", true, false, ""],
         ["State.SOC", "state", "SOC", "number", "", true, false, "%"],
         ["State.VoltMax", "state", "Max Cell Voltage", "number", "", true, false, "V"],
         ["State.VoltMin", "state", "Min Cell Voltage", "number", "", true, false, "V"],
@@ -253,13 +291,12 @@ function setObjects() {
                 adapter.log.error("callback deletestate called: " + err + " " + obj);
             });
         }, 4000);*/
-    changeErrorNum(); //not a really good idea but I do not know how to delete
+    //changeErrorNum(); //not a really good idea but I do not know how to delete -- did not work :-(
 
 }
 
-async function changeErrorNum() {
-    //want to test and understand async and await, so it's introduced here.
-    //check for forgotten unit in first version and if it's missing add unit.
+/*async function changeErrorNum() {
+  //did not work, this part created a state with "getObjectAsync"
     try {
         const obj = await adapter.getObjectAsync("State.ErrorNum");
         adapter.extendObject("State.ErrorNum", { common: { type: "string", name: "deprecated" } });
@@ -270,7 +307,7 @@ async function changeErrorNum() {
     catch (err) {
         //dann eben nicht.
     }
-}
+}*/
 
 
 async function checkandrepairUnit(id, NewUnit) {
@@ -336,7 +373,7 @@ function decodePacket1(data) {
         hvsBMU = hvsBMUB + "-B";
     }
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
-    hvsModules = (byteArray[36] - 16).toString();
+    hvsModules = parseInt((byteArray[36] - 16).toString());
     if (byteArray[38] === 1) {
         hvsGrid = "OnGrid";
     } else {
@@ -356,18 +393,18 @@ function decodePacket1(data) {
 function decodePacket2(data) {
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16SI(byteArray, 3);
-    hvsMaxVolt = (buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2);
-    hvsMinVolt = (buf2int16SI(byteArray, 7) * 1.0 / 100.0).toFixed(2);
-    hvsA = (buf2int16SI(byteArray, 11) * 1.0 / 10.0).toFixed(1);
-    hvsBattVolt = (buf2int16US(byteArray, 13) * 1.0 / 100.0).toFixed(1);
+    hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2));
+    hvsMinVolt = parseFloat((buf2int16SI(byteArray, 7) * 1.0 / 100.0).toFixed(2));
+    hvsA = parseFloat((buf2int16SI(byteArray, 11) * 1.0 / 10.0).toFixed(1));
+    hvsBattVolt = parseFloat((buf2int16US(byteArray, 13) * 1.0 / 100.0).toFixed(1));
     hvsMaxTemp = buf2int16SI(byteArray, 15);
     hvsMinTemp = buf2int16SI(byteArray, 17);
     hvsBatTemp = buf2int16SI(byteArray, 19);
     hvsError = buf2int16SI(byteArray, 29);
     hvsParamT = byteArray[31].toString() + "." + byteArray[32].toString();
-    hvsOutVolt = (buf2int16US(byteArray, 35) * 1.0 / 100.0).toFixed(1);
-    hvsPower = (parseFloat(hvsA) * parseFloat(hvsOutVolt)).toFixed(2);
-    hvsDiffVolt = (parseFloat(hvsMaxVolt) - parseFloat(hvsMinVolt)).toFixed(2);
+    hvsOutVolt = parseFloat((buf2int16US(byteArray, 35) * 1.0 / 100.0).toFixed(1));
+    hvsPower = hvsA * hvsOutVolt;
+    hvsDiffVolt = Math.round((hvsMaxVolt - hvsMinVolt) * 100) / 100;
     hvsErrorString = "";
     //        hvsError = 65535;
     for (let j = 0; j < 16; j++) {
@@ -385,7 +422,39 @@ function decodePacketNOP(data) {
     adapter.log.silly("Packet NOP");
 }
 
-function decodePacket7(data) {
+function decodePacket3(data) {
+    const byteArray = new Uint8Array(data);
+    hvsBattType = byteArray[5];
+    hvsInvType = byteArray[3];
+    hvsNumCells = 0;
+    hvsNumTemps = 0;
+    switch (hvsBattType) {
+        case 0: //HVL -> unknown specification, so 0 cells and 0 temps
+            //hvsNumCells = 0;
+            //hvsNumTemps = 0;
+            //see above, is default
+            break;
+        case 1: //HVM 16 Cells per module
+            hvsNumCells = hvsModules * 16;
+            hvsNumTemps = hvsModules * 8;
+            break;
+        //crosscheck
+        // 5 modules, 80 voltages, 40 temps
+        case 2: //HVS 32 cells per module
+            hvsNumCells = hvsModules * 32;
+            hvsNumTemps = hvsModules * 12;
+            break;
+        //crosscheck:
+        //Counts from real data: 
+        //mine: 2 modules, 64 voltages, 24 temps
+        //4 modules, 128 voltages, 48 temps
+    }
+    if (hvsNumCells > 128) { hvsNumCells = 128 }
+    if (hvsNumTemps > 60) { hvsNumTemps = 60 }
+}
+
+
+function decodePacket6(data) {
     const byteArray = new Uint8Array(data);
     hvsMaxmVolt = buf2int16SI(byteArray, 5);
     hvsMinmVolt = buf2int16SI(byteArray, 7);
@@ -393,87 +462,63 @@ function decodePacket7(data) {
     hvsMinmVoltCell = byteArray[10];
     hvsMaxTempCell = byteArray[15];
     hvsMinTempCell = byteArray[16];
-    for (let i = 101; i < 132; i = i + 2) {
-        adapter.log.silly("Battery Voltage-" + pad((i - 99) / 2, 3) + " :" + buf2int16SI(byteArray, i));
-        hvsBatteryVoltsperCell[(i - 99) / 2] = buf2int16SI(byteArray, i);
+
+    //starting with byte 101, ending with 131, Cell voltage 1-16 
+    let MaxCells = 16
+    for (let i = 0; i < MaxCells; i++) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 1), 3) + " :" + buf2int16SI(byteArray, i * 2 + 101));
+        hvsBatteryVoltsperCell[i + 1] = buf2int16SI(byteArray, i * 2 + 101);
+    }
+}
+
+function decodePacket7(data) {
+    const byteArray = new Uint8Array(data);
+    // e.g. hvsNumCells = 80
+    // first Voltage in byte 5+6
+    // Count = 80-17 --> 63
+    let MaxCells = hvsNumCells - 17; //0 to n-1 is the same like 1 to n
+    if (MaxCells > 64) { MaxCells = 64 }
+    for (let i = 0; i < MaxCells; i++) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 17), 3) + " :" + buf2int16SI(byteArray, i * 2 + 5));
+        hvsBatteryVoltsperCell[i + 17] = buf2int16SI(byteArray, i * 2 + 5);
     }
 }
 
 function decodePacket8(data) {
     const byteArray = new Uint8Array(data);
-    let MaxCounter = 0;
-    switch (hvsModules) {
-        case "2":
-            MaxCounter = 100;
-            break;
-        case "3":
-            MaxCounter = 132;
-            break;
-        case "4":
-            MaxCounter = 132;
-            break;
-        case "5":
-            MaxCounter = 132;
-            break;
+    let MaxCounterV = 0;
+    let MaxCounterT = 0;
+    //starting with byte 5, ending 101, voltage for cell 81 to 128
+    //starting with byte 103, ending 132, temp for cell 1 to 30
+
+    // e.g. hvsNumCells = 128
+    // first Voltage in byte 5+6
+    // Count = 128-80 --> 48
+    let MaxCells = hvsNumCells - 80; //0 to n-1 is the same like 1 to n
+    if (MaxCells > 48) { MaxCells = 48 }
+    adapter.log.silly("hvsModules =" + hvsModules + " maxCells= " + MaxCells);
+    for (let i = 0; i < MaxCells; i++) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 81), 3) + " :" + buf2int16SI(byteArray, i * 2 + 5));
+        hvsBatteryVoltsperCell[i + 81] = buf2int16SI(byteArray, i * 2 + 5);
     }
-    for (let i = 5; i < MaxCounter; i = i + 2) {
-        adapter.log.silly("Battery Voltage-" + pad((i + 29) / 2, 3) + " :" + buf2int16SI(byteArray, i));
-        hvsBatteryVoltsperCell[(i + 29) / 2] = buf2int16SI(byteArray, i);
+
+    let MaxTemps = hvsNumTemps - 0; //0 to n-1 is the same like 1 to n
+    if (MaxTemps > 30) { MaxTemps = 30 }
+    adapter.log.silly("hvsModules =" + hvsModules + " MaxTemps= " + MaxTemps);
+    for (let i = 0; i < MaxTemps; i++) {
+        adapter.log.silly("Battery Temp " + pad(i + 1, 3) + " :" + byteArray[i + 103]);
+        hvsBatteryTempperCell[i + 1] = byteArray[i + 103];
     }
 }
 
 function decodePacket9(data) {
     const byteArray = new Uint8Array(data);
-    let MaxCounterV = 0;
-    let MaxCounterT = 0;
-    switch (hvsModules) {
-        case "2":
-            MaxCounterV = 0;
-            MaxCounterT = 127;
-            break;
-        case "3":
-            MaxCounterV = 36;
-            MaxCounterT = 133;
-            break;
-        case "4":
-            MaxCounterV = 100;
-            MaxCounterT = 133;
-            break;
-        case "5":
-            MaxCounterV = 100;
-            MaxCounterT = 133;
-            break;
-    }
-    for (let i = 5; i < MaxCounterV; i = i + 2) {
-        adapter.log.silly("Battery Voltage-" + pad((i + 157) / 2, 3) + " :" + buf2int16SI(byteArray, i));
-        hvsBatteryVoltsperCell[(i + 157) / 2] = buf2int16SI(byteArray, i);
-    }
-    for (let i = 103; i < MaxCounterT; i++) {
-        adapter.log.silly("Battery Temp " + pad(i - 102, 3) + " :" + byteArray[i]);
-        hvsBatteryTempperCell[i - 102] = byteArray[i];
-    }
-}
-
-function decodePacket10(data) {
-    const byteArray = new Uint8Array(data);
-    let MaxCounterT = 0;
-    switch (hvsModules) {
-        case '2':
-            MaxCounterT = 0;
-            break;
-        case '3':
-            MaxCounterT = 12;
-            break;
-        case '4':
-            MaxCounterT = 23;
-            break;
-        case '5':
-            MaxCounterT = 35;
-            break;
-    }
-    for (let i = 5; i < MaxCounterT; i++) {
-        adapter.log.silly("Battery Temp " + pad(i + 26, 3) + " :" + byteArray[i]);
-        hvsBatteryTempperCell[i + 26] = byteArray[i];
+    let MaxTemps = hvsNumTemps - 30; //0 to n-1 is the same like 1 to n
+    if (MaxTemps > 30) { MaxTemps = 30 }
+    adapter.log.silly("hvsModules =" + hvsModules + " MaxTemps= " + MaxTemps);
+    for (let i = 0; i < MaxTemps; i++) {
+        adapter.log.silly("Battery Temp " + pad(i + 31, 3) + " :" + byteArray[i + 5]);
+        hvsBatteryTempperCell[i + 31] = byteArray[i + 5];
     }
 }
 
@@ -512,50 +557,52 @@ function setStates() {
     adapter.log.silly("hvsError        >" + hvsError + "<");
     adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
 
-    adapter.setState("System.Serial", hvsSerial);
-    adapter.setState("System.BMU", hvsBMU);
-    adapter.setState("System.BMUBankA", hvsBMUA);
-    adapter.setState("System.BMUBankB", hvsBMUB);
-    adapter.setState("System.BMS", hvsBMS);
-    adapter.setState("System.Modules", hvsModules);
-    adapter.setState("System.Grid", hvsGrid);
-    adapter.setState("State.SOC", hvsSOC);
-    adapter.setState("State.VoltMax", hvsMaxVolt);
-    adapter.setState("State.VoltMin", hvsMinVolt);
-    adapter.setState("State.Current", hvsA);
-    adapter.setState("State.VoltBatt", hvsBattVolt);
-    adapter.setState("State.TempMax", hvsMaxTemp);
-    adapter.setState("State.TempMin", hvsMinTemp);
-    adapter.setState("State.VoltDiff", hvsDiffVolt);
-    adapter.setState("State.Power", hvsPower);
-    adapter.setState("System.ParamT", hvsParamT);
-    adapter.setState("State.TempBatt", hvsBatTemp);
-    adapter.setState("State.VoltOut", hvsOutVolt);
-    adapter.setState("System.ErrorNum", hvsError);
-    adapter.setState("System.ErrorStr", hvsErrorString);
+    adapter.setState("System.Serial", hvsSerial, true);
+    adapter.setState("System.BMU", hvsBMU, true);
+    adapter.setState("System.BMUBankA", hvsBMUA, true);
+    adapter.setState("System.BMUBankB", hvsBMUB, true);
+    adapter.setState("System.BMS", hvsBMS, true);
+    adapter.setState("System.Modules", hvsModules, true);
+    adapter.setState("System.Grid", hvsGrid, true);
+    adapter.setState("State.SOC", hvsSOC, true);
+    adapter.setState("State.VoltMax", hvsMaxVolt, true);
+    adapter.setState("State.VoltMin", hvsMinVolt, true);
+    adapter.setState("State.Current", hvsA, true);
+    adapter.setState("State.VoltBatt", hvsBattVolt, true);
+    adapter.setState("State.TempMax", hvsMaxTemp, true);
+    adapter.setState("State.TempMin", hvsMinTemp, true);
+    adapter.setState("State.VoltDiff", hvsDiffVolt, true);
+    adapter.setState("State.Power", hvsPower, true /*ack*/);
+    adapter.setState("System.ParamT", hvsParamT, true);
+    adapter.setState("State.TempBatt", hvsBatTemp, true);
+    adapter.setState("State.VoltOut", hvsOutVolt, true);
+    adapter.setState("System.ErrorNum", hvsError, true);
+    adapter.setState("System.ErrorStr", hvsErrorString, true);
     if (hvsPower >= 0) {
-        adapter.setState("State.Power_Consumption", hvsPower);
-        adapter.setState("State.Power_Delivery", 0);
+        adapter.setState("State.Power_Consumption", hvsPower, true);
+        adapter.setState("State.Power_Delivery", 0, true);
     } else {
-        adapter.setState("State.Power_Consumption", 0);
-        adapter.setState("State.Power_Delivery", -hvsPower);
+        adapter.setState("State.Power_Consumption", 0, true);
+        adapter.setState("State.Power_Delivery", -hvsPower, true);
     }
+    adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
+    adapter.setState("System.InvType", myINVs[hvsInvType], true);
 
     if (myNumberforDetails == 0) {
         const maxCellVolts = hvsModules * 32 + 1;
         const maxCellTemps = hvsModules * 12 + 1;
-        adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt);
-        adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt);
-        adapter.setState("Diagnosis.mVoltMaxCell", hvsMaxmVoltCell);
-        adapter.setState("Diagnosis.mVoltMinCell", hvsMinmVoltCell);
-        adapter.setState("Diagnosis.TempMaxCell", hvsMaxTempCell);
-        adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell);
+        adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt, true);
+        adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt, true);
+        adapter.setState("Diagnosis.mVoltMaxCell", hvsMaxmVoltCell, true);
+        adapter.setState("Diagnosis.mVoltMinCell", hvsMinmVoltCell, true);
+        adapter.setState("Diagnosis.TempMaxCell", hvsMaxTempCell, true);
+        adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell, true);
 
         for (let i = 1; i < maxCellVolts; i++) {
-            adapter.setState("CellDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i]);
+            adapter.setState("CellDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i], true);
         }
         for (let i = 1; i < maxCellTemps; i++) {
-            adapter.setState("CellDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i],);
+            adapter.setState("CellDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i], true);
         }
         adapter.log.silly("hvsMaxmVolt     >" + hvsMaxmVolt + "<");
         adapter.log.silly("hvsMinmVolt     >" + hvsMinmVolt + "<");
@@ -601,8 +648,16 @@ IPClient.on("data", function (data) {
                 IPClient.write(myRequests[1]);
             }, 200);
             break;
-        case 3: //test if it is time for reading all data. If not stop here
+        case 3:
             decodePacket2(data);
+            IPClient.setTimeout(1000);
+            setTimeout(() => {
+                myState = 4;
+                IPClient.write(myRequests[2]);
+            }, 200);
+            break;
+        case 4: //test if it is time for reading all data. If not stop here
+            decodePacket3(data);
             if ((myNumberforDetails < ConfBatDetailshowoften) || (ConfBatDetails == false)) {
                 setStates();
                 IPClient.destroy();
@@ -611,18 +666,10 @@ IPClient.on("data", function (data) {
                 myNumberforDetails = 0; //restart counting
                 IPClient.setTimeout(1000);
                 setTimeout(() => {
-                    myState = 4;
-                    IPClient.write(myRequests[2]);
+                    myState = 5;
+                    IPClient.write(myRequests[3]);
                 }, 200);
             }
-            break;
-        case 4:
-            decodePacketNOP(data);
-            IPClient.setTimeout(1000);
-            myState = 5;
-            setTimeout(() => {
-                IPClient.write(myRequests[3]);
-            }, 200);
             break;
         case 5:
             decodePacketNOP(data);
@@ -642,7 +689,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 7:
-            decodePacket7(data);
+            decodePacket6(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 8;
@@ -650,7 +697,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 8:
-            decodePacket8(data);
+            decodePacket7(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 9;
@@ -658,7 +705,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 9:
-            decodePacket9(data);
+            decodePacket8(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 10;
@@ -666,7 +713,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 10:
-            decodePacket10(data);
+            decodePacket9(data);
             setStates();
             IPClient.destroy();
             myState = 0;
