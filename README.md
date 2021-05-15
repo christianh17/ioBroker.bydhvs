@@ -53,7 +53,7 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 1.2.0 (2021-05-15)
 * preparation for being listed in official repository
 * English part in readme.md
 * removed State.ErrorNum totally in code, datapoint has to be deleted manually - I did not found a way to do it with JS
@@ -83,8 +83,6 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 * 1st change with release-script
 ### 0.1.3
 - Test Mode for getting hex data easily, removed check for 2 modules, moved "diagnosis-states" to extra folder, renaming CellStates
-### 0.1.2
-- Battery Voltage is unsigned, should now work with 4 modules
 ###
 
 ## License
