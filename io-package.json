@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.2.0",
+        "version": "1.2.1",
         "news": {
+            "1.2.1": {
+                "en": "Power is now fixed with 2 number after the decimal point\nbug removed, cell voltage for cell 64 works now",
+                "de": "Die Leistung wird jetzt mit 2 Zahlen nach dem Dezimalpunkt festgelegt\nFehler entfernt, Zellenspannung für Zelle 64 funktioniert jetzt",
+                "ru": "Мощность теперь фиксируется двумя цифрами после десятичной точки.\nошибка устранена, напряжение ячейки для ячейки 64 теперь работает",
+                "pt": "A potência agora é fixada com 2 números após o ponto decimal\nbug removido, a voltagem da célula para a célula 64 funciona agora",
+                "nl": "De macht staat nu vast met 2 cijfers achter de komma\nbug verwijderd, celspanning voor cel 64 werkt nu",
+                "fr": "La puissance est maintenant fixée avec 2 chiffres après la virgule décimale\nbug supprimé, la tension de la cellule 64 fonctionne maintenant",
+                "it": "La potenza è ora fissata con 2 numeri dopo il punto decimale\nbug rimosso, la tensione della cella per la cella 64 ora funziona",
+                "es": "La potencia ahora se fija con 2 números después del punto decimal\nerror eliminado, el voltaje de la celda para la celda 64 funciona ahora",
+                "pl": "Moc jest teraz ustalona liczbą 2 po przecinku\nusunięty błąd, napięcie ogniwa dla ogniwa 64 działa teraz",
+                "zh-cn": "小数点后的功率现在固定为2\n错误已删除，单元64的单元电压现在可以工作"
+            },
             "1.2.0": {
                 "en": "preparation for being listed in official repository\nEnglish part in readme.md\nremoved State.ErrorNum totally in code, datapoint has to be deleted manually - I did not found a way to do it with JS\nhopefully works with HVM and HVS and possibly with HVL (only American market)\nredesign and more robust detection: number of cells for voltage and temperature\nNew: inverter type\nNew: type of battery \ncompatibility with new js-controller 3.3\ncompatibility with nodejs 15\ncompatibility with admin UI 5",
                 "de": "Vorbereitung für die Aufnahme in das offizielle Repository\nEnglischer Teil in readme.md\nState.ErrorNum vollständig im Code entfernt, Datenpunkt muss manuell gelöscht werden - ich habe keine Möglichkeit gefunden, dies mit JS zu tun\nhoffentlich funktioniert mit HVM und HVS und möglicherweise mit HVL (nur amerikanischer Markt)\nNeugestaltung und robustere Erkennung: Anzahl der Zellen für Spannung und Temperatur\nNeu: Wechselrichtertyp\nNeu: Batterietyp\nKompatibilität mit neuem js-controller 3.3\nKompatibilität mit NodeJS 15\nKompatibilität mit der Admin-Benutzeroberfläche 5",

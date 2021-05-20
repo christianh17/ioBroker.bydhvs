@@ -53,7 +53,7 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 1.2.1 (2021-05-20)
 * Power is now fixed with 2 number after the decimal point
 * bug removed, cell voltage for cell 64 works now
 
@@ -85,8 +85,6 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 * first public version
 ### 0.1.4-beta.0 (2021-04-02)
 * 1st change with release-script
-### 0.1.3
-- Test Mode for getting hex data easily, removed check for 2 modules, moved "diagnosis-states" to extra folder, renaming CellStates
 ###
 
 ## License
