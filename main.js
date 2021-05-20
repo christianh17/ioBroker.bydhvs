@@ -188,12 +188,9 @@ function startAdapter(options) {
 /**
  * @param {number} ModuleCount
  */
-function setObjectsCells(ModuleCount) {
+function setObjectsCells() {
 
-    const maxCellVolts = ModuleCount * 32 + 1;
-    const maxCellTemps = ModuleCount * 12 + 1;
-
-    for (let i = 1; i < maxCellVolts; i++) {
+    for (let i = 1; i <= hvsNumCells; i++) {
         adapter.setObjectNotExists("CellDetails.CellVolt" + pad(i, 3), {
             type: "state",
             common: {
@@ -208,7 +205,7 @@ function setObjectsCells(ModuleCount) {
         });
         checkandrepairUnit("CellDetails.CellVolt" + pad(i, 3), "mV"); //repair forgotten units in first version
     }
-    for (let i = 1; i < maxCellTemps; i++) {
+    for (let i = 1; i <= hvsNumTemps; i++) {
         adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
             type: "state",
             common: {
@@ -222,7 +219,6 @@ function setObjectsCells(ModuleCount) {
             native: {}
         });
         checkandrepairUnit("CellDetails.CellTemp" + pad(i, 3), "°C"); //repair forgotten units in first version
-
     }
 }
 
@@ -379,11 +375,6 @@ function decodePacket1(data) {
     } else {
         hvsGrid = "OffGrid";
     }
-    if (ConfBatDetails && FirstRun) {
-        FirstRun = false;
-        console.log("decodePacket1 + firstrun " + FirstRun + " modules " + hvsModules);
-        setObjectsCells(hvsModules);
-    }
     /*    if ((ConfBatDetails) && (hvsModules > 2)) {
             adapter.log.error("Sorry, Details at the moment only for two modules. I need a wireshark dump from bigger systems to adjust the adapter.");
             ConfBatDetails = false;
@@ -403,7 +394,7 @@ function decodePacket2(data) {
     hvsError = buf2int16SI(byteArray, 29);
     hvsParamT = byteArray[31].toString() + "." + byteArray[32].toString();
     hvsOutVolt = parseFloat((buf2int16US(byteArray, 35) * 1.0 / 100.0).toFixed(1));
-    hvsPower = hvsA * hvsOutVolt;
+    hvsPower = Math.round((hvsA * hvsOutVolt) * 100) / 100;
     hvsDiffVolt = Math.round((hvsMaxVolt - hvsMinVolt) * 100) / 100;
     hvsErrorString = "";
     //        hvsError = 65535;
@@ -445,12 +436,16 @@ function decodePacket3(data) {
             hvsNumTemps = hvsModules * 12;
             break;
         //crosscheck:
-        //Counts from real data: 
+        //Counts from real data:
         //mine: 2 modules, 64 voltages, 24 temps
         //4 modules, 128 voltages, 48 temps
     }
-    if (hvsNumCells > 128) { hvsNumCells = 128 }
-    if (hvsNumTemps > 60) { hvsNumTemps = 60 }
+    if (hvsNumCells > 128) { hvsNumCells = 128; }
+    if (hvsNumTemps > 60) { hvsNumTemps = 60; }
+    if (ConfBatDetails && FirstRun) {
+        FirstRun = false;
+        setObjectsCells();
+    }
 }
 
 
@@ -463,8 +458,8 @@ function decodePacket6(data) {
     hvsMaxTempCell = byteArray[15];
     hvsMinTempCell = byteArray[16];
 
-    //starting with byte 101, ending with 131, Cell voltage 1-16 
-    let MaxCells = 16
+    //starting with byte 101, ending with 131, Cell voltage 1-16
+    const MaxCells = 16;
     for (let i = 0; i < MaxCells; i++) {
         adapter.log.silly("Battery Voltage-" + pad((i + 1), 3) + " :" + buf2int16SI(byteArray, i * 2 + 101));
         hvsBatteryVoltsperCell[i + 1] = buf2int16SI(byteArray, i * 2 + 101);
@@ -476,8 +471,8 @@ function decodePacket7(data) {
     // e.g. hvsNumCells = 80
     // first Voltage in byte 5+6
     // Count = 80-17 --> 63
-    let MaxCells = hvsNumCells - 17; //0 to n-1 is the same like 1 to n
-    if (MaxCells > 64) { MaxCells = 64 }
+    let MaxCells = hvsNumCells - 16; //0 to n-1 is the same like 1 to n
+    if (MaxCells > 64) { MaxCells = 64; }
     for (let i = 0; i < MaxCells; i++) {
         adapter.log.silly("Battery Voltage-" + pad((i + 17), 3) + " :" + buf2int16SI(byteArray, i * 2 + 5));
         hvsBatteryVoltsperCell[i + 17] = buf2int16SI(byteArray, i * 2 + 5);
@@ -486,8 +481,6 @@ function decodePacket7(data) {
 
 function decodePacket8(data) {
     const byteArray = new Uint8Array(data);
-    let MaxCounterV = 0;
-    let MaxCounterT = 0;
     //starting with byte 5, ending 101, voltage for cell 81 to 128
     //starting with byte 103, ending 132, temp for cell 1 to 30
 
@@ -495,7 +488,7 @@ function decodePacket8(data) {
     // first Voltage in byte 5+6
     // Count = 128-80 --> 48
     let MaxCells = hvsNumCells - 80; //0 to n-1 is the same like 1 to n
-    if (MaxCells > 48) { MaxCells = 48 }
+    if (MaxCells > 48) { MaxCells = 48; }
     adapter.log.silly("hvsModules =" + hvsModules + " maxCells= " + MaxCells);
     for (let i = 0; i < MaxCells; i++) {
         adapter.log.silly("Battery Voltage-" + pad((i + 81), 3) + " :" + buf2int16SI(byteArray, i * 2 + 5));
@@ -503,7 +496,7 @@ function decodePacket8(data) {
     }
 
     let MaxTemps = hvsNumTemps - 0; //0 to n-1 is the same like 1 to n
-    if (MaxTemps > 30) { MaxTemps = 30 }
+    if (MaxTemps > 30) { MaxTemps = 30; }
     adapter.log.silly("hvsModules =" + hvsModules + " MaxTemps= " + MaxTemps);
     for (let i = 0; i < MaxTemps; i++) {
         adapter.log.silly("Battery Temp " + pad(i + 1, 3) + " :" + byteArray[i + 103]);
@@ -514,7 +507,7 @@ function decodePacket8(data) {
 function decodePacket9(data) {
     const byteArray = new Uint8Array(data);
     let MaxTemps = hvsNumTemps - 30; //0 to n-1 is the same like 1 to n
-    if (MaxTemps > 30) { MaxTemps = 30 }
+    if (MaxTemps > 30) { MaxTemps = 30; }
     adapter.log.silly("hvsModules =" + hvsModules + " MaxTemps= " + MaxTemps);
     for (let i = 0; i < MaxTemps; i++) {
         adapter.log.silly("Battery Temp " + pad(i + 31, 3) + " :" + byteArray[i + 5]);
@@ -589,8 +582,6 @@ function setStates() {
     adapter.setState("System.InvType", myINVs[hvsInvType], true);
 
     if (myNumberforDetails == 0) {
-        const maxCellVolts = hvsModules * 32 + 1;
-        const maxCellTemps = hvsModules * 12 + 1;
         adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt, true);
         adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt, true);
         adapter.setState("Diagnosis.mVoltMaxCell", hvsMaxmVoltCell, true);
@@ -598,10 +589,10 @@ function setStates() {
         adapter.setState("Diagnosis.TempMaxCell", hvsMaxTempCell, true);
         adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell, true);
 
-        for (let i = 1; i < maxCellVolts; i++) {
+        for (let i = 1; i <= hvsNumCells; i++) {
             adapter.setState("CellDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i], true);
         }
-        for (let i = 1; i < maxCellTemps; i++) {
+        for (let i = 1; i <= hvsNumTemps; i++) {
             adapter.setState("CellDetails.CellTemp" + pad(i, 3), hvsBatteryTempperCell[i], true);
         }
         adapter.log.silly("hvsMaxmVolt     >" + hvsMaxmVolt + "<");
@@ -629,7 +620,7 @@ function stopPoll() {
 IPClient.on("data", function (data) {
     adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
     if (ConfTestMode) {
-        let PacketNumber = myState - 1;
+        const PacketNumber = myState - 1;
         adapter.log.error("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
     }
     if (checkPacket(data) == false) {

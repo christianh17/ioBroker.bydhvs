@@ -53,6 +53,10 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* Power is now fixed with 2 number after the decimal point
+* bug removed, cell voltage for cell 64 works now
+
 ### 1.2.0 (2021-05-15)
 * preparation for being listed in official repository
 * English part in readme.md
