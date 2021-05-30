@@ -53,7 +53,7 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 1.2.2-0 (2021-05-30)
 * Create States for Diagnose-Data only if necessary
 * changes according review of the adapter
 
@@ -87,8 +87,6 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 ### 1.0.0 (2021-04-05)
 * Update all dependencies
 * first public version
-### 0.1.4-beta.0 (2021-04-02)
-* 1st change with release-script
 ###
 
 ## License

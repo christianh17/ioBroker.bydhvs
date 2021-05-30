@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.2.1",
+        "version": "1.2.2-0",
         "news": {
+            "1.2.2-0": {
+                "en": "Create States for Diagnose-Data only if necessary\nchanges according review of the adapter",
+                "de": "Erstellen Sie nur bei Bedarf Zustände für Diagnosedaten\nÄnderungen entsprechend Überprüfung des Adapters",
+                "ru": "Создавайте состояния для диагностических данных только при необходимости\nизменения согласно обзору адаптера",
+                "pt": "Crie estados para dados de diagnóstico apenas se necessário\nmudanças de acordo com a revisão do adaptador",
+                "nl": "Maak alleen statussen voor diagnosegegevens als dat nodig is\nverandert volgens herziening van de adapter",
+                "fr": "Créer des états pour les données de diagnostic uniquement si nécessaire\nchangements en fonction de l'examen de l'adaptateur",
+                "it": "Crea stati per Diagnose-Data solo se necessario\ncambia in base alla revisione dell'adattatore",
+                "es": "Crear estados para datos de diagnóstico solo si es necesario\ncambios según revisión del adaptador",
+                "pl": "Utwórz stany dla danych diagnostycznych tylko wtedy, gdy jest to konieczne\nzmienia się zgodnie z przeglądem adaptera",
+                "zh-cn": "仅在必要时创建诊断数据状态\n根据适配器的审查而改变"
+            },
             "1.2.1": {
                 "en": "Power is now fixed with 2 number after the decimal point\nbug removed, cell voltage for cell 64 works now",
                 "de": "Die Leistung wird jetzt mit 2 Zahlen nach dem Dezimalpunkt festgelegt\nFehler entfernt, Zellenspannung für Zelle 64 funktioniert jetzt",
