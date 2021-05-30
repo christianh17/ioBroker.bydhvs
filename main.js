@@ -84,6 +84,7 @@ let ConfBatDetails;
 
 /** @type {NodeJS.Timeout} */
 let idInterval1;
+let idTimeout1;
 
 
 const myRequests = [
@@ -174,6 +175,7 @@ function startAdapter(options) {
             adapter.log.silly("got unload event");
             try {
                 clearInterval(idInterval1);
+                clearTimeout(idTimeout1);
                 stopPoll();
                 IPClient.destroy();
 
@@ -185,10 +187,37 @@ function startAdapter(options) {
     }));
 }
 
-/**
- * @param {number} ModuleCount
- */
+
 function setObjectsCells() {
+    //Diagnose-data only if necessary.
+    const myObjects = [
+        ["Diagnosis.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+        ["Diagnosis.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+        ["Diagnosis.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+        ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+        ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
+        ["Diagnosis.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
+    ];
+
+    for (let i = 0; i < myObjects.length; i++) {
+        adapter.setObjectNotExists(myObjects[i][0], {
+            type: myObjects[i][1],
+            common: {
+                name: myObjects[i][2],
+                type: myObjects[i][3],
+                role: myObjects[i][4],
+                read: myObjects[i][5],
+                write: myObjects[i][6],
+                unit: myObjects[i][7],
+            },
+            native: {}
+        });
+    }
+    for (let i = 0; i < myObjects.length; i++) {
+        //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
+        checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][5]);
+    }
+
 
     for (let i = 1; i <= hvsNumCells; i++) {
         adapter.setObjectNotExists("CellDetails.CellVolt" + pad(i, 3), {
@@ -196,67 +225,61 @@ function setObjectsCells() {
             common: {
                 name: "Voltage Cell: " + pad(i, 3),
                 type: "number",
-                role: "",
+                role: "value.voltage",
                 read: true,
                 write: false,
                 unit: "mV"
             },
             native: {}
         });
-        checkandrepairUnit("CellDetails.CellVolt" + pad(i, 3), "mV"); //repair forgotten units in first version
-    }
-    for (let i = 1; i <= hvsNumTemps; i++) {
-        adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
-            type: "state",
-            common: {
-                name: "Temp Cell: " + pad(i, 3),
-                type: "number",
-                role: "",
-                read: true,
-                write: false,
-                unit: "°C"
-            },
-            native: {}
-        });
-        checkandrepairUnit("CellDetails.CellTemp" + pad(i, 3), "°C"); //repair forgotten units in first version
+        checkandrepairUnit("CellDetails.CellVolt" + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
+
+        for (let i = 1; i <= hvsNumTemps; i++) {
+            adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
+                type: "state",
+                common: {
+                    name: "Temp Cell: " + pad(i, 3),
+                    type: "number",
+                    role: "value.temperature",
+                    read: true,
+                    write: false,
+                    unit: "°C"
+                },
+                native: {}
+            });
+            checkandrepairUnit("CellDetails.CellTemp" + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
+        }
     }
 }
 
-
 function setObjects() {
     const myObjects = [
-        ["System.Serial", "state", "Serial number", "string", "", true, false, ""],
-        ["System.BMU", "state", "F/W BMU", "string", "", true, false, ""],
-        ["System.BMS", "state", "F/W BMS", "string", "", true, false, ""],
-        ["System.BMUBankA", "state", "F/W BMU-BankA", "string", "", true, false, ""],
-        ["System.BMUBankB", "state", "F/W BMU-BankB", "string", "", true, false, ""],
-        ["System.Modules", "state", "modules (count)", "number", "", true, false, ""],
-        ["System.Grid", "state", "Parameter Table", "string", "", true, false, ""],
-        ["System.ParamT", "state", "F/W BMU", "string", "", true, false, ""],
-        ["System.BattType", "state", "Battery Type", "string", "", true, false, ""],
-        ["System.InvType", "state", "Inverter Type", "string", "", true, false, ""],
-        ["State.SOC", "state", "SOC", "number", "", true, false, "%"],
-        ["State.VoltMax", "state", "Max Cell Voltage", "number", "", true, false, "V"],
-        ["State.VoltMin", "state", "Min Cell Voltage", "number", "", true, false, "V"],
-        ["State.Current", "state", "Charge / Discharge Current", "number", "", true, false, "A"],
-        ["State.Power_Consumption", "state", "Discharge Power", "number", "", true, false, "W"],
-        ["State.Power_Delivery", "state", "Charge Power", "number", "", true, false, "W"],
-        ["State.VoltBatt", "state", "Battery Voltage", "number", "", true, false, "V"],
-        ["State.TempMax", "state", "Max Cell Temp", "number", "", true, false, "°C"],
-        ["State.TempMin", "state", "Min Cell Temp", "number", "", true, false, "°C"],
-        ["State.VoltDiff", "state", "Max - Min Cell Voltage", "number", "", true, false, "V"],
-        ["State.Power", "state", "Power", "number", "", true, false, "W"],
-        ["State.TempBatt", "state", "Battery Temperature", "number", "", true, false, "°C"],
-        ["State.VoltOut", "state", "Output Voltage", "number", "", true, false, "V"],
-        ["System.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""],
+        ["System.Serial", "state", "Serial number", "string", "text", true, false, ""],
+        ["System.BMU", "state", "F/W BMU", "string", "text", true, false, ""],
+        ["System.BMS", "state", "F/W BMS", "string", "text", true, false, ""],
+        ["System.BMUBankA", "state", "F/W BMU-BankA", "string", "text", true, false, ""],
+        ["System.BMUBankB", "state", "F/W BMU-BankB", "string", "text", true, false, ""],
+        ["System.Modules", "state", "modules (count)", "number", "value", true, false, ""],
+        ["System.Grid", "state", "Parameter Table", "string", "text", true, false, ""],
+        ["System.ParamT", "state", "F/W BMU", "string", "text", true, false, ""],
+        ["System.BattType", "state", "Battery Type", "string", "text", true, false, ""],
+        ["System.InvType", "state", "Inverter Type", "string", "text", true, false, ""],
+        ["State.SOC", "state", "SOC", "number", "value.battery", true, false, "%"],
+        ["State.VoltMax", "state", "Max Cell Voltage", "number", "value.voltage", true, false, "V"],
+        ["State.VoltMin", "state", "Min Cell Voltage", "number", "value.voltage", true, false, "V"],
+        ["State.Current", "state", "Charge / Discharge Current", "number", "value.current", true, false, "A"],
+        ["State.Power_Consumption", "state", "Discharge Power", "number", "value.power", true, false, "W"],
+        ["State.Power_Delivery", "state", "Charge Power", "number", "value.power", true, false, "W"],
+        ["State.VoltBatt", "state", "Battery Voltage", "number", "value.voltage", true, false, "V"],
+        ["State.TempMax", "state", "Max Cell Temp", "number", "value.temperature", true, false, "°C"],
+        ["State.TempMin", "state", "Min Cell Temp", "number", "value.temperature", true, false, "°C"],
+        ["State.VoltDiff", "state", "Max - Min Cell Voltage", "number", "value.temperature", true, false, "V"],
+        ["State.Power", "state", "Power", "number", "value.power", true, false, "W"],
+        ["State.TempBatt", "state", "Battery Temperature", "number", "value.temperature", true, false, "°C"],
+        ["State.VoltOut", "state", "Output Voltage", "number", "value.voltage", true, false, "V"],
+        ["System.ErrorNum", "state", "Error (numeric)", "number", "value", true, false, ""],
         //["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""], // ERROR ERROR ERROR
-        ["System.ErrorStr", "state", "Error (string)", "string", "", true, false, ""],
-        ["Diagnosis.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "", true, false, "mV"],
-        ["Diagnosis.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "", true, false, "mV"],
-        ["Diagnosis.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "", true, false, ""],
-        ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "", true, false, ""],
-        ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "", true, false, ""],
-        ["Diagnosis.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "", true, false, ""],
+        ["System.ErrorStr", "state", "Error (string)", "string", "text", true, false, ""],
     ];
 
     for (let i = 0; i < myObjects.length; i++) {
@@ -273,23 +296,22 @@ function setObjects() {
             native: {}
         });
     }
-    //repair forgotten units in first version
+    //repair forgotten units in first version and required roles
     for (let i = 0; i < myObjects.length; i++) {
         //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
-        if (myObjects[i][7] != "") { //unit is not empty
-            checkandrepairUnit(myObjects[i][0], myObjects[i][7]);
-        }
+        checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][4]);
     }
-
-    /*    setTimeout(() => {
-            adapter.log.error("deleting State State.ErrorNum");
-            adapter.deleteState("State.ErrorNum", "", function (err, obj) {
-                adapter.log.error("callback deletestate called: " + err + " " + obj);
-            });
-        }, 4000);*/
-    //changeErrorNum(); //not a really good idea but I do not know how to delete -- did not work :-(
-
 }
+
+/*    setTimeout(() => {
+        adapter.log.error("deleting State State.ErrorNum");
+        adapter.deleteState("State.ErrorNum", "", function (err, obj) {
+            adapter.log.error("callback deletestate called: " + err + " " + obj);
+        });
+    }, 4000);*/
+//changeErrorNum(); //not a really good idea but I do not know how to delete -- did not work :-(
+
+
 
 /*async function changeErrorNum() {
   //did not work, this part created a state with "getObjectAsync"
@@ -306,13 +328,18 @@ function setObjects() {
 }*/
 
 
-async function checkandrepairUnit(id, NewUnit) {
+async function checkandrepairUnit(id, NewUnit, NewRole) {
     //want to test and understand async and await, so it's introduced here.
     //check for forgotten unit in first version and if it's missing add unit.
     try {
         const obj = await adapter.getObjectAsync(id);
-        if (obj.common.unit != NewUnit) {
-            adapter.extendObject(id, { common: { unit: NewUnit } });
+        if (NewUnit != "") {
+            if (obj.common.unit != NewUnit) {
+                adapter.extendObject(id, { common: { unit: NewUnit } });
+            }
+        }
+        if (obj.common.role == "") {
+            adapter.extendObject(id, { common: { role: NewRole } });
         }
     }
     catch (err) {
@@ -446,6 +473,7 @@ function decodePacket3(data) {
         FirstRun = false;
         setObjectsCells();
     }
+    adapter.log.silly ("NumCells: " + hvsNumCells +" Numtemps: " + hvsNumTemps + " Modules: " + hvsModules);
 }
 
 
@@ -608,7 +636,7 @@ function setStates() {
 function startPoll(adapter) {
     //erster Start sofort (500ms), dann entsprechend der Config - dann muss man nicht beim Entwickeln warten bis der erste Timer durch ist.
     FirstRun = true;
-    setTimeout(() => { Poll(adapter); }, 500);
+    idTimeout1 = setTimeout(() => { Poll(adapter); }, 500);
     idInterval1 = setInterval(() => Poll(adapter), confBatPollTime * 1000);
     adapter.log.info("gestartet: " + adapter.config.ConfPollInterval + " " + idInterval1);
 }
@@ -721,6 +749,14 @@ IPClient.on("timeout", function () {
     myState = 0;
     adapter.log.error("no connection to IP: " + adapter.config.ConfIPAdress);
 });
+
+IPClient.on("error", function () {
+    IPClient.destroy();
+    setConnected(adapter, false);
+    myState = 0;
+    adapter.log.error("Error connecting to " + adapter.config.ConfIPAdress);
+});
+
 
 function Poll(adapter) {
     myState = 1;
