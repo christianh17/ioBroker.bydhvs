@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.2.2-0",
+        "version": "1.2.2",
         "news": {
+            "1.2.2": {
+                "en": "bump to new patch-level (to get rid of the \"-0\")",
+                "de": "Auf neues Patch-Level springen (um das \"-0\" loszuwerden)",
+                "ru": "перейти на новый уровень патча (чтобы избавиться от \"-0\")",
+                "pt": "pular para um novo nível de patch (para se livrar do \"-0\")",
+                "nl": "hobbel naar nieuw patch-niveau (om van de \"-0 af te komen\")",
+                "fr": "passer au nouveau niveau de correctif (pour se débarrasser du \"-0\")",
+                "it": "passare a un nuovo livello di patch (per eliminare lo \"-0\")",
+                "es": "subir a un nuevo nivel de parche (para deshacerse del \"-0\")",
+                "pl": "wskoczyć na nowy poziom patcha (aby pozbyć się „-0”)",
+                "zh-cn": "碰撞到新的补丁级别（摆脱“-0”）"
+            },
             "1.2.2-0": {
                 "en": "Create States for Diagnose-Data only if necessary\nchanges according review of the adapter",
                 "de": "Erstellen Sie nur bei Bedarf Zustände für Diagnosedaten\nÄnderungen entsprechend Überprüfung des Adapters",

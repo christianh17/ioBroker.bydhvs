@@ -53,7 +53,7 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 1.2.2 (2021-06-14)
 * bump to new patch-level (to get rid of the "-0")
 
 ### 1.2.2-0 (2021-05-30)
@@ -87,9 +87,6 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 * some minor bugs removed
 * obviously the adapter works for hvm, too -> need more testers and an idea for a new name
 
-### 1.0.0 (2021-04-05)
-* Update all dependencies
-* first public version
 ###
 
 ## License

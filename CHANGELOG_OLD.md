@@ -1,4 +1,7 @@
 # Older changes
+## 1.0.0 (2021-04-05)
+* Update all dependencies
+* first public version
 ## 0.1.4-beta.0 (2021-04-02)
 * 1st change with release-script
 ## 0.1.3
