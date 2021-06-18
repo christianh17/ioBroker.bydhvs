@@ -53,6 +53,9 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+*changed ratio of logo
+
 ### 1.2.2 (2021-06-14)
 * bump to new patch-level (to get rid of the "-0")
 
