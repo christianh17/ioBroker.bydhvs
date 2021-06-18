@@ -53,7 +53,7 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-### __WORK IN PROGRESS__
+### 1.2.3 (2021-06-18)
 *changed ratio of logo
 
 ### 1.2.2 (2021-06-14)
@@ -79,16 +79,6 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 * compatibility with nodejs 15
 * compatibility with admin UI 5
 
-
-### 1.1.0 (2021-04-22)
-* HVS-Version with two banks and - hopefully - correct display
-* states are now with units, the existing states are changed
-* new states Power_Consumption and Power_Delivery for summarizing 
-* Systems with 5 modules: Temp display should work now for all cells, voltage only for first 128
-* moved state from State.ErrorNum to System.ErrorNum --> old states exists further on, I do not know how to delete it, adapter.deletestate does not work.
-* deleted test-answers --> moved to my BYD-HVS-Simulator
-* some minor bugs removed
-* obviously the adapter works for hvm, too -> need more testers and an idea for a new name
 
 ###
 

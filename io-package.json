@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.2.2",
+        "version": "1.2.3",
         "news": {
+            "1.2.3": {
+                "en": "changed ratio of logo",
+                "de": "geändertes Verhältnis des Logos",
+                "ru": "изменено соотношение логотипа",
+                "pt": "proporção alterada do logotipo",
+                "nl": "gewijzigde verhouding van logo",
+                "fr": "rapport modifié du logo",
+                "it": "rapporto modificato del logo",
+                "es": "proporción cambiada del logotipo",
+                "pl": "zmieniony stosunek logo",
+                "zh-cn": "更改徽标比例"
+            },
             "1.2.2": {
                 "en": "bump to new patch-level (to get rid of the \"-0\")",
                 "de": "Auf neues Patch-Level springen (um das \"-0\" loszuwerden)",
