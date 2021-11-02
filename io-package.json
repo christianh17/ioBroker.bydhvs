@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.2.3",
+        "version": "1.2.4-0",
         "news": {
+            "1.2.4-0": {
+                "en": "Added state: SOH\nupdated dependencies as suggested from bot",
+                "de": "Hinzugefügter Zustand: SOH\naktualisierte Abhängigkeiten wie vom Bot vorgeschlagen",
+                "ru": "Добавлено состояние: SOH\nобновленные зависимости, как было предложено от бота",
+                "pt": "Estado adicionado: SOH\ndependências atualizadas conforme sugerido pelo bot",
+                "nl": "Toegevoegde staat: SOH\nbijgewerkte afhankelijkheden zoals voorgesteld door bot",
+                "fr": "État ajouté : SOH\ndépendances mises à jour comme suggéré par le bot",
+                "it": "Stato aggiunto: SOH\ndipendenze aggiornate come suggerito da bot",
+                "es": "Estado añadido: SOH\ndependencias actualizadas según lo sugerido por el bot",
+                "pl": "Dodany stan: SOH\nzaktualizowane zależności zgodnie z sugestią bota",
+                "zh-cn": "添加状态：SOH\n按照 bot 的建议更新依赖项"
+            },
             "1.2.3": {
                 "en": "changed ratio of logo",
                 "de": "geändertes Verhältnis des Logos",

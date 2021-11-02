@@ -1,4 +1,17 @@
 # Older changes
+## 1.2.0 (2021-05-15)
+* preparation for being listed in official repository
+* English part in readme.md
+* removed State.ErrorNum totally in code, datapoint has to be deleted manually - I did not found a way to do it with JS
+* hopefully works with HVM and HVS and possibly with HVL (only American market)
+* redesign and more robust detection: number of cells for voltage and temperature
+* New: inverter type
+* New: type of battery 
+* compatibility with new js-controller 3.3
+* compatibility with nodejs 15
+* compatibility with admin UI 5
+
+
 ## 1.1.0 (2021-04-22)
 * HVS-Version with two banks and - hopefully - correct display
 * states are now with units, the existing states are changed
