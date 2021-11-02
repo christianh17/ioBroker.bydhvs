@@ -32,6 +32,7 @@ let myState; // Aktueller Status
 let hvsSOC;
 let hvsMaxVolt;
 let hvsMinVolt;
+let hvsSOH;
 let hvsMaxmVolt;
 let hvsMinmVolt;
 let hvsMaxmVoltCell;
@@ -267,6 +268,7 @@ function setObjects() {
         ["State.SOC", "state", "SOC", "number", "value.battery", true, false, "%"],
         ["State.VoltMax", "state", "Max Cell Voltage", "number", "value.voltage", true, false, "V"],
         ["State.VoltMin", "state", "Min Cell Voltage", "number", "value.voltage", true, false, "V"],
+        ["State.SOH", "state", "SOH", "number", "number", true, false, "%"],
         ["State.Current", "state", "Charge / Discharge Current", "number", "value.current", true, false, "A"],
         ["State.Power_Consumption", "state", "Discharge Power", "number", "value.power", true, false, "W"],
         ["State.Power_Delivery", "state", "Charge Power", "number", "value.power", true, false, "W"],
@@ -413,6 +415,7 @@ function decodePacket2(data) {
     hvsSOC = buf2int16SI(byteArray, 3);
     hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2));
     hvsMinVolt = parseFloat((buf2int16SI(byteArray, 7) * 1.0 / 100.0).toFixed(2));
+    hvsSOH = buf2int16SI(byteArray, 9);
     hvsA = parseFloat((buf2int16SI(byteArray, 11) * 1.0 / 10.0).toFixed(1));
     hvsBattVolt = parseFloat((buf2int16US(byteArray, 13) * 1.0 / 100.0).toFixed(1));
     hvsMaxTemp = buf2int16SI(byteArray, 15);
@@ -566,6 +569,7 @@ function setStates() {
     adapter.log.silly("hvsSOC          >" + hvsSOC + "<");
     adapter.log.silly("hvsMaxVolt      >" + hvsMaxVolt + "<");
     adapter.log.silly("hvsMinVolt      >" + hvsMinVolt + "<");
+    adapter.log.silly("hvsSOH          >" + hvsSOH + "<");
     adapter.log.silly("hvsA            >" + hvsA + "<");
     adapter.log.silly("hvsBattVolt     >" + hvsBattVolt + "<");
     adapter.log.silly("hvsMaxTemp      >" + hvsMaxTemp + "<");
@@ -588,6 +592,7 @@ function setStates() {
     adapter.setState("State.SOC", hvsSOC, true);
     adapter.setState("State.VoltMax", hvsMaxVolt, true);
     adapter.setState("State.VoltMin", hvsMinVolt, true);
+    adapter.setState("State.SOH", hvsSOH, true);
     adapter.setState("State.Current", hvsA, true);
     adapter.setState("State.VoltBatt", hvsBattVolt, true);
     adapter.setState("State.TempMax", hvsMaxTemp, true);
