@@ -268,7 +268,7 @@ function setObjects() {
         ["State.SOC", "state", "SOC", "number", "value.battery", true, false, "%"],
         ["State.VoltMax", "state", "Max Cell Voltage", "number", "value.voltage", true, false, "V"],
         ["State.VoltMin", "state", "Min Cell Voltage", "number", "value.voltage", true, false, "V"],
-        ["State.SOH", "state", "SOH", "number", "number", true, false, "%"],
+        ["State.SOH", "state", "SOH", "number", "value.battery", true, false, "%"],
         ["State.Current", "state", "Charge / Discharge Current", "number", "value.current", true, false, "A"],
         ["State.Power_Consumption", "state", "Discharge Power", "number", "value.power", true, false, "W"],
         ["State.Power_Delivery", "state", "Charge Power", "number", "value.power", true, false, "W"],
