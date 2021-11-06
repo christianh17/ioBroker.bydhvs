@@ -53,6 +53,10 @@ Zu den Batterie-Größen: Der Adapter funktioniert auch für Zelltemperaturen un
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* updated even more dependencies
+* official release with new state SOH
+
 ### 1.2.4-0 (2021-11-02)
 * Added state: SOH
 * updated dependencies as suggested from bot
