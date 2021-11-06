@@ -1,4 +1,8 @@
 # Older changes
+## 1.2.1 (2021-05-20)
+* Power is now fixed with 2 number after the decimal point
+* bug removed, cell voltage for cell 64 works now
+
 ## 1.2.0 (2021-05-15)
 * preparation for being listed in official repository
 * English part in readme.md

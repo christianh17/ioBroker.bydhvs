@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.2.4-0",
+        "version": "1.3.0",
         "news": {
+            "1.3.0": {
+                "en": "updated even more dependencies\nofficial release with new state SOH",
+                "de": "noch mehr Abhängigkeiten aktualisiert\noffizielle Veröffentlichung mit neuem Zustand SOH",
+                "ru": "обновлено еще больше зависимостей\nофициальный релиз с новым состоянием SOH",
+                "pt": "atualizou ainda mais dependências\nlançamento oficial com novo estado SOH",
+                "nl": "nog meer afhankelijkheden bijgewerkt\nofficiële release met nieuwe staat SOH",
+                "fr": "mis à jour encore plus de dépendances\nsortie officielle avec le nouvel état SOH",
+                "it": "aggiornato ancora più dipendenze\nrilascio ufficiale con il nuovo stato SOH",
+                "es": "actualizado aún más dependencias\nlanzamiento oficial con el nuevo estado SOH",
+                "pl": "zaktualizowałem jeszcze więcej zależności\noficjalne wydanie z nowym stanem SOH",
+                "zh-cn": "更新了更多依赖项\n正式发布新状态 SOH"
+            },
             "1.2.4-0": {
                 "en": "Added state: SOH\nupdated dependencies as suggested from bot",
                 "de": "Hinzugefügter Zustand: SOH\naktualisierte Abhängigkeiten wie vom Bot vorgeschlagen",
