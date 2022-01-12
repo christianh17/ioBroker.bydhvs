@@ -50,6 +50,7 @@ let hvsModules;
 let hvsDiffVolt;
 let hvsPower;
 let hvsBattType;
+let hvsBattType_fromSerial;
 let hvsInvType;
 let hvsNumCells; //number of cells in system
 let hvsNumTemps; // number of temperatures to count with
@@ -147,6 +148,30 @@ const myINVs = [
     "SMA SBS 2.5 HV",
     "Fronius HV"
 ];
+
+const myINVsLVS = [
+    "Fronius HV",
+    "Goodwe HV",
+    "Goodwe HV",
+    "Kostal HV",
+    "Selectronic LV",
+    "SMA SBS3.7/5.0",
+    "SMA LV",
+    "Victron LV",
+    "Suntech LV",
+    "Sungrow HV",
+    "Kaco HV",
+    "Studer LV",
+    "Solar Edge LV",
+    "Ingeteam HV",
+    "Sungrow LV",
+    "Schneider LV",
+    "SMA SBS2.5 HV",
+    "Solar Edge LV",
+    "Solar Edge LV",
+    "Solar Edge LV"
+];
+
 
 const myBattTypes = [
     "HVL",
@@ -390,6 +415,10 @@ function decodePacket1(data) {
     for (let i = 3; i < 22; i++) {
         hvsSerial += String.fromCharCode(byteArray[i]);
     }
+    //leider dazugestrickt, wollte in die andere Logik nicht eingreifen
+    if (byteArray[5] == 51 ) {hvsBattType_fromSerial = "HVS";}
+    if (byteArray[5] == 50 ) {hvsBattType_fromSerial = "LVS";}
+    if (byteArray[5] == 49 ) {hvsBattType_fromSerial = "LVS";}
     hvsBMUA = "V" + byteArray[27].toString() + "." + byteArray[28].toString();
     hvsBMUB = "V" + byteArray[29].toString() + "." + byteArray[30].toString();
     if (byteArray[33] === 0) {
@@ -469,6 +498,12 @@ function decodePacket3(data) {
         //Counts from real data:
         //mine: 2 modules, 64 voltages, 24 temps
         //4 modules, 128 voltages, 48 temps
+    }
+    //leider hässlich dazugestrickt, wollte in die andere Logik nicht eingreifen
+    if (hvsBattType_fromSerial == "LVS") {
+        hvsBattType = "LVS";
+        hvsNumCells = hvsModules * 7;
+        hvsNumTemps = 0;
     }
     if (hvsNumCells > 128) { hvsNumCells = 128; }
     if (hvsNumTemps > 60) { hvsNumTemps = 60; }
