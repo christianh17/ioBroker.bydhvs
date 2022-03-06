@@ -224,7 +224,7 @@ function setObjectsCells() {
         ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
         ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
         ["Diagnosis.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, ""],
+        ["Diagnosis.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
     ];
 
     for (let i = 0; i < myObjects.length; i++) {
