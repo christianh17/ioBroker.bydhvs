@@ -30,6 +30,7 @@ const hvsBatteryTempperCell = [];
 /** @type {number | any } */
 let myState; // Aktueller Status
 let hvsSOC;
+let hvsSOCDiagnosis;
 let hvsMaxVolt;
 let hvsMinVolt;
 let hvsSOH;
@@ -177,7 +178,7 @@ const myBattTypes = [
     "HVL",
     "HVM",
     "HVS"
-]
+];
 /* HVM: 16 cells per module
    HVS: 32 cells per module
    HVL: unknown so I count 0 cells per module
@@ -223,6 +224,7 @@ function setObjectsCells() {
         ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
         ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
         ["Diagnosis.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
+        ["Diagnosis.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, ""],
     ];
 
     for (let i = 0; i < myObjects.length; i++) {
@@ -523,6 +525,7 @@ function decodePacket6(data) {
     hvsMinmVoltCell = byteArray[10];
     hvsMaxTempCell = byteArray[15];
     hvsMinTempCell = byteArray[16];
+    hvsSOCDiagnosis = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
 
     //starting with byte 101, ending with 131, Cell voltage 1-16
     const MaxCells = 16;
@@ -647,8 +650,11 @@ function setStates() {
         adapter.setState("State.Power_Delivery", -hvsPower, true);
     }
     adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
-    adapter.setState("System.InvType", myINVs[hvsInvType], true);
-
+    if (hvsBattType_fromSerial == "LVS") { //unterschiedliche WR-Tabelle je nach Batt-Typ
+        adapter.setState("System.InvType", myINVsLVS[hvsInvType], true);
+    } else {
+        adapter.setState("System.InvType", myINVs[hvsInvType], true);
+    }
     if (myNumberforDetails == 0) {
         adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt, true);
         adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt, true);
@@ -656,6 +662,7 @@ function setStates() {
         adapter.setState("Diagnosis.mVoltMinCell", hvsMinmVoltCell, true);
         adapter.setState("Diagnosis.TempMaxCell", hvsMaxTempCell, true);
         adapter.setState("Diagnosis.TempMinCell", hvsMinTempCell, true);
+        adapter.setState("Diagnosis.SOC", hvsSOCDiagnosis, true);
 
         for (let i = 1; i <= hvsNumCells; i++) {
             adapter.setState("CellDetails.CellVolt" + pad(i, 3), hvsBatteryVoltsperCell[i], true);
