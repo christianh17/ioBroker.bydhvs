@@ -619,6 +619,7 @@ function setStates() {
     adapter.log.silly("hvsOutVolt      >" + hvsOutVolt + "<");
     adapter.log.silly("hvsError        >" + hvsError + "<");
     adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
+    adapter.log.silly("hvsSOC (Diag)   >" + hvsSOCDiagnosis + "<");
 
     adapter.setState("System.Serial", hvsSerial, true);
     adapter.setState("System.BMU", hvsBMU, true);
@@ -696,7 +697,7 @@ IPClient.on("data", function (data) {
     adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
     if (ConfTestMode) {
         const PacketNumber = myState - 1;
-        adapter.log.error("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
+        adapter.log.info("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
     }
     if (checkPacket(data) == false) {
         adapter.log.error("error: no valid data");
