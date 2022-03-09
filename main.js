@@ -839,10 +839,10 @@ async function main() {
     ConfBatDetails = (adapter.config.ConfBatDetails ? true : false);
     adapter.log.info("Bat Details  : " + adapter.config.ConfBatDetails);
     ConfBatDetailshowoften = parseInt(adapter.config.ConfDetailshowoften);
-    if (ConfBatDetailshowoften < 10) {
+    /*if (ConfBatDetailshowoften < 10) {
         ConfBatDetails = false;
         adapter.log.error("Details polling to often - disabling ");
-    }
+    }*/
     ConfTestMode = (adapter.config.ConfTestMode ? true : false);
     adapter.log.info("BatDetailshowoften: " + ConfBatDetailshowoften);
     adapter.log.silly("TestMode= " + ConfTestMode);
