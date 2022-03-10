@@ -508,7 +508,7 @@ function decodePacket3(data) {
         hvsNumTemps = 0;
     }
     if (hvsNumCells > 128) { hvsNumCells = 128; }
-    if (hvsNumTemps > 60) { hvsNumTemps = 60; }
+    if (hvsNumTemps > 64) { hvsNumTemps = 64; }
     if (ConfBatDetails && FirstRun) {
         FirstRun = false;
         setObjectsCells();
