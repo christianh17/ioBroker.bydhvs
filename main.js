@@ -576,7 +576,7 @@ function decodePacket8(data) {
 function decodePacket9(data) {
     const byteArray = new Uint8Array(data);
     let MaxTemps = hvsNumTemps - 30; //0 to n-1 is the same like 1 to n
-    if (MaxTemps > 30) { MaxTemps = 30; }
+    if (MaxTemps > 34) { MaxTemps = 34; }
     adapter.log.silly("hvsModules =" + hvsModules + " MaxTemps= " + MaxTemps);
     for (let i = 0; i < MaxTemps; i++) {
         adapter.log.silly("Battery Temp " + pad(i + 31, 3) + " :" + byteArray[i + 5]);
