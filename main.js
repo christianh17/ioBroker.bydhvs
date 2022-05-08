@@ -94,12 +94,21 @@ const myRequests = [
     Buffer.from("010300000066c5e0", "hex"), //0
     Buffer.from("01030500001984cc", "hex"), //1
     Buffer.from("010300100003040e", "hex"), //2
-    Buffer.from("0110055000020400018100f853", "hex"), //3
+    Buffer.from("0110055000020400018100f853", "hex"), //3 start measuring
     Buffer.from("010305510001d517", "hex"), //4
     Buffer.from("01030558004104e5", "hex"), //5
     Buffer.from("01030558004104e5", "hex"), //6
     Buffer.from("01030558004104e5", "hex"), //7
     Buffer.from("01030558004104e5", "hex"), //8
+    // to read the 5th module, the box must first be reconfigured
+    Buffer.from("01100100000306444542554700176f", "hex"), //9 switch to second turn for the last few cells
+    Buffer.from("0110055000020400018100f853", "hex"), //10 start measuring remaining cells (like 3)
+    Buffer.from("010305510001d517", "hex"), //11 (like 4)
+    Buffer.from("01030558004104e5", "hex"), //12 (like 5)
+    Buffer.from("01030558004104e5", "hex"), //13 (like 6)
+    // The BYD tool also issues two more requests, probably to gather even more cells in some larger setups
+    // Buffer.from("01030558004104e5", "hex"), //14 (like 7)
+    // Buffer.from("01030558004104e5", "hex"), //15 (like 8)
 ];
 
 
@@ -507,7 +516,7 @@ function decodePacket3(data) {
         hvsNumCells = hvsModules * 7;
         hvsNumTemps = 0;
     }
-    if (hvsNumCells > 128) { hvsNumCells = 128; }
+    if (hvsNumCells > 160) { hvsNumCells = 160; }
     if (hvsNumTemps > 64) { hvsNumTemps = 64; }
     if (ConfBatDetails && FirstRun) {
         FirstRun = false;
@@ -581,6 +590,34 @@ function decodePacket9(data) {
     for (let i = 0; i < MaxTemps; i++) {
         adapter.log.silly("Battery Temp " + pad(i + 31, 3) + " :" + byteArray[i + 5]);
         hvsBatteryTempperCell[i + 31] = byteArray[i + 5];
+    }
+}
+
+/*
+ * decode response to request[12]
+ * @see #decodePacket6()
+ */
+function decodeResponse12(data) {
+    const byteArray = new Uint8Array(data);
+    //starting with byte 101, ending with 131, Cell voltage 129-144
+    const MaxCells = 16;
+    for (let i = 0; i < MaxCells; i++) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 1 + 128), 3) + " :" + buf2int16SI(byteArray, i * 2 + 101));
+        hvsBatteryVoltsperCell[i + 1 + 128] = buf2int16SI(byteArray, i * 2 + 101);
+    }
+}
+
+/*
+ * decode response to request[13]
+ * @see #decodePacket7()
+ */
+function decodeResponse13(data) {
+    const byteArray = new Uint8Array(data);
+    let MaxCells = hvsNumCells - 128 - 16; // The first round measured up to 128 cells, request[12] then get another 16
+    if (MaxCells > 16) { MaxCells = 16; } // With 5 HVS Modules, only 16 cells are remaining
+    for (let i = 0; i < MaxCells; i++) {
+        adapter.log.silly("Battery Voltage-" + pad((i + 1 + 16 + 128), 3) + " :" + buf2int16SI(byteArray, i * 2 + 5));
+        hvsBatteryVoltsperCell[i + 1 + 16 + 128] = buf2int16SI(byteArray, i * 2 + 5);
     }
 }
 
@@ -708,7 +745,7 @@ IPClient.on("data", function (data) {
     setConnected(adapter, true);
     switch (myState) {
         case 2:
-            decodePacket1(data);
+            decodePacket1(data); // decode request 0
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 3;
@@ -742,10 +779,10 @@ IPClient.on("data", function (data) {
             decodePacketNOP(data);
             IPClient.setTimeout(8000);
             myState = 6;
-            adapter.log.silly("waiting 4 seconds to measure cells");
+            adapter.log.silly("waiting 3 seconds to measure cells");
             setTimeout(() => {
                 IPClient.write(myRequests[4]);
-            }, 4000);
+            }, 3000);
             break;
         case 6:
             decodePacketNOP(data);
@@ -781,6 +818,51 @@ IPClient.on("data", function (data) {
             break;
         case 10:
             decodePacket9(data);
+            if (hvsNumCells > 128) {
+                setTimeout(() => {
+                    myState = 11;
+                    IPClient.write(myRequests[9]); // Switch to second turn for the last module
+                }, 200);
+            } else {
+                setStates();
+                IPClient.destroy();
+                myState = 0;
+            }
+            break;
+        case 11:
+            decodePacketNOP(data);
+            setTimeout(() => {
+                myState = 12;
+                IPClient.write(myRequests[10]);
+            }, 200);
+            break;
+        case 12:
+            decodePacketNOP(data);
+            IPClient.setTimeout(8000);
+            adapter.log.silly("waiting 3 seconds to measure cells");
+            setTimeout(() => {
+                myState = 13;
+                IPClient.write(myRequests[11]);
+            }, 3000);
+            break;
+        case 13:
+            decodePacketNOP(data);
+            IPClient.setTimeout(1000);
+            setTimeout(() => {
+                myState = 14;
+                IPClient.write(myRequests[12]);
+            }, 200);
+            break;
+        case 14:
+            decodeResponse12(data);
+            setTimeout(() => {
+                myState = 15;
+                IPClient.write(myRequests[13]);
+            }, 200);
+            break;
+        case 15:
+            decodeResponse13(data);
+
             setStates();
             IPClient.destroy();
             myState = 0;
