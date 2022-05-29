@@ -420,7 +420,7 @@ function buf2int16US(byteArray, pos) { //unsigned
     return result;
 }
 
-function decodePacket1(data) {
+function decodePacket0(data) {
     const byteArray = new Uint8Array(data);
     hvsSerial = "";
     for (let i = 3; i < 22; i++) {
@@ -450,7 +450,7 @@ function decodePacket1(data) {
         }*/
 }
 
-function decodePacket2(data) {
+function decodePacket1(data) {
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16SI(byteArray, 3);
     hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2));
@@ -483,7 +483,7 @@ function decodePacketNOP(data) {
     adapter.log.silly("Packet NOP");
 }
 
-function decodePacket3(data) {
+function decodePacket2(data) {
     const byteArray = new Uint8Array(data);
     hvsBattType = byteArray[5];
     hvsInvType = byteArray[3];
@@ -526,7 +526,7 @@ function decodePacket3(data) {
 }
 
 
-function decodePacket6(data) {
+function decodePacket5(data) {
     const byteArray = new Uint8Array(data);
     hvsMaxmVolt = buf2int16SI(byteArray, 5);
     hvsMinmVolt = buf2int16SI(byteArray, 7);
@@ -544,7 +544,7 @@ function decodePacket6(data) {
     }
 }
 
-function decodePacket7(data) {
+function decodePacket6(data) {
     const byteArray = new Uint8Array(data);
     // e.g. hvsNumCells = 80
     // first Voltage in byte 5+6
@@ -557,7 +557,7 @@ function decodePacket7(data) {
     }
 }
 
-function decodePacket8(data) {
+function decodePacket7(data) {
     const byteArray = new Uint8Array(data);
     //starting with byte 5, ending 101, voltage for cell 81 to 128
     //starting with byte 103, ending 132, temp for cell 1 to 30
@@ -582,7 +582,7 @@ function decodePacket8(data) {
     }
 }
 
-function decodePacket9(data) {
+function decodePacket8(data) {
     const byteArray = new Uint8Array(data);
     let MaxTemps = hvsNumTemps - 30; //0 to n-1 is the same like 1 to n
     if (MaxTemps > 34) { MaxTemps = 34; }
@@ -595,7 +595,7 @@ function decodePacket9(data) {
 
 /*
  * decode response to request[12]
- * @see #decodePacket6()
+ * @see #decodePacket5()
  */
 function decodeResponse12(data) {
     const byteArray = new Uint8Array(data);
@@ -609,7 +609,7 @@ function decodeResponse12(data) {
 
 /*
  * decode response to request[13]
- * @see #decodePacket7()
+ * @see #decodePacket6()
  */
 function decodeResponse13(data) {
     const byteArray = new Uint8Array(data);
@@ -745,7 +745,7 @@ IPClient.on("data", function (data) {
     setConnected(adapter, true);
     switch (myState) {
         case 2:
-            decodePacket1(data); // decode request 0
+            decodePacket0(data); // decode request 0
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 3;
@@ -753,7 +753,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 3:
-            decodePacket2(data);
+            decodePacket1(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 4;
@@ -761,7 +761,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 4: //test if it is time for reading all data. If not stop here
-            decodePacket3(data);
+            decodePacket2(data);
             if ((myNumberforDetails < ConfBatDetailshowoften) || (ConfBatDetails == false)) {
                 setStates();
                 IPClient.destroy();
@@ -793,7 +793,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 7:
-            decodePacket6(data);
+            decodePacket5(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 8;
@@ -801,7 +801,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 8:
-            decodePacket7(data);
+            decodePacket6(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 9;
@@ -809,7 +809,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 9:
-            decodePacket8(data);
+            decodePacket7(data);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 10;
@@ -817,7 +817,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 10:
-            decodePacket9(data);
+            decodePacket8(data);
             if (hvsNumCells > 128) {
                 setTimeout(() => {
                     myState = 11;
