@@ -3,6 +3,10 @@
 * Create States for Diagnose-Data only if necessary
 * changes according review of the adapter
 
+## 1.2.2-0 (2021-05-30)
+* Create States for Diagnose-Data only if necessary
+* changes according review of the adapter
+
 ## 1.2.1 (2021-05-20)
 * Power is now fixed with 2 number after the decimal point
 * bug removed, cell voltage for cell 64 works now

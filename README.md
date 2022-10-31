@@ -53,11 +53,9 @@ Zu den Batterie-Größen: Der Adapter funktioniert für Zelltemperaturen und Zel
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-
-### __WORK IN PROGRESS__
+### 1.4.0 (2022-10-31)
 * Update of referred modules (mainly around testing)
 * improvmenets contributed by Tapter (5 modules, readme and better readable code)
-
 * Better detection of battery type and inverter
 * SOC not only from normal data but from diagnosis-data, too. There we have one decimal place more
 * removed frequency limit for battery detail data
@@ -77,10 +75,6 @@ Zu den Batterie-Größen: Der Adapter funktioniert für Zelltemperaturen und Zel
 
 ### 1.2.2 (2021-06-14)
 * bump to new patch-level (to get rid of the "-0")
-
-### 1.2.2-0 (2021-05-30)
-* Create States for Diagnose-Data only if necessary
-* changes according review of the adapter
 
 ###
 
