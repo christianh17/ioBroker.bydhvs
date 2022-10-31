@@ -1,4 +1,8 @@
 # Older changes
+## 1.2.2-0 (2021-05-30)
+* Create States for Diagnose-Data only if necessary
+* changes according review of the adapter
+
 ## 1.2.1 (2021-05-20)
 * Power is now fixed with 2 number after the decimal point
 * bug removed, cell voltage for cell 64 works now
@@ -15,7 +19,6 @@
 * compatibility with nodejs 15
 * compatibility with admin UI 5
 
-
 ## 1.1.0 (2021-04-22)
 * HVS-Version with two banks and - hopefully - correct display
 * states are now with units, the existing states are changed
@@ -29,18 +32,21 @@
 ## 1.0.0 (2021-04-05)
 * Update all dependencies
 * first public version
+
 ## 0.1.4-beta.0 (2021-04-02)
 * 1st change with release-script
+
 ## 0.1.3
 - Test Mode for getting hex data easily, removed check for 2 modules, moved "diagnosis-states" to extra folder, renaming CellStates
+
 ## 0.1.2
 - Battery Voltage is unsigned, should now work with 4 modules
+
 ## 0.1.1
 - start of documentation (German)
+
 ## 0.1.0
 - (Christian) first testing release with (limited) public announcement
+
 ## 0.0.1
 - (Christian) initial release
-
-
-
