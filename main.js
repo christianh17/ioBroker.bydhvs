@@ -439,11 +439,9 @@ function decodePacket0(data) {
     }
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
     hvsModules = parseInt((byteArray[36] - 16).toString());
-    if (byteArray[38] === 1) {
-        hvsGrid = "OnGrid";
-    } else {
-        hvsGrid = "OffGrid";
-    }
+    if (byteArray[38] === 0) {hvsGrid = "OffGrid";}
+	if (byteArray[38] === 1) {hvsGrid = "OnGrid";}
+	if (byteArray[38] === 2) {hvsGrid = "Backup";}
     /*    if ((ConfBatDetails) && (hvsModules > 2)) {
             adapter.log.error("Sorry, Details at the moment only for two modules. I need a wireshark dump from bigger systems to adjust the adapter.");
             ConfBatDetails = false;
