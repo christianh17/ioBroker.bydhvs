@@ -687,10 +687,11 @@ function setStates() {
         adapter.setState("State.Power_Consumption", 0, true);
         adapter.setState("State.Power_Delivery", -hvsPower, true);
     }
-    adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
     if (hvsBattType_fromSerial == "LVS") { //unterschiedliche WR-Tabelle je nach Batt-Typ
+        adapter.setState("System.BattType", "LVS", true);
         adapter.setState("System.InvType", myINVsLVS[hvsInvType], true);
     } else {
+        adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
         adapter.setState("System.InvType", myINVs[hvsInvType], true);
     }
     if (myNumberforDetails == 0) {
