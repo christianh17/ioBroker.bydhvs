@@ -53,6 +53,7 @@ let hvsPower;
 let hvsBattType;
 let hvsBattType_fromSerial;
 let hvsInvType;
+let hvsInvType_String;
 let hvsNumCells; //number of cells in system
 let hvsNumTemps; // number of temperatures to count with
 let ConfBatDetailshowoften;
@@ -139,24 +140,26 @@ const myErrors = [
 ];
 
 const myINVs = [
-    "Fronius HV",
-    "Goodwe HV",
-    "Fronius HV",
-    "Kostal HV",
-    "Goodwe HV",
-    "SMA SBS3.7/5.0",
-    "Kostal HV",
-    "SMA SBS3.7/5.0",
-    "Sungrow HV",
-    "Sungrow HV",
-    "Kaco HV",
-    "Kaco HV",
-    "Ingeteam HV",
-    "Ingeteam HV",
-    "SMA SBS 2.5 HV",
-    "",
-    "SMA SBS 2.5 HV",
-    "Fronius HV"
+    "Fronius HV", //0
+    "Goodwe HV", //1
+    "Fronius HV", //2
+    "Kostal HV", //3
+    "Goodwe HV",  //4
+    "SMA SBS3.7/5.0", //5
+    "Kostal HV", //6
+    "SMA SBS3.7/5.0",  //7
+    "Sungrow HV", //8
+    "Sungrow HV", //9
+    "Kaco HV", //10
+    "Kaco HV", //11
+    "Ingeteam HV", //12
+    "Ingeteam HV", //13
+    "SMA SBS 2.5 HV", //14
+    "undefined", //15
+    "SMA SBS 2.5 HV", //16
+    "Fronius HV", //17
+    "undefined", //18
+    "SMA STP"  //19
 ];
 
 const myINVsLVS = [
@@ -179,7 +182,8 @@ const myINVsLVS = [
     "SMA SBS2.5 HV",
     "Solar Edge LV",
     "Solar Edge LV",
-    "Solar Edge LV"
+    "Solar Edge LV",
+    "unknown"
 ];
 
 
@@ -516,6 +520,34 @@ function decodePacket2(data) {
         hvsNumCells = hvsModules * 7;
         hvsNumTemps = 0;
     }
+    if (hvsBattType_fromSerial == "LVS") { //unterschiedliche WR-Tabelle je nach Batt-Typ
+        hvsInvType_String = myINVsLVS[hvsInvType];
+    }
+    else {
+        hvsInvType_String = myINVs[hvsInvType];        
+    }
+    if (hvsInvType_String == undefined) {
+        hvsInvType_String = "undefined";
+    }
+/*        if (hvsInvType > myINVsLVS.length) {
+            hvsInvType = myINVsLVS.length -1;
+        }
+        adapter.log.error("hvsinvtype     >" + hvsInvType + "<");        
+        adapter.log.error("hvsinvtype     >" + myINVs.length + " " + myINVsLVS.length + "<");
+        adapter.log.error("hvsinvtype     >" + myINVsLVS[hvsInvType] + " " + myINVsLVS[hvsInvType-1] + "<");
+        adapter.setState("System.BattType", "LVS", true);
+        adapter.setState("System.InvType", myINVsLVS[hvsInvType], true);
+    } else {
+        if (hvsInvType >= myINVs.length) {
+            hvsInvType = myINVs.length -1;
+        }
+        adapter.log.error("hvsinvtype     >" + hvsInvType + "<");        
+        adapter.log.error("hvsinvtype     >" + myINVs.length + " " + myINVsLVS.length + "<");
+        adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
+        adapter.setState("System.InvType", myINVs[hvsInvType], true);
+    }*/
+
+
     if (hvsNumCells > 160) { hvsNumCells = 160; }
     if (hvsNumTemps > 64) { hvsNumTemps = 64; }
     if (ConfBatDetails && FirstRun) {
@@ -657,6 +689,10 @@ function setStates() {
     adapter.log.silly("hvsError        >" + hvsError + "<");
     adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
     adapter.log.silly("hvsSOC (Diag)   >" + hvsSOCDiagnosis + "<");
+    adapter.log.silly("BattType        >" + hvsBattType_fromSerial + "<");
+    adapter.log.silly("Invert. Type    >" + hvsInvType_String + "," + hvsInvType + "<");    
+ 
+
 
     adapter.setState("System.Serial", hvsSerial, true);
     adapter.setState("System.BMU", hvsBMU, true);
@@ -687,13 +723,10 @@ function setStates() {
         adapter.setState("State.Power_Consumption", 0, true);
         adapter.setState("State.Power_Delivery", -hvsPower, true);
     }
-    if (hvsBattType_fromSerial == "LVS") { //unterschiedliche WR-Tabelle je nach Batt-Typ
-        adapter.setState("System.BattType", "LVS", true);
-        adapter.setState("System.InvType", myINVsLVS[hvsInvType], true);
-    } else {
-        adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
-        adapter.setState("System.InvType", myINVs[hvsInvType], true);
-    }
+
+    adapter.setState("System.BattType", hvsBattType_fromSerial, true);
+    adapter.setState("System.InvType", hvsInvType_String, true);
+
     if (myNumberforDetails == 0) {
         adapter.setState("Diagnosis.mVoltMax", hvsMaxmVolt, true);
         adapter.setState("Diagnosis.mVoltMin", hvsMinmVolt, true);
