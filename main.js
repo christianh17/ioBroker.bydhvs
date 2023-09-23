@@ -529,24 +529,6 @@ function decodePacket2(data) {
     if (hvsInvType_String == undefined) {
         hvsInvType_String = "undefined";
     }
-/*        if (hvsInvType > myINVsLVS.length) {
-            hvsInvType = myINVsLVS.length -1;
-        }
-        adapter.log.error("hvsinvtype     >" + hvsInvType + "<");        
-        adapter.log.error("hvsinvtype     >" + myINVs.length + " " + myINVsLVS.length + "<");
-        adapter.log.error("hvsinvtype     >" + myINVsLVS[hvsInvType] + " " + myINVsLVS[hvsInvType-1] + "<");
-        adapter.setState("System.BattType", "LVS", true);
-        adapter.setState("System.InvType", myINVsLVS[hvsInvType], true);
-    } else {
-        if (hvsInvType >= myINVs.length) {
-            hvsInvType = myINVs.length -1;
-        }
-        adapter.log.error("hvsinvtype     >" + hvsInvType + "<");        
-        adapter.log.error("hvsinvtype     >" + myINVs.length + " " + myINVsLVS.length + "<");
-        adapter.setState("System.BattType", myBattTypes[hvsBattType], true);
-        adapter.setState("System.InvType", myINVs[hvsInvType], true);
-    }*/
-
 
     if (hvsNumCells > 160) { hvsNumCells = 160; }
     if (hvsNumTemps > 64) { hvsNumTemps = 64; }
