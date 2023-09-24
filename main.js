@@ -672,10 +672,8 @@ function setStates() {
     adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
     adapter.log.silly("hvsSOC (Diag)   >" + hvsSOCDiagnosis + "<");
     adapter.log.silly("BattType        >" + hvsBattType_fromSerial + "<");
-    adapter.log.silly("Invert. Type    >" + hvsInvType_String + "," + hvsInvType + "<");    
+    adapter.log.silly("Invert. Type    >" + hvsInvType_String + ", Nr: " + hvsInvType + "<");    
  
-
-
     adapter.setState("System.Serial", hvsSerial, true);
     adapter.setState("System.BMU", hvsBMU, true);
     adapter.setState("System.BMUBankA", hvsBMUA, true);
