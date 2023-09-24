@@ -1,4 +1,7 @@
 # Older changes
+## 1.2.2 (2021-06-14)
+* bump to new patch-level (to get rid of the "-0")
+
 ## 1.2.2-0 (2021-05-30)
 * Create States for Diagnose-Data only if necessary
 * changes according review of the adapter
