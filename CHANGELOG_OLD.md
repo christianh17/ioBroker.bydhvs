@@ -1,4 +1,7 @@
 # Older changes
+## 1.2.3 (2021-06-18)
+* changed ratio of logo
+
 ## 1.2.2 (2021-06-14)
 * bump to new patch-level (to get rid of the "-0")
 
