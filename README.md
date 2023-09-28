@@ -53,6 +53,8 @@ Zu den Batterie-Größen: Der Adapter funktioniert für Zelltemperaturen und Zel
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* Typo in version number removed
 ### 1.4.1 (2023-09-24)
 * Compatibility with js.controller 5x
 * Removed some bugs in detecting inverter
