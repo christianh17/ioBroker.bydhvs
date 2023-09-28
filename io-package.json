@@ -1,8 +1,34 @@
 {
     "common": {
         "name": "bydhvs",
-        "version": "1.4.0",
+        "version": "1.4.2",
         "news": {
+            "1.4.2": {
+                "en": "typo in version number corrected\n",
+                "de": "typo in versionsnummer korrigiert\n",
+                "ru": "typo в версии номер исправлен\n",
+                "pt": "typo no número da versão corrigido\n",
+                "nl": "typo in versie nummer correct\n",
+                "fr": "typo dans la version numéro corrigé\n",
+                "it": "typo nel numero di versione corretto\n",
+                "es": "typo en el número de versión corregido\n",
+                "pl": "typo\n",
+                "uk": "типо в номер версія виправлено\n",
+                "zh-cn": "更正编号的类型\n"
+            },
+            "1.4.1": {
+                "en": "support of js-controller 5 and detection of more inverters",
+                "de": "Unterstützung js-controllers 5 und Erkennung von mehr Wechselrichtern",
+                "ru": "поддержка js-controller 5 и обнаружение более инверторов",
+                "pt": "suporte de js-controller 5 e detecção de mais inversores",
+                "nl": "quality over quantity (qoq) releases vertaling:",
+                "fr": "support de js-controller 5 et détection de plus d'invertisseurs",
+                "it": "supporto di js-controller 5 e rilevamento di più inverter",
+                "es": "soporte de js-controller 5 y detección de más inversores",
+                "pl": "poparcie sterownika 5 i wykrycie bardziej intruzatorów",
+                "uk": "підтримка js-controller 5 і виявлення більш інверторів",
+                "zh-cn": "b. 支持控制巴士5和发现更多防火器"
+                },    
             "1.4.0": {
                 "en": "5 modules supported, frequency limit for polling removed, security updates",
                 "de": "5 Module unterstützt, Frequenzgrenze für die Abfrage entfernt, Sicherheitsupdates",
