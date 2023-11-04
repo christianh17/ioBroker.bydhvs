@@ -29,9 +29,15 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 
 ## Changelog
 <!--
-* breaking change: 
+	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+
+### __WORK IN PROGRESS__
+* Breaking change: nodejs 16 minimum required  
+* automated checks and release-script repaired (thanks to mcm1957, he did the work)
+* nothing else changed in code
+
 ### 1.4.2 (2023-09-28)
 * Typo in version number removed
 
