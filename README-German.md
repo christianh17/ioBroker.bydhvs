@@ -17,3 +17,5 @@ Lesezyklen zu Batterie-Details: Anzahl der "Normal-Lese-Zyklen" bis wieder einma
 
 Zu den Batterie-Größen: Der Adapter funktioniert für Zelltemperaturen und ZellSpannungen bei 2-5 Batterie-Modulen. 
 
+[Zurück zur automatisch übersetzten Readme](README.md)
+

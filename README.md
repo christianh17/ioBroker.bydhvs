@@ -25,9 +25,11 @@ Battery-details - every ... cycles :Also like above, should be clear
 Test Mode - show data in error log: If you check this box: the sent and recieved data are displayed in the error-log, so you can easily download the data and send it to me in case of errors. 
 Copy and Paste does not work - the data is cut at the end. You will have to download it before you send it to me.
 
+[Link zur nativen deutschen Readme:](README-German.md)
+
 ## Changelog
 <!--
-	Placeholder for the next version (at the beginning of the line):
+* breaking change: 
 	### __WORK IN PROGRESS__
 -->
 ### 1.4.2 (2023-09-28)
