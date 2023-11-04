@@ -32,8 +32,7 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-
-### __WORK IN PROGRESS__
+### 1.5.0 (2023-11-04)
 * Breaking change: nodejs 16 minimum required  
 * automated checks and release-script repaired (thanks to mcm1957, he did the work)
 * nothing else changed in code
@@ -58,10 +57,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 ### 1.3.0 (2021-11-06)
 * updated even more dependencies
 * official release with new state SOH
-
-### 1.2.4-0 (2021-11-02)
-* Added state: SOH
-* updated dependencies as suggested from bot
 
 ###
 

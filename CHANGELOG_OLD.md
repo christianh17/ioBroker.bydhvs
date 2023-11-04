@@ -1,4 +1,8 @@
 # Older changes
+## 1.2.4-0 (2021-11-02)
+* Added state: SOH
+* updated dependencies as suggested from bot
+
 ## 1.2.3 (2021-06-18)
 * changed ratio of logo
 

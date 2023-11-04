@@ -1,307 +1,176 @@
 {
-    "common": {
-        "name": "bydhvs",
-        "version": "1.4.2",
-        "news": {
-            "1.4.2": {
-                "en": "typo in version number corrected\n",
-                "de": "typo in versionsnummer korrigiert\n",
-                "ru": "typo в версии номер исправлен\n",
-                "pt": "typo no número da versão corrigido\n",
-                "nl": "typo in versie nummer correct\n",
-                "fr": "typo dans la version numéro corrigé\n",
-                "it": "typo nel numero di versione corretto\n",
-                "es": "typo en el número de versión corregido\n",
-                "pl": "typo\n",
-                "uk": "типо в номер версія виправлено\n",
-                "zh-cn": "更正编号的类型\n"
-            },
-            "1.4.1": {
-                "en": "support of js-controller 5 and detection of more inverters",
-                "de": "Unterstützung js-controllers 5 und Erkennung von mehr Wechselrichtern",
-                "ru": "поддержка js-controller 5 и обнаружение более инверторов",
-                "pt": "suporte de js-controller 5 e detecção de mais inversores",
-                "nl": "quality over quantity (qoq) releases vertaling:",
-                "fr": "support de js-controller 5 et détection de plus d'invertisseurs",
-                "it": "supporto di js-controller 5 e rilevamento di più inverter",
-                "es": "soporte de js-controller 5 y detección de más inversores",
-                "pl": "poparcie sterownika 5 i wykrycie bardziej intruzatorów",
-                "uk": "підтримка js-controller 5 і виявлення більш інверторів",
-                "zh-cn": "b. 支持控制巴士5和发现更多防火器"
-                },    
-            "1.4.0": {
-                "en": "5 modules supported, frequency limit for polling removed, security updates",
-                "de": "5 Module unterstützt, Frequenzgrenze für die Abfrage entfernt, Sicherheitsupdates",
-                "ru": "5 поддерживаемых модулей, частотный лимит для удаления опроса, обновления безопасности",
-                "pt": "5 módulos suportados, limite de frequência para votação removido, atualizações de segurança",
-                "nl": "vijf modules ondersteund, frequentielimiet voor het vervullen van de beveiliging",
-                "fr": "5 modules supportés, limite de fréquence pour le polling supprimé, mises à jour de sécurité",
-                "it": "5 moduli supportati, limite di frequenza per la rimozione del polling, aggiornamenti di sicurezza",
-                "es": "5 módulos compatibles, límite de frecuencia para las encuestas eliminadas, actualizaciones de seguridad",
-                "pl": "5 modułów obsługiwanych, limit częstotliwości zanieczyszczeń, aktualizacja bezpieczeństwa",
-                "uk": "5 модулів підтримуються, частотний ліміт для видалення пилу, оновлення безпеки",
-                "zh-cn": "5个单元支助,清除的污染频率限制,安全更新"
-              },
-            "1.3.1": {
-                "en": "updated even more dependencies\nofficial release with new state SOH",
-                "de": "noch mehr Abhängigkeiten aktualisiert\noffizielle Veröffentlichung mit neuem Zustand SOH",
-                "ru": "обновлено еще больше зависимостей\nофициальный релиз с новым состоянием SOH",
-                "pt": "atualizou ainda mais dependências\nlançamento oficial com novo estado SOH",
-                "nl": "nog meer afhankelijkheden bijgewerkt\nofficiële release met nieuwe staat SOH",
-                "fr": "mis à jour encore plus de dépendances\nsortie officielle avec le nouvel état SOH",
-                "it": "aggiornato ancora più dipendenze\nrilascio ufficiale con il nuovo stato SOH",
-                "es": "actualizado aún más dependencias\nlanzamiento oficial con el nuevo estado SOH",
-                "pl": "zaktualizowałem jeszcze więcej zależności\noficjalne wydanie z nowym stanem SOH",
-                "zh-cn": "更新了更多依赖项\n正式发布新状态 SOH"
-            },
-            "1.2.4-0": {
-                "en": "Added state: SOH\nupdated dependencies as suggested from bot",
-                "de": "Hinzugefügter Zustand: SOH\naktualisierte Abhängigkeiten wie vom Bot vorgeschlagen",
-                "ru": "Добавлено состояние: SOH\nобновленные зависимости, как было предложено от бота",
-                "pt": "Estado adicionado: SOH\ndependências atualizadas conforme sugerido pelo bot",
-                "nl": "Toegevoegde staat: SOH\nbijgewerkte afhankelijkheden zoals voorgesteld door bot",
-                "fr": "État ajouté : SOH\ndépendances mises à jour comme suggéré par le bot",
-                "it": "Stato aggiunto: SOH\ndipendenze aggiornate come suggerito da bot",
-                "es": "Estado añadido: SOH\ndependencias actualizadas según lo sugerido por el bot",
-                "pl": "Dodany stan: SOH\nzaktualizowane zależności zgodnie z sugestią bota",
-                "zh-cn": "添加状态：SOH\n按照 bot 的建议更新依赖项"
-            },
-            "1.2.3": {
-                "en": "changed ratio of logo",
-                "de": "geändertes Verhältnis des Logos",
-                "ru": "изменено соотношение логотипа",
-                "pt": "proporção alterada do logotipo",
-                "nl": "gewijzigde verhouding van logo",
-                "fr": "rapport modifié du logo",
-                "it": "rapporto modificato del logo",
-                "es": "proporción cambiada del logotipo",
-                "pl": "zmieniony stosunek logo",
-                "zh-cn": "更改徽标比例"
-            },
-            "1.2.2": {
-                "en": "bump to new patch-level (to get rid of the \"-0\")",
-                "de": "Auf neues Patch-Level springen (um das \"-0\" loszuwerden)",
-                "ru": "перейти на новый уровень патча (чтобы избавиться от \"-0\")",
-                "pt": "pular para um novo nível de patch (para se livrar do \"-0\")",
-                "nl": "hobbel naar nieuw patch-niveau (om van de \"-0 af te komen\")",
-                "fr": "passer au nouveau niveau de correctif (pour se débarrasser du \"-0\")",
-                "it": "passare a un nuovo livello di patch (per eliminare lo \"-0\")",
-                "es": "subir a un nuevo nivel de parche (para deshacerse del \"-0\")",
-                "pl": "wskoczyć na nowy poziom patcha (aby pozbyć się „-0”)",
-                "zh-cn": "碰撞到新的补丁级别（摆脱“-0”）"
-            },
-            "1.2.2-0": {
-                "en": "Create States for Diagnose-Data only if necessary\nchanges according review of the adapter",
-                "de": "Erstellen Sie nur bei Bedarf Zustände für Diagnosedaten\nÄnderungen entsprechend Überprüfung des Adapters",
-                "ru": "Создавайте состояния для диагностических данных только при необходимости\nизменения согласно обзору адаптера",
-                "pt": "Crie estados para dados de diagnóstico apenas se necessário\nmudanças de acordo com a revisão do adaptador",
-                "nl": "Maak alleen statussen voor diagnosegegevens als dat nodig is\nverandert volgens herziening van de adapter",
-                "fr": "Créer des états pour les données de diagnostic uniquement si nécessaire\nchangements en fonction de l'examen de l'adaptateur",
-                "it": "Crea stati per Diagnose-Data solo se necessario\ncambia in base alla revisione dell'adattatore",
-                "es": "Crear estados para datos de diagnóstico solo si es necesario\ncambios según revisión del adaptador",
-                "pl": "Utwórz stany dla danych diagnostycznych tylko wtedy, gdy jest to konieczne\nzmienia się zgodnie z przeglądem adaptera",
-                "zh-cn": "仅在必要时创建诊断数据状态\n根据适配器的审查而改变"
-            },
-            "1.2.1": {
-                "en": "Power is now fixed with 2 number after the decimal point\nbug removed, cell voltage for cell 64 works now",
-                "de": "Die Leistung wird jetzt mit 2 Zahlen nach dem Dezimalpunkt festgelegt\nFehler entfernt, Zellenspannung für Zelle 64 funktioniert jetzt",
-                "ru": "Мощность теперь фиксируется двумя цифрами после десятичной точки.\nошибка устранена, напряжение ячейки для ячейки 64 теперь работает",
-                "pt": "A potência agora é fixada com 2 números após o ponto decimal\nbug removido, a voltagem da célula para a célula 64 funciona agora",
-                "nl": "De macht staat nu vast met 2 cijfers achter de komma\nbug verwijderd, celspanning voor cel 64 werkt nu",
-                "fr": "La puissance est maintenant fixée avec 2 chiffres après la virgule décimale\nbug supprimé, la tension de la cellule 64 fonctionne maintenant",
-                "it": "La potenza è ora fissata con 2 numeri dopo il punto decimale\nbug rimosso, la tensione della cella per la cella 64 ora funziona",
-                "es": "La potencia ahora se fija con 2 números después del punto decimal\nerror eliminado, el voltaje de la celda para la celda 64 funciona ahora",
-                "pl": "Moc jest teraz ustalona liczbą 2 po przecinku\nusunięty błąd, napięcie ogniwa dla ogniwa 64 działa teraz",
-                "zh-cn": "小数点后的功率现在固定为2\n错误已删除，单元64的单元电压现在可以工作"
-            },
-            "1.2.0": {
-                "en": "preparation for being listed in official repository\nEnglish part in readme.md\nremoved State.ErrorNum totally in code, datapoint has to be deleted manually - I did not found a way to do it with JS\nhopefully works with HVM and HVS and possibly with HVL (only American market)\nredesign and more robust detection: number of cells for voltage and temperature\nNew: inverter type\nNew: type of battery \ncompatibility with new js-controller 3.3\ncompatibility with nodejs 15\ncompatibility with admin UI 5",
-                "de": "Vorbereitung für die Aufnahme in das offizielle Repository\nEnglischer Teil in readme.md\nState.ErrorNum vollständig im Code entfernt, Datenpunkt muss manuell gelöscht werden - ich habe keine Möglichkeit gefunden, dies mit JS zu tun\nhoffentlich funktioniert mit HVM und HVS und möglicherweise mit HVL (nur amerikanischer Markt)\nNeugestaltung und robustere Erkennung: Anzahl der Zellen für Spannung und Temperatur\nNeu: Wechselrichtertyp\nNeu: Batterietyp\nKompatibilität mit neuem js-controller 3.3\nKompatibilität mit NodeJS 15\nKompatibilität mit der Admin-Benutzeroberfläche 5",
-                "ru": "подготовка к размещению в официальном репозитории\nАнглийская часть в readme.md\nполностью удален State.ErrorNum в коде, точку данных нужно удалить вручную - я не нашел способа сделать это с помощью JS\nнадеюсь работает с HVM и HVS и, возможно, с HVL (только американский рынок)\nмодернизация и более надежное обнаружение: количество ячеек для напряжения и температуры\nНовинка: инверторного типа\nНовинка: тип батареи\nсовместимость с новым js-контроллером 3.3\nсовместимость с nodejs 15\nсовместимость с административным интерфейсом 5",
-                "pt": "preparação para ser listado no repositório oficial\nParte em inglês em readme.md\nremoveu o State.ErrorNum totalmente no código, o ponto de dados tem que ser excluído manualmente - não encontrei uma maneira de fazer isso com JS\nespero que funcione com HVM e HVS e possivelmente com HVL (apenas no mercado americano)\nredesenho e detecção mais robusta: número de células para tensão e temperatura\nNovo: tipo de inversor\nNovo: tipo de bateria\ncompatibilidade com o novo js-controller 3.3\ncompatibilidade com nodejs 15\ncompatibilidade com admin UI 5",
-                "nl": "voorbereiding om in de officiële repository te worden vermeld\nEngels gedeelte in readme.md\nverwijderd State.ErrorNum volledig in code, datapunt moet handmatig worden verwijderd - ik heb geen manier gevonden om het met JS te doen\nwerkt hopelijk met HVM en HVS en mogelijk met HVL (alleen Amerikaanse markt)\nherontwerp en robuustere detectie: aantal cellen voor spanning en temperatuur\nNieuw: omvormertype\nNieuw: type batterij\ncompatibiliteit met nieuwe js-controller 3.3\ncompatibiliteit met nodejs 15\ncompatibiliteit met admin UI 5",
-                "fr": "préparation à l'inscription dans le référentiel officiel\nPartie anglaise dans readme.md\nsupprimé State.ErrorNum totalement dans le code, le point de données doit être supprimé manuellement - je n'ai pas trouvé de moyen de le faire avec JS\navec un peu de chance fonctionne avec HVM et HVS et éventuellement avec HVL (marché américain uniquement)\nrefonte et détection plus robuste: nombre de cellules pour la tension et la température\nNouveau: type d'onduleur\nNouveau: type de batterie\ncompatibilité avec le nouveau js-controller 3.3\ncompatibilité avec nodejs 15\ncompatibilité avec l'interface utilisateur d'administration 5",
-                "it": "preparazione per essere elencati nel repository ufficiale\nParte inglese in readme.md\nrimosso State.ErrorNum totalmente nel codice, il datapoint deve essere cancellato manualmente - non ho trovato un modo per farlo con JS\nsi spera che funzioni con HVM e HVS e possibilmente con HVL (solo mercato americano)\nriprogettazione e rilevamento più robusto: numero di celle per tensione e temperatura\nNovità: tipo inverter\nNovità: tipo di batteria\ncompatibilità con il nuovo js-controller 3.3\ncompatibilità con nodejs 15\ncompatibilità con l'interfaccia utente di amministrazione 5",
-                "es": "preparación para ser incluido en el repositorio oficial\nParte en inglés en readme.md\neliminado State.ErrorNum totalmente en el código, el punto de datos debe eliminarse manualmente; no encontré una manera de hacerlo con JS\ncon suerte funciona con HVM y HVS y posiblemente con HVL (solo mercado estadounidense)\nrediseño y detección más robusta: número de celdas para voltaje y temperatura\nNuevo: tipo de inversor\nNuevo: tipo de batería\ncompatibilidad con el nuevo js-controller 3.3\ncompatibilidad con nodejs 15\ncompatibilidad con la interfaz de usuario de administración 5",
-                "pl": "przygotowanie do umieszczenia w oficjalnym repozytorium\nCzęść angielska w readme.md\nusunięto State.ErrorNum w całości w kodzie, punkt danych należy usunąć ręcznie - nie znalazłem sposobu na zrobienie tego z JS\nmam nadzieję, że współpracuje z HVM i HVS i prawdopodobnie z HVL (tylko rynek amerykański)\nprzeprojektowanie i bardziej niezawodne wykrywanie: liczba ogniw dla napięcia i temperatury\nNowość: typ falownika\nNowość: rodzaj baterii\nkompatybilność z nowym kontrolerem js 3.3\nkompatybilność z nodejs 15\nzgodność z interfejsem administratora 5",
-                "zh-cn": "准备列入官方资料库\nreadme.md中的英语部分\n完全在代码中删除了State.ErrorNum，必须手动删除数据点-我没有找到使用JS的方法\n希望与HVM和HVS以及可能与HVL（仅限美国市场）一起使用\n重新设计和更可靠的检测：电压和温度的电池数量\n新增：逆变器类型\n新增：电池类型\n与新的js-controller 3.3的兼容性\n与nodejs 15的兼容性\n与管理界面5的兼容性"
-            },
-            "1.1.0": {
-                "en": "HVS-Version with two banks and - hopefully - correct display\nstates are now with units, the existing states are changed\nnew states Power_Consumption and Power_Delivery for summarizing \nSystems with 5 modules: Temp display should work now for all cells, voltage only for first 128\nmoved state from State.ErrorNum to System.ErrorNum --> old states exists further on, I do not know how to delete it, adapter.deletestate does not work.\ndeleted test-answers --> moved to my BYD-HVS-Simulator\nsome minor bugs removed\nobviously the adapter works for hvm, too -> need more testers and an idea for a new name",
-                "de": "HVS-Version mit zwei Bänken und - hoffentlich - korrekter Anzeige\nZustände sind jetzt mit Einheiten, die vorhandenen Zustände werden geändert\nneue Zustände Power_Consumption und Power_Delivery zur Zusammenfassung\nSysteme mit 5 Modulen: Die Temperaturanzeige sollte jetzt für alle Zellen funktionieren, die Spannung nur für die ersten 128\nStatus von State.ErrorNum nach System.ErrorNum verschoben -> alte Status existieren weiter, ich weiß nicht, wie ich ihn löschen soll, adapter.deletestate funktioniert nicht.\ngelöschte Testantworten -> in meinen BYD-HVS-Simulator verschoben\nEinige kleinere Fehler wurden entfernt\nnatürlich funktioniert der adapter auch für hvm -> brauche mehr tester und eine idee für einen neuen namen",
-                "ru": "Версия HVS с двумя банками и, надеюсь, правильным отображением\nсостояния теперь с юнитами, существующие состояния изменены\nновые состояния Power_Consuming и Power_Delivery для подведения итогов\nСистемы с 5 модулями: отображение температуры теперь должно работать для всех ячеек, напряжение только для первых 128\nперенесено состояние из State.ErrorNum в System.ErrorNum -> старые состояния существуют дальше, я не знаю, как его удалить, адаптер.deletestate не работает.\nудаленные тестовые ответы -> перенесены в мой BYD-HVS-Simulator\nустранены некоторые мелкие ошибки\nочевидно, что адаптер работает и для hvm -> нужно больше тестеров и идея для нового имени",
-                "pt": "Versão HVS com dois bancos e - esperançosamente - exibição correta\nestados agora estão com unidades, os estados existentes são alterados\nnovos estados Power_Consumption e Power_Delivery para resumir\nSistemas com 5 módulos: o display de temperatura deve funcionar agora para todas as células, voltagem apenas para os primeiros 128\nestado movido de State.ErrorNum para System.ErrorNum -> estados antigos existem mais adiante, não sei como excluí-lo, adapter.deletestate não funciona.\nrespostas de teste excluídas -> movidas para meu Simulador BYD-HVS\nalguns pequenos bugs removidos\nobviamente, o adaptador também funciona para hvm -> preciso de mais testadores e uma ideia para um novo nome",
-                "nl": "HVS-versie met twee banken en - hopelijk - correcte weergave\nstaten zijn nu met eenheden, de bestaande staten zijn gewijzigd\nnieuwe staten Power_Consumption en Power_Delivery om samen te vatten\nSystemen met 5 modules: de temperatuurweergave zou nu voor alle cellen moeten werken, spanning alleen voor de eerste 128\nstaat verplaatst van State.ErrorNum naar System.ErrorNum -> oude staten bestaan verderop, ik weet niet hoe ik het moet verwijderen, adapter.deletestate werkt niet.\nverwijderde testantwoorden -> verplaatst naar mijn BYD-HVS-Simulator\nenkele kleine bugs verwijderd\nuiteraard werkt de adapter ook voor hvm -> hebben meer testers nodig en een idee voor een nieuwe naam",
-                "fr": "Version HVS avec deux banques et - espérons-le - affichage correct\nles états sont maintenant avec des unités, les états existants sont modifiés\nnouveaux états Power_Consumption et Power_Delivery pour la synthèse\nSystèmes avec 5 modules: l'affichage de la température devrait maintenant fonctionner pour toutes les cellules, la tension uniquement pour les 128 premiers\nétat déplacé de State.ErrorNum à System.ErrorNum -> les anciens états existent plus loin, je ne sais pas comment le supprimer, adapter.deletestate ne fonctionne pas.\ntest-réponses supprimées -> déplacé vers mon BYD-HVS-Simulator\nquelques bugs mineurs supprimés\névidemment l'adaptateur fonctionne aussi pour hvm -> besoin de plus de testeurs et d'une idée pour un nouveau nom",
-                "it": "Versione HVS con due banchi e, si spera, visualizzazione corretta\ngli stati ora sono con unità, gli stati esistenti vengono modificati\nnuovi stati Power_Consumption e Power_Delivery per il riepilogo\nSistemi con 5 moduli: il display Temp dovrebbe ora funzionare per tutte le celle, la tensione solo per le prime 128\nstato spostato da State.ErrorNum a System.ErrorNum -> i vecchi stati esistono più avanti, non so come eliminarlo, adapter.deletestate non funziona.\nrisposte test eliminate -> spostato nel mio simulatore BYD-HVS\nalcuni bug minori rimossi\novviamente l'adattatore funziona anche per hvm -> servono più tester e un'idea per un nuovo nome",
-                "es": "Versión HVS con dos bancos y, con suerte, visualización correcta\nlos estados ahora están con unidades, los estados existentes se cambian\nnuevos estados Power_Consumption y Power_Delivery para resumir\nSistemas con 5 módulos: la pantalla de temperatura debería funcionar ahora para todas las celdas, el voltaje solo para los primeros 128\nmovió el estado de State.ErrorNum a System.ErrorNum -> los estados antiguos existen más adelante, no sé cómo eliminarlo, adapter.deletestate no funciona.\nrespuestas de prueba eliminadas -> movido a mi BYD-HVS-Simulator\nalgunos errores menores eliminados\nobviamente, el adaptador también funciona para hvm -> necesito más probadores y una idea para un nuevo nombre",
-                "pl": "Wersja HVS z dwoma bankami i - miejmy nadzieję - poprawnym wyświetlaniem\nstany są teraz z jednostkami, istniejące stany są zmieniane\nnowe stany Power_Consumption i Power_Delivery do podsumowania\nSystemy z 5 modułami: Wyświetlacz temperatury powinien teraz działać dla wszystkich ogniw, napięcie tylko dla pierwszych 128\nprzeniesiony stan z State.ErrorNum do System.ErrorNum -> stare stany istnieją dalej, nie wiem jak to usunąć, adapter.deletestate nie działa.\nusunięte odpowiedzi testowe -> przeniesione do mojego symulatora BYD-HVS\nusunięto kilka drobnych błędów\noczywiście adapter działa też dla hvm -> potrzebuję więcej testerów i pomysłu na nową nazwę",
-                "zh-cn": "具有两个库的HVS版本，并且-希望-正确显示\n状态现在带有单位，现有状态已更改\n用于汇总的新状态Power_Consumption和Power_Delivery\n带有5个模块的系统：温度显示现在应可用于所有电池，电压仅适用于前128个\n将状态从State.ErrorNum移到System.ErrorNum->旧状态进一步存在，我不知道如何删除它，adapter.deletestate不起作用。\n删除的测试答案->移至我的BYD-HVS-Simulator\n删除了一些小错误\n显然，适配器也适用于hvm->需要更多的测试人员和一个新名字的想法"
-            },
-            "1.0.0": {
-                "en": "Update all dependencies\nfirst public version",
-                "de": "Aktualisieren Sie alle Abhängigkeiten\nerste öffentliche Version",
-                "ru": "Обновите все зависимости\nпервая публичная версия",
-                "pt": "Atualize todas as dependências\nprimeira versão pública",
-                "nl": "Werk alle afhankelijkheden bij\neerste openbare versie",
-                "fr": "Mettre à jour toutes les dépendances\npremière version publique",
-                "it": "Aggiorna tutte le dipendenze\nprima versione pubblica",
-                "es": "Actualizar todas las dependencias\nprimera versión pública",
-                "pl": "Zaktualizuj wszystkie zależności\npierwsza publiczna wersja",
-                "zh-cn": "更新所有依赖项\n首次公开发行"
-            },
-            "0.1.4-beta.0": {
-                "en": "1st change with release-script",
-                "de": "1. Änderung mit Release-Skript",
-                "ru": "1-е изменение с релиз-скриптом",
-                "pt": "1ª alteração com script de lançamento",
-                "nl": "1e wijziging met release-script",
-                "fr": "1er changement avec release-script",
-                "it": "1a modifica con lo script di rilascio",
-                "es": "1er cambio con el script de lanzamiento",
-                "pl": "Pierwsza zmiana ze skryptem wydania",
-                "zh-cn": "发布脚本的第一个变化"
-            },
-            "0.1.3": {
-                "en": "Test Mode for getting hex data easily",
-                "de": "Testmodus zum einfachen Abrufen von Hex-Daten",
-                "ru": "Тестовый режим для легкого получения шестнадцатеричных данных",
-                "pt": "Modo de teste para obter dados hexadecimais facilmente",
-                "nl": "Testmodus om gemakkelijk hexadecimale gegevens te verkrijgen",
-                "fr": "Mode test pour obtenir facilement des données hexadécimales",
-                "it": "Modalità test per ottenere facilmente dati esadecimali",
-                "es": "Modo de prueba para obtener datos hexadecimales fácilmente",
-                "pl": "Tryb testowy do łatwego uzyskiwania danych szesnastkowych",
-                "zh-cn": "测试模式可轻松获取十六进制数据"
-            },
-            "0.1.2": {
-                "en": "voltage is unsigned - should now work",
-                "de": "Spannung ist ohne Vorzeichen - sollte jetzt funktionieren",
-                "ru": "напряжение без знака - теперь должно работать",
-                "pt": "a tensão não está sinalizada - agora deve funcionar",
-                "nl": "spanning is niet ondertekend - zou nu moeten werken",
-                "fr": "la tension n'est pas signée - devrait maintenant fonctionner",
-                "it": "la tensione non è firmata - ora dovrebbe funzionare",
-                "es": "el voltaje no está firmado - ahora debería funcionar",
-                "pl": "napięcie jest niepodpisane - powinno teraz działać",
-                "zh-cn": "电压无符号-现在应该可以工作"
-            },
-            "0.1.1": {
-                "en": "Documentation (only German)",
-                "de": "Dokumentation (nur deutsch)",
-                "ru": "Документация (только на немецком языке)",
-                "pt": "Documentação (somente alemão)",
-                "nl": "Documentatie (alleen Duits)",
-                "fr": "Documentation (uniquement en allemand)",
-                "it": "Documentazione (solo tedesco)",
-                "es": "Documentación (solo en alemán)",
-                "pl": "Dokumentacja (tylko w języku niemieckim)",
-                "zh-cn": "文档（仅德语）"
-            },
-            "0.1.0": {
-                "en": "First release with limited public announcement",
-                "de": "Erste Veröffentlichung mit begrenzter öffentlicher Ankündigung",
-                "ru": "Первый выпуск с ограниченным публичным объявлением",
-                "pt": "Primeiro lançamento com anúncio público limitado",
-                "nl": "Eerste uitgave met beperkte openbare aankondiging",
-                "fr": "Première version avec annonce publique limitée",
-                "it": "Primo rilascio con annuncio pubblico limitato",
-                "es": "Primer lanzamiento con anuncio público limitado",
-                "pl": "Pierwsza wersja z ograniczonym publicznym ogłoszeniem",
-                "zh-cn": "首次发布，并发布了有限的公告"
-            },
-            "0.0.3": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Начальная версия",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "zh-cn": "首次出版"
-            }
-        },
-        "title": "BYD HVS Battery",
-        "titleLang": {
-            "en": "BYD HVS Battery",
-            "de": "BYD HVS Batterie",
-            "ru": "BYD HVS аккумулятор",
-            "pt": "Bateria BYD HVS",
-            "nl": "BYD HVS-batterij",
-            "fr": "Batterie BYD HVS",
-            "it": "Batteria BYD HVS",
-            "es": "Batería BYD HVS",
-            "pl": "Akumulator BYD HVS",
-            "zh-cn": "比亚迪HVS电池"
-        },
-        "desc": {
-            "en": "BYD HVS Battery poll data",
-            "de": "BYD HVS Batterieabfragedaten",
-            "ru": "BYD HVS Данные опроса аккумулятора",
-            "pt": "Dados de sondagem da bateria BYD HVS",
-            "nl": "BYD HVS Battery poll-gegevens",
-            "fr": "BYD HVS Battery poll data",
-            "it": "BYD HVS Dati di polling della batteria",
-            "es": "Datos de sondeo de la batería BYD HVS",
-            "pl": "Dane ankietowe dotyczące baterii BYD HVS",
-            "zh-cn": "比亚迪HVS电池民意调查数据"
-        },
-        "authors": [
-            "Christian <github@familie-herrmann.de>"
-        ],
-        "keywords": [
-            "byd hvs battery pv"
-        ],
-        "license": "MIT",
-        "platform": "Javascript/Node.js",
-        "main": "main.js",
-        "icon": "bydhvs.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ChristianH17/ioBroker.bydhvs/master/admin/bydhvs.png",
-        "readme": "https://github.com/ChristianH17/ioBroker.bydhvs/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "energy",
-        "compact": true,
-        "connectionType": "local",
-        "dataSource": "poll",
-        "materialize": true,
-        "dependencies": [
-            {
-                "js-controller": ">=2.0.0"
-            }
-        ]
+  "common": {
+    "name": "bydhvs",
+    "version": "1.5.0",
+    "news": {
+      "1.5.0": {
+        "en": "Breaking change: nodejs 16 minimum required  \nautomated checks and release-script repaired (thanks to mcm1957, he did the work)\nnothing else changed in code",
+        "de": "Breaking change: nodejs 16 minimum erforderlich\nautomatisierte kontrollen und release-script repariert (dank mcm1957, er tat die arbeit)\nnichts anders geändert in code",
+        "ru": "Разбивка изменения: nodejs 16 минимум требуется\nавтоматизированные проверки и релиз-скрипты отремонтированы (спасибо mcm1957, он сделал работу)\nничего не изменилось в коде",
+        "pt": "Alteração de ruptura: nodejs 16 mínimo necessário\nverificações automatizadas e release-script reparado (graças a mcm1957, ele fez o trabalho)\nnada mais mudou no código",
+        "nl": "Verandering: Nodej 16 minimum vereist\ngeautomatiseerde cheques en uitgave gerepareerd (danks aan mcm1957, hij deed het werk\nniets anders veranderd in code",
+        "fr": "Changement de rupture: nodejs 16 minimum requis\nvérifications automatisées et relevage-script réparé (merci à mcm1957, il a fait le travail)\nrien d'autre n'a changé de code",
+        "it": "Cambiamento di rottura: nodejs 16 minimo richiesto\ncontrolli automatizzati e release-script riparato (grazie a mcm1957, ha fatto il lavoro)\nniente altro cambiato in codice",
+        "es": "Cambio de ruptura: nodejs 16 mínimo requerido\ncheques automatizados y desbloqueo reparados (gracias a mcm1957, hizo el trabajo)\nnada más cambió en código",
+        "pl": "Zmiana węzłów: 16 wymagane minimum wymagane jest minimum\nzautomatyzowane sprawozdania i naprawione pisownie (do mcm1957 dokonał)\nnic innego nie zmieniło się w kodie",
+        "uk": "Зміна розривів: nodejs 16 мінімальний\nавтоматизовані перевірки та редакційно-регулятивно-редагувальні роботи (додатки до мкм1957 р.)\nнічого не змінився в коді",
+        "zh-cn": "意外变化:不需要16个最低限度\n自动检查和释放后修理(他的工作)\n守则的任何改变"
+      },
+      "1.4.2": {
+        "en": "typo in version number corrected\n",
+        "de": "typo in versionsnummer korrigiert\n",
+        "ru": "typo в версии номер исправлен\n",
+        "pt": "typo no número da versão corrigido\n",
+        "nl": "typo in versie nummer correct\n",
+        "fr": "typo dans la version numéro corrigé\n",
+        "it": "typo nel numero di versione corretto\n",
+        "es": "typo en el número de versión corregido\n",
+        "pl": "typo\n",
+        "uk": "типо в номер версія виправлено\n",
+        "zh-cn": "更正编号的类型\n"
+      },
+      "1.4.1": {
+        "en": "support of js-controller 5 and detection of more inverters",
+        "de": "Unterstützung js-controllers 5 und Erkennung von mehr Wechselrichtern",
+        "ru": "поддержка js-controller 5 и обнаружение более инверторов",
+        "pt": "suporte de js-controller 5 e detecção de mais inversores",
+        "nl": "quality over quantity (qoq) releases vertaling:",
+        "fr": "support de js-controller 5 et détection de plus d'invertisseurs",
+        "it": "supporto di js-controller 5 e rilevamento di più inverter",
+        "es": "soporte de js-controller 5 y detección de más inversores",
+        "pl": "poparcie sterownika 5 i wykrycie bardziej intruzatorów",
+        "uk": "підтримка js-controller 5 і виявлення більш інверторів",
+        "zh-cn": "b. 支持控制巴士5和发现更多防火器"
+      },
+      "1.4.0": {
+        "en": "5 modules supported, frequency limit for polling removed, security updates",
+        "de": "5 Module unterstützt, Frequenzgrenze für die Abfrage entfernt, Sicherheitsupdates",
+        "ru": "5 поддерживаемых модулей, частотный лимит для удаления опроса, обновления безопасности",
+        "pt": "5 módulos suportados, limite de frequência para votação removido, atualizações de segurança",
+        "nl": "vijf modules ondersteund, frequentielimiet voor het vervullen van de beveiliging",
+        "fr": "5 modules supportés, limite de fréquence pour le polling supprimé, mises à jour de sécurité",
+        "it": "5 moduli supportati, limite di frequenza per la rimozione del polling, aggiornamenti di sicurezza",
+        "es": "5 módulos compatibles, límite de frecuencia para las encuestas eliminadas, actualizaciones de seguridad",
+        "pl": "5 modułów obsługiwanych, limit częstotliwości zanieczyszczeń, aktualizacja bezpieczeństwa",
+        "uk": "5 модулів підтримуються, частотний ліміт для видалення пилу, оновлення безпеки",
+        "zh-cn": "5个单元支助,清除的污染频率限制,安全更新"
+      },
+      "1.3.1": {
+        "en": "updated even more dependencies\nofficial release with new state SOH",
+        "de": "noch mehr Abhängigkeiten aktualisiert\noffizielle Veröffentlichung mit neuem Zustand SOH",
+        "ru": "обновлено еще больше зависимостей\nофициальный релиз с новым состоянием SOH",
+        "pt": "atualizou ainda mais dependências\nlançamento oficial com novo estado SOH",
+        "nl": "nog meer afhankelijkheden bijgewerkt\nofficiële release met nieuwe staat SOH",
+        "fr": "mis à jour encore plus de dépendances\nsortie officielle avec le nouvel état SOH",
+        "it": "aggiornato ancora più dipendenze\nrilascio ufficiale con il nuovo stato SOH",
+        "es": "actualizado aún más dependencias\nlanzamiento oficial con el nuevo estado SOH",
+        "pl": "zaktualizowałem jeszcze więcej zależności\noficjalne wydanie z nowym stanem SOH",
+        "zh-cn": "更新了更多依赖项\n正式发布新状态 SOH"
+      },
+      "1.2.4-0": {
+        "en": "Added state: SOH\nupdated dependencies as suggested from bot",
+        "de": "Hinzugefügter Zustand: SOH\naktualisierte Abhängigkeiten wie vom Bot vorgeschlagen",
+        "ru": "Добавлено состояние: SOH\nобновленные зависимости, как было предложено от бота",
+        "pt": "Estado adicionado: SOH\ndependências atualizadas conforme sugerido pelo bot",
+        "nl": "Toegevoegde staat: SOH\nbijgewerkte afhankelijkheden zoals voorgesteld door bot",
+        "fr": "État ajouté : SOH\ndépendances mises à jour comme suggéré par le bot",
+        "it": "Stato aggiunto: SOH\ndipendenze aggiornate come suggerito da bot",
+        "es": "Estado añadido: SOH\ndependencias actualizadas según lo sugerido por el bot",
+        "pl": "Dodany stan: SOH\nzaktualizowane zależności zgodnie z sugestią bota",
+        "zh-cn": "添加状态：SOH\n按照 bot 的建议更新依赖项"
+      },
+      "1.2.3": {
+        "en": "changed ratio of logo",
+        "de": "geändertes Verhältnis des Logos",
+        "ru": "изменено соотношение логотипа",
+        "pt": "proporção alterada do logotipo",
+        "nl": "gewijzigde verhouding van logo",
+        "fr": "rapport modifié du logo",
+        "it": "rapporto modificato del logo",
+        "es": "proporción cambiada del logotipo",
+        "pl": "zmieniony stosunek logo",
+        "zh-cn": "更改徽标比例"
+      }
     },
-    "native": {
-        "ConfPollInterval": "60",
-        "ConfIPAdress": "192.168.16.254",
-        "ConfDetailshowoften": 60,
-        "pingInterval": 15000
+    "title": "BYD HVS Battery",
+    "titleLang": {
+      "en": "BYD HVS Battery",
+      "de": "BYD HVS Batterie",
+      "ru": "BYD HVS аккумулятор",
+      "pt": "Bateria BYD HVS",
+      "nl": "BYD HVS-batterij",
+      "fr": "Batterie BYD HVS",
+      "it": "Batteria BYD HVS",
+      "es": "Batería BYD HVS",
+      "pl": "Akumulator BYD HVS",
+      "zh-cn": "比亚迪HVS电池"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+    "desc": {
+      "en": "BYD HVS Battery poll data",
+      "de": "BYD HVS Batterieabfragedaten",
+      "ru": "BYD HVS Данные опроса аккумулятора",
+      "pt": "Dados de sondagem da bateria BYD HVS",
+      "nl": "BYD HVS Battery poll-gegevens",
+      "fr": "BYD HVS Battery poll data",
+      "it": "BYD HVS Dati di polling della batteria",
+      "es": "Datos de sondeo de la batería BYD HVS",
+      "pl": "Dane ankietowe dotyczące baterii BYD HVS",
+      "zh-cn": "比亚迪HVS电池民意调查数据"
+    },
+    "authors": [
+      "Christian <github@familie-herrmann.de>"
+    ],
+    "keywords": [
+      "byd hvs battery pv"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "main.js",
+    "icon": "bydhvs.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ChristianH17/ioBroker.bydhvs/master/admin/bydhvs.png",
+    "readme": "https://github.com/ChristianH17/ioBroker.bydhvs/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "energy",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "materialize": true,
+    "dependencies": [
+      {
+        "js-controller": ">=2.0.0"
+      }
     ]
+  },
+  "native": {
+    "ConfPollInterval": "60",
+    "ConfIPAdress": "192.168.16.254",
+    "ConfDetailshowoften": 60,
+    "pingInterval": 15000
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
