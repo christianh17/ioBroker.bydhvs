@@ -807,7 +807,7 @@ IPClient.on("data", function (data) {
                 IPClient.setTimeout(timeout);
                 setTimeout(() => {
                     myState = 5;
-                    adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[3]}`);
+                    adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[3].toString('hex')}`);
                     IPClient.write(myRequests[3]);
                 }, 200);
             }
@@ -818,7 +818,7 @@ IPClient.on("data", function (data) {
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
                 myState = 6;
-                adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[4]}`);
+                adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[4].toString('hex')}`);
                 IPClient.write(myRequests[4]);
             }, waitTime);
             break;
