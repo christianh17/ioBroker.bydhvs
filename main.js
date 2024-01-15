@@ -455,6 +455,7 @@ function decodePacket0(data) {
         hvsBMU = hvsBMUB + "-B";
     }
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
+    // TODO: hier gibt es einen Fehler: Ich habe mit je 3 Modulen in zwei Tower 0x23 (35) (MK-2001)
     hvsModules = parseInt((byteArray[36] - 16).toString());
     if (byteArray[38] === 0) {hvsGrid = "OffGrid";}
 	if (byteArray[38] === 1) {hvsGrid = "OnGrid";}
@@ -952,7 +953,7 @@ IPClient.on("data", function (data) {
                 IPClient.write(myRequests[7]);
             }, 200);
             break;
-        case 21:
+        case 20:
             decodePacket7(data, 1);
             IPClient.setTimeout(1000);
             setTimeout(() => {
@@ -960,7 +961,7 @@ IPClient.on("data", function (data) {
                 IPClient.write(myRequests[8]);
             }, 200);
             break;
-        case 23:
+        case 22:
             decodePacket8(data, 1);
             setStates();
             IPClient.destroy();
