@@ -900,7 +900,8 @@ IPClient.on("data", function (data) {
             break;
         case 15:
             decodeResponse13(data);
-            if(adapter.config.ConfBydTowerCont > 1 ) {
+            if(adapter.config.ConfBydTowerCount > 1 ) {
+                adapter.log.silly("Start to read Tower 2");
                 myState = 16;
                 IPClient.setTimeout(1000);
                 setTimeout(() => {
@@ -988,6 +989,12 @@ function Poll(adapter) {
     myNumberforDetails += 1;
     adapter.log.silly("myNumberforDetails:" + myNumberforDetails);
     adapter.log.silly("Poll start, IP:" + adapter.config.ConfIPAdress);
+    // Erstelle die Arrays
+    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCont; towerNumber++) {
+        adapter.log.silly("Empty tower " + towerNumber);
+        towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
+        towerAttributes[towerNumber].hvsBatteryTempperCell = [];
+    }
     IPClient.connect(8080, adapter.config.ConfIPAdress, function () {
         myState = 2;
         setConnected(adapter, true);
@@ -1002,11 +1009,7 @@ async function main() {
     setConnected(adapter, false);
     setObjects();
     myState = 0;
-    // Erstelle die Arrays
-    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCont; towerNumber++) {
-        towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
-        towerAttributes[towerNumber].hvsBatteryTempperCell = [];
-    }
+
     // The adapters config (in the instance object everything under the attribute "native") is accessible via
     // adapter.config:
     adapter.log.info("Poll Interval: " + adapter.config.ConfPollInterval);
@@ -1019,6 +1022,7 @@ async function main() {
     ConfBatDetails = (adapter.config.ConfBatDetails ? true : false);
     adapter.log.info("Bat Details  : " + adapter.config.ConfBatDetails);
     ConfBatDetailshowoften = parseInt(adapter.config.ConfDetailshowoften);
+    adapter.log.info("Tower count: " + adapter.config.ConfBydTowerCount);
     /*if (ConfBatDetailshowoften < 10) {
         ConfBatDetails = false;
         adapter.log.error("Details polling to often - disabling ");

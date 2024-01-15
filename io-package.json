@@ -150,7 +150,7 @@
     "ConfPollInterval": "60",
     "ConfIPAdress": "192.168.16.254",
     "ConfDetailshowoften": 60,
-    "ConfBydTowerCont": 1,
+    "ConfBydTowerCount": 1,
     "pingInterval": 15000
   },
   "objects": [],
