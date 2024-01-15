@@ -3,6 +3,9 @@
     "name": "bydhvs",
     "version": "1.5.0",
     "news": {
+      "1.5.1": {
+        "en": "Working with parallel towers. you can setup it in admin page."
+      },
       "1.5.0": {
         "en": "Breaking change: nodejs 16 minimum required  \nautomated checks and release-script repaired (thanks to mcm1957, he did the work)\nnothing else changed in code",
         "de": "Breaking change: nodejs 16 minimum erforderlich\nautomatisierte kontrollen und release-script repariert (dank mcm1957, er tat die arbeit)\nnichts anders geändert in code",
@@ -147,6 +150,7 @@
     "ConfPollInterval": "60",
     "ConfIPAdress": "192.168.16.254",
     "ConfDetailshowoften": 60,
+    "ConfBydTowerCont": 1,
     "pingInterval": 15000
   },
   "objects": [],
