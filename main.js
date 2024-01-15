@@ -239,13 +239,13 @@ function startAdapter(options) {
 function setObjectsCells() {
     //Diagnose-data only if necessary.
     const myObjects = [
-        ["Diagnosis.1.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-        ["Diagnosis.1.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-        ["Diagnosis.1.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-        ["Diagnosis.1.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-        ["Diagnosis.1.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.1.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.1.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+        ["Diagnosis.Tower_1.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+        ["Diagnosis.Tower_1.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+        ["Diagnosis.Tower_1.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+        ["Diagnosis.Tower_1.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+        ["Diagnosis.Tower_1.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
+        ["Diagnosis.Tower_1.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
+        ["Diagnosis.Tower_1.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
     ];
 
     for (let i = 0; i < myObjects.length; i++) {
@@ -716,13 +716,13 @@ function setStates() {
     if (myNumberforDetails == 0) {
         // For every tower
         for(let t = 1; t < towerAttributes.length + 1; t++) {
-            adapter.setState("Diagnosis.mVoltMax", towerAttributes[t].hvsMaxmVolt, true);
-            adapter.setState("Diagnosis.mVoltMin", towerAttributes[t].hvsMinmVolt, true);
-            adapter.setState("Diagnosis.mVoltMaxCell", towerAttributes[t].hvsMaxmVoltCell, true);
-            adapter.setState("Diagnosis.mVoltMinCell", towerAttributes[t].hvsMinmVoltCell, true);
-            adapter.setState("Diagnosis.TempMaxCell", towerAttributes[t].hvsMaxTempCell, true);
-            adapter.setState("Diagnosis.TempMinCell", towerAttributes[t].hvsMinTempCell, true);
-            adapter.setState("Diagnosis.SOC", towerAttributes[t].hvsSOCDiagnosis, true);
+            adapter.setState(`Diagnosis.Tower_${t}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
+            adapter.setState(`Diagnosis.Tower_${t}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
+            adapter.setState(`Diagnosis.Tower_${t}.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true);
+            adapter.setState(`Diagnosis.Tower_${t}.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
+            adapter.setState(`Diagnosis.Tower_${t}.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
+            adapter.setState(`Diagnosis.Tower_${t}.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
+            adapter.setState(`Diagnosis.Tower_${t}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
 
             for (let i = 1; i <= hvsNumCells; i++) {
                 adapter.setState("CellDetails.CellVolt" + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
@@ -730,13 +730,13 @@ function setStates() {
             for (let i = 1; i <= hvsNumTemps; i++) {
                 adapter.setState("CellDetails.CellTemp" + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
             }
-            adapter.log.silly("hvsMaxmVolt     >" + towerAttributes[t].hvsMaxmVolt + "<");
-            adapter.log.silly("hvsMinmVolt     >" + towerAttributes[t].hvsMinmVolt + "<");
-            adapter.log.silly("hvsMaxmVoltCell >" + towerAttributes[t].hvsMaxmVoltCell + "<");
-            adapter.log.silly("hvsMinmVoltCell >" + towerAttributes[t].hvsMinmVoltCell + "<");
-            adapter.log.silly("hvsMaxTempCell  >" + towerAttributes[t].hvsMaxTempCell + "<");
-            adapter.log.silly("hvsMinTempCell  >" + towerAttributes[t].hvsMinTempCell + "<");
-            adapter.log.silly("hvsSOC (Diag)   >" + towerAttributes[t].hvsSOCDiagnosis + "<");
+            adapter.log.silly(`Tower_${1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
+            adapter.log.silly(`Tower_${1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
+            adapter.log.silly(`Tower_${1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
+            adapter.log.silly(`Tower_${1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
+            adapter.log.silly(`Tower_${1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
+            adapter.log.silly(`Tower_${1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
+            adapter.log.silly(`Tower_${1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
 
         }
     }
