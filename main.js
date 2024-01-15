@@ -862,7 +862,7 @@ IPClient.on("data", function (data) {
                     IPClient.write(myRequests[9]); // Switch to second turn for the last module
                 }, 200);
             } else {
-                if(adapter.config.ConfBydTowerCont > 1 ) {
+                if(adapter.config.ConfBydTowerCount > 1 ) {
                     myState = 16;
                     IPClient.setTimeout(1000);
                     setTimeout(() => {
@@ -924,12 +924,12 @@ IPClient.on("data", function (data) {
             break;
         case 16:
             decodePacketNOP(data);
-            IPClient.setTimeout(waitTime);
+            IPClient.setTimeout(waitTime + timeout);
             myState = 17;
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
                 IPClient.write(myRequests[4]);
-            }, 3000);
+            }, waitTime);
             break;
         case 17:
             // MK Package: 01 03 02 88 01 1f 84
