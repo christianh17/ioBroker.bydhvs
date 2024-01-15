@@ -139,6 +139,50 @@
     "compact": true,
     "connectionType": "local",
     "dataSource": "poll",
+    "messages": [
+      {
+        "condition": {
+          "operand": "and",
+          "rules": [
+            "oldVersion<1.5.1",
+            "newVersion>=1.5.1"
+          ]
+        },
+        "title": {
+          "en": "Changed structure of Diagnosis and CellDetails.",
+          "de": "Geänderte Struktur der Diagnose und CellDetails.",
+          "ru": "Изменение структуры диагностики и клеточных деталей.",
+          "pt": "Estrutura alterada de Diagnóstico e CellDetails.",
+          "nl": "Veranderde structuur van Diagnose en CellDetails.",
+          "fr": "Structure modifiée du diagnostic et des détails cellulaires.",
+          "it": "Struttura modificata di Diagnosi e CellDetails.",
+          "es": "Estructura modificada de Diagnóstico y Detalles Celulares.",
+          "pl": "Zmieniona struktura diagnostyki i cellDetails.",
+          "uk": "Змінена структура діагностики та клітинних деталей.",
+          "zh-cn": "已改变的诊断和细胞分类的结构."
+        },
+        "text": {
+          "en": "Changed structure of Diagnosis and CellDetails. We introduced an additional level for each tower. Example: Old Structure: bydhvs.0.Diagnosis.SOC; New Structure: bydhvs.0.Diagnosis.Tower_1.SOC; You should check your Database/Influx/... subscriptions.",
+          "de": "Geänderte Struktur der Diagnose und CellDetails. Wir haben für jeden Turm ein zusätzliches Niveau eingeführt. Beispiel: Alte Struktur: bydhvs.0.Diagnosis.SOC; Neue Struktur: bydhvs.0.Diagnosis.Tower_1.SOC; Sie sollten Ihre Datenbank/Influx/... Abonnements überprüfen.",
+          "ru": "Изменение структуры диагностики и клеточных деталей. Мы ввели дополнительный уровень для каждой башни. Пример: Старая структура: bydhvs.0.Diagnosis.SOC; Новая структура: bydhvs.0.Diagnosis.Tower_1.SOC; Вы должны проверить свою базу данных / Influx /... подписки.",
+          "pt": "Estrutura alterada de Diagnóstico e CellDetails. Introduzimos um nível adicional para cada torre. Exemplo: Old Structure: bydhvs.0.Diagnosis.SOC; New Structure: bydhvs.0.Diagnosis.Tower_1.SOC; Você deve verificar seu banco de dados / Influx /... assinaturas.",
+          "nl": "Veranderde structuur van Diagnose en CellDetails. We hebben een extra niveau voor elke toren ingevoerd. Voorbeeld: Oude structuur: bydhvs.0.Diagnose.SOC; Nieuwe structuur: bydhvs.0.Diagnose.Tower_1.SOC; Controleer uw Database/Influx/... abonnementen.",
+          "fr": "Structure modifiée du diagnostic et des détails cellulaires. Nous avons introduit un niveau supplémentaire pour chaque tour. Exemple: Ancienne structure: bydhvs.0.Diagnosis.SOC; Nouvelle structure: bydhvs.0.Diagnosis.Tower_1.SOC; Vous devriez vérifier vos abonnements Database/Influx/...",
+          "it": "Struttura modificata di Diagnosi e CellDetails. Abbiamo introdotto un livello aggiuntivo per ogni torre. Esempio: Struttura vecchia: bydhvs.0.Diagnosis.SOC; Nuova struttura: bydhvs.0.Diagnosis.Tower_1.SOC; Si consiglia di controllare il database/Influx/... abbonamenti.",
+          "es": "Estructura modificada de Diagnóstico y Detalles Celulares. Presentamos un nivel adicional para cada torre. Ejemplo: Old Structure: bydhvs.0.Diagnosis.SOC; New Structure: bydhvs.0.Diagnosis.Tower_1.SOC; Usted debe comprobar sus suscripciones de Base de Datos/Influjo/...",
+          "pl": "Zmieniona struktura diagnostyki i cellDetails. Wprowadziliśmy dodatkowy poziom dla każdej wieży. Przykład: Stara struktura: bydhvs.0.Diagnosis.SOC; Nowa struktura: bydhvs.0.Diagnosis.Tower _ 1.SOC; Powinieneś sprawdzić swoją bazę danych / Influm /... subskrypcje.",
+          "uk": "Змінена структура діагностики та клітинних деталей. Ми ввели додатковий рівень для кожної вежі. Приклад: Стара структура: bydhvs.0.Diagnosis.SOC; Нова структура: bydhvs.0.Diagnosis.Tower_1.SOC; Ви повинні перевірити вашу базу даних/Influx/... підписки.",
+          "zh-cn": "已改变的诊断和细胞分类的结构。 我们为每座塔增加了一层 例:旧结构:bydhvs.0.Diagnosis.SOC;新结构:bydhvs.0.Diagnosis.Tower_1.SOC; 您应该检查您的数据库/ Influx/... 订阅 ."
+        },
+        "link": "https://github.com/christianh17/ioBroker.bydhvs/pull/262",
+        "linkText": "Reiew SourceCode of that change or report an issue",
+        "level":"warn",
+        "buttons": [
+          "agree",
+          "cancel"
+        ]
+      }
+    ],
     "materialize": true,
     "dependencies": [
       {
