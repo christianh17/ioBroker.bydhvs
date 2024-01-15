@@ -239,13 +239,13 @@ function startAdapter(options) {
 function setObjectsCells() {
     //Diagnose-data only if necessary.
     const myObjects = [
-        ["Diagnosis.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-        ["Diagnosis.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-        ["Diagnosis.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-        ["Diagnosis.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-        ["Diagnosis.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+        ["Diagnosis.1.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+        ["Diagnosis.1.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+        ["Diagnosis.1.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+        ["Diagnosis.1.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+        ["Diagnosis.1.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
+        ["Diagnosis.1.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
+        ["Diagnosis.1.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
     ];
 
     for (let i = 0; i < myObjects.length; i++) {
@@ -715,7 +715,7 @@ function setStates() {
 
     if (myNumberforDetails == 0) {
         // For every tower
-        for(let t = 0; t < towerAttributes.length; t++) {
+        for(let t = 1; t < towerAttributes.length + 1; t++) {
             adapter.setState("Diagnosis.mVoltMax", towerAttributes[t].hvsMaxmVolt, true);
             adapter.setState("Diagnosis.mVoltMin", towerAttributes[t].hvsMinmVolt, true);
             adapter.setState("Diagnosis.mVoltMaxCell", towerAttributes[t].hvsMaxmVoltCell, true);
