@@ -766,10 +766,10 @@ function stopPoll() {
 
 IPClient.on("data", function (data) {
     adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
-    if (ConfTestMode) {
+    /* if (ConfTestMode) {
         const PacketNumber = myState - 1;
         adapter.log.info("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
-    }
+    } */
     if (checkPacket(data) == false) {
         adapter.log.error("error: no valid data");
         IPClient.destroy();
