@@ -732,10 +732,10 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 adapter.setState(`Diagnosis.Tower_${t+1}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
 
                 for (let i = 1; i <= hvsNumCells; i++) {
-                    adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
+                    adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
                 }
                 for (let i = 1; i <= hvsNumTemps; i++) {
-                    adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
+                    adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
                 }
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
