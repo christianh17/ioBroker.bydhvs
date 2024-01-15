@@ -660,30 +660,30 @@ function setConnected(adapter, isConnected) {
 
 function setStates() {
 
-    adapter.log.silly("hvsSerial       >" + hvsSerial + "<");
-    adapter.log.silly("hvsBMU          >" + hvsBMU + "<");
-    adapter.log.silly("hvsBMUA         >" + hvsBMUA + "<");
-    adapter.log.silly("hvsBMUB         >" + hvsBMUB + "<");
-    adapter.log.silly("hvsBMS          >" + hvsBMS + "<");
-    adapter.log.silly("hvsModules      >" + hvsModules + "<");
-    adapter.log.silly("hvsGrid         >" + hvsGrid + "<");
-    adapter.log.silly("hvsSOC          >" + hvsSOC + "<");
-    adapter.log.silly("hvsMaxVolt      >" + hvsMaxVolt + "<");
-    adapter.log.silly("hvsMinVolt      >" + hvsMinVolt + "<");
-    adapter.log.silly("hvsSOH          >" + hvsSOH + "<");
-    adapter.log.silly("hvsA            >" + hvsA + "<");
-    adapter.log.silly("hvsBattVolt     >" + hvsBattVolt + "<");
-    adapter.log.silly("hvsMaxTemp      >" + hvsMaxTemp + "<");
-    adapter.log.silly("hvsMinTemp      >" + hvsMinTemp + "<");
-    adapter.log.silly("hvsDiffVolt     >" + hvsDiffVolt + "<");
-    adapter.log.silly("hvsPower        >" + hvsPower + "<");
-    adapter.log.silly("hvsParamT       >" + hvsParamT + "<");
-    adapter.log.silly("hvsBatTemp      >" + hvsBatTemp + "<");
-    adapter.log.silly("hvsOutVolt      >" + hvsOutVolt + "<");
-    adapter.log.silly("hvsError        >" + hvsError + "<");
-    adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
-    adapter.log.silly("BattType        >" + hvsBattType_fromSerial + "<");
-    adapter.log.silly("Invert. Type    >" + hvsInvType_String + ", Nr: " + hvsInvType + "<");
+    adapter.log.silly(`hvsSerial       >${hvsSerial}<
+hvsBMU          >${hvsBMU}<;
+hvsBMUA         >${hvsBMUA}<;
+hvsBMUB         >${hvsBMUB}<;
+hvsBMS          >${hvsBMS}<;
+hvsModules      >${hvsModules}<;
+hvsGrid         >${hvsGrid}<;
+hvsSOC          >${hvsSOC}<;
+hvsMaxVolt      >${hvsMaxVolt}<;
+hvsMinVolt      >${hvsMinVolt}<;
+hvsSOH          >${hvsSOH}<;
+hvsA            >${hvsA}<;
+hvsBattVolt     >${hvsBattVolt}<;
+hvsMaxTemp      >${hvsMaxTemp}<;
+hvsMinTemp      >${hvsMinTemp}<;
+hvsDiffVolt     >${hvsDiffVolt}<;
+hvsPower        >${hvsPower}<;
+hvsParamT       >${hvsParamT}<;
+hvsBatTemp      >${hvsBatTemp}<;
+hvsOutVolt      >${hvsOutVolt}<,
+hvsError        >${hvsError}<,
+hvsErrorStr     >${hvsErrorString}<,
+BattType        >${hvsBattType_fromSerial}<,
+Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
 
     adapter.setState("System.Serial", hvsSerial, true);
     adapter.setState("System.BMU", hvsBMU, true);
