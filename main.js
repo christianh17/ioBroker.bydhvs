@@ -548,7 +548,6 @@ function decodePacket2(data) {
 
 function decodePacket5(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
-    towerAttributes[towerNumber] = {};
     towerAttributes[towerNumber].hvsMaxmVolt = buf2int16SI(byteArray, 5);
     towerAttributes[towerNumber].hvsMinmVolt = buf2int16SI(byteArray, 7);
     towerAttributes[towerNumber].hvsMaxmVoltCell = byteArray[9];
