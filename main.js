@@ -272,7 +272,7 @@ function setObjectsCells() {
 
 
         for (let i = 1; i <= hvsNumCells; i++) {
-            adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber}.CellVolt` + pad(i, 3), {
+            adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber+1}.CellVolt` + pad(i, 3), {
                 type: "state",
                 common: {
                     name: "Voltage Cell: " + pad(i, 3),
@@ -284,7 +284,7 @@ function setObjectsCells() {
                 },
                 native: {}
             });
-            checkandrepairUnit(`CellDetails.Tower_${towerNumber}.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
+            checkandrepairUnit(`CellDetails.Tower_${towerNumber+1}.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
 
             for (let i = 1; i <= hvsNumTemps; i++) {
                 adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber+1}.CellTemp` + pad(i, 3), {
