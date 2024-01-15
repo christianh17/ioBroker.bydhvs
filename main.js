@@ -546,7 +546,7 @@ function decodePacket2(data) {
 }
 
 
-function decodePacket5(data, towerNumber = 1) {
+function decodePacket5(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     towerAttributes[towerNumber] = {};
     towerAttributes[towerNumber].hvsMaxmVolt = buf2int16SI(byteArray, 5);
@@ -556,8 +556,7 @@ function decodePacket5(data, towerNumber = 1) {
     towerAttributes[towerNumber].hvsMaxTempCell = byteArray[15];
     towerAttributes[towerNumber].hvsMinTempCell = byteArray[16];
     towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
-    towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
-    towerAttributes[towerNumber].hvsBatteryTempperCell = [];
+
     //starting with byte 101, ending with 131, Cell voltage 1-16
     const MaxCells = 16;
     for (let i = 0; i < MaxCells; i++) {
@@ -566,7 +565,7 @@ function decodePacket5(data, towerNumber = 1) {
     }
 }
 
-function decodePacket6(data, towerNumber = 1) {
+function decodePacket6(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     // e.g. hvsNumCells = 80
     // first Voltage in byte 5+6
@@ -579,7 +578,7 @@ function decodePacket6(data, towerNumber = 1) {
     }
 }
 
-function decodePacket7(data, towerNumber = 1) {
+function decodePacket7(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     //starting with byte 5, ending 101, voltage for cell 81 to 128
     //starting with byte 103, ending 132, temp for cell 1 to 30
@@ -604,7 +603,7 @@ function decodePacket7(data, towerNumber = 1) {
     }
 }
 
-function decodePacket8(data, towerNumber = 1) {
+function decodePacket8(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     let MaxTemps = hvsNumTemps - 30; //0 to n-1 is the same like 1 to n
     if (MaxTemps > 34) { MaxTemps = 34; }
@@ -619,7 +618,7 @@ function decodePacket8(data, towerNumber = 1) {
  * decode response to request[12]
  * @see #decodePacket5()
  */
-function decodeResponse12(data, towerNumber = 1) {
+function decodeResponse12(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     //starting with byte 101, ending with 131, Cell voltage 129-144
     const MaxCells = 16;
@@ -633,7 +632,7 @@ function decodeResponse12(data, towerNumber = 1) {
  * decode response to request[13]
  * @see #decodePacket6()
  */
-function decodeResponse13(data, towerNumber = 1) {
+function decodeResponse13(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     let MaxCells = hvsNumCells - 128 - 16; // The first round measured up to 128 cells, request[12] then get another 16
     if (MaxCells > 16) { MaxCells = 16; } // With 5 HVS Modules, only 16 cells are remaining
@@ -717,29 +716,29 @@ function setStates() {
     if (myNumberforDetails == 0) {
         // For every tower
         adapter.log.silly("Tower attributes: " + JSON.stringify(towerAttributes));
-        for(let t = 1; t < towerAttributes.length + 1; t++) {
+        for(let t = 0; t < towerAttributes.length; t++) {
             try {
-                adapter.setState(`Diagnosis.Tower_${t}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
-                adapter.setState(`Diagnosis.Tower_${t}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
-                adapter.setState(`Diagnosis.Tower_${t}.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true);
-                adapter.setState(`Diagnosis.Tower_${t}.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
-                adapter.setState(`Diagnosis.Tower_${t}.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
-                adapter.setState(`Diagnosis.Tower_${t}.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
-                adapter.setState(`Diagnosis.Tower_${t}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
 
                 for (let i = 1; i <= hvsNumCells; i++) {
-                    adapter.setState("CellDetails.CellVolt" + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
+                    adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
                 }
                 for (let i = 1; i <= hvsNumTemps; i++) {
-                    adapter.setState("CellDetails.CellTemp" + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
+                    adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
                 }
-                adapter.log.silly(`Tower_${1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
-                adapter.log.silly(`Tower_${1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
-                adapter.log.silly(`Tower_${1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
-                adapter.log.silly(`Tower_${1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
-                adapter.log.silly(`Tower_${1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
-                adapter.log.silly(`Tower_${1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
-                adapter.log.silly(`Tower_${1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
+                adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
+                adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
+                adapter.log.silly(`Tower_${t+1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
+                adapter.log.silly(`Tower_${t+1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
+                adapter.log.silly(`Tower_${t+1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
+                adapter.log.silly(`Tower_${t+1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
+                adapter.log.silly(`Tower_${t+1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
             } catch(err) {
                 adapter.log.error(`Cant read in Tower ${t} with ${err.message}` );
             }
@@ -901,7 +900,6 @@ IPClient.on("data", function (data) {
             break;
         case 15:
             decodeResponse13(data);
-            setStates();
             if(adapter.config.ConfBydTowerCont > 1 ) {
                 myState = 16;
                 IPClient.setTimeout(1000);
@@ -934,7 +932,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 18:
-            decodePacket5(data), 2;
+            decodePacket5(data, 1);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 19;
@@ -942,7 +940,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 19:
-            decodePacket6(data, 2);
+            decodePacket6(data, 1);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 20;
@@ -950,7 +948,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 21:
-            decodePacket7(data, 2);
+            decodePacket7(data, 1);
             IPClient.setTimeout(1000);
             setTimeout(() => {
                 myState = 22;
@@ -958,7 +956,7 @@ IPClient.on("data", function (data) {
             }, 200);
             break;
         case 23:
-            decodePacket8(data, 2);
+            decodePacket8(data, 1);
             setStates();
             IPClient.destroy();
             myState = 0;
@@ -1004,7 +1002,11 @@ async function main() {
     setConnected(adapter, false);
     setObjects();
     myState = 0;
-
+    // Erstelle die Arrays
+    for(let towerNumber = 0; t < adapter.config.ConfBydTowerCont; towerNumber++) {
+        towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
+        towerAttributes[towerNumber].hvsBatteryTempperCell = [];
+    }
     // The adapters config (in the instance object everything under the attribute "native") is accessible via
     // adapter.config:
     adapter.log.info("Poll Interval: " + adapter.config.ConfPollInterval);
