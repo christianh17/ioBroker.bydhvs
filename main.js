@@ -803,11 +803,11 @@ IPClient.on("data", function (data) {
                 myState = 0;
             } else {
                 myNumberforDetails = 0; //restart counting
-                IPClient.setTimeout(1000);
+                IPClient.setTimeout(waitTime);
                 setTimeout(() => {
                     myState = 5;
                     IPClient.write(myRequests[3]);
-                }, 200);
+                }, waitTime);
             }
             break;
         case 5:
@@ -817,7 +817,7 @@ IPClient.on("data", function (data) {
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
                 IPClient.write(myRequests[4]);
-            }, 3000);
+            }, waitTime);
             break;
         case 6:
             decodePacketNOP(data);
