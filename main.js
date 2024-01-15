@@ -240,7 +240,7 @@ function setObjectsCells() {
     //Diagnose-data only if necessary.
     let myObjects = [];
 
-    for(let towerNumber = 0; towernumber < adapter.config.ConfBydTowerCount; towerNumber++) {
+    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCount; towerNumber++) {
         myObjects = [
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
