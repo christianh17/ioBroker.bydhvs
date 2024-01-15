@@ -272,7 +272,7 @@ function setObjectsCells() {
 
 
         for (let i = 1; i <= hvsNumCells; i++) {
-            adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber}.CellVolt` + pad(i, 3), {
+            adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber+1}.CellVolt` + pad(i, 3), {
                 type: "state",
                 common: {
                     name: "Voltage Cell: " + pad(i, 3),
@@ -284,10 +284,10 @@ function setObjectsCells() {
                 },
                 native: {}
             });
-            checkandrepairUnit(`CellDetails.Tower_${towerNumber}.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
+            checkandrepairUnit(`CellDetails.Tower_${towerNumber+1}.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
 
             for (let i = 1; i <= hvsNumTemps; i++) {
-                adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber}.CellTemp` + pad(i, 3), {
+                adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber+1}.CellTemp` + pad(i, 3), {
                     type: "state",
                     common: {
                         name: "Temp Cell: " + pad(i, 3),
@@ -299,7 +299,7 @@ function setObjectsCells() {
                     },
                     native: {}
                 });
-                checkandrepairUnit(`CellDetails.Tower_${towerNumber}.CellTemp` + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
+                checkandrepairUnit(`CellDetails.Tower_${towerNumber+1}.CellTemp` + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
             }
         }
     }
@@ -660,30 +660,30 @@ function setConnected(adapter, isConnected) {
 
 function setStates() {
 
-    adapter.log.silly("hvsSerial       >" + hvsSerial + "<");
-    adapter.log.silly("hvsBMU          >" + hvsBMU + "<");
-    adapter.log.silly("hvsBMUA         >" + hvsBMUA + "<");
-    adapter.log.silly("hvsBMUB         >" + hvsBMUB + "<");
-    adapter.log.silly("hvsBMS          >" + hvsBMS + "<");
-    adapter.log.silly("hvsModules      >" + hvsModules + "<");
-    adapter.log.silly("hvsGrid         >" + hvsGrid + "<");
-    adapter.log.silly("hvsSOC          >" + hvsSOC + "<");
-    adapter.log.silly("hvsMaxVolt      >" + hvsMaxVolt + "<");
-    adapter.log.silly("hvsMinVolt      >" + hvsMinVolt + "<");
-    adapter.log.silly("hvsSOH          >" + hvsSOH + "<");
-    adapter.log.silly("hvsA            >" + hvsA + "<");
-    adapter.log.silly("hvsBattVolt     >" + hvsBattVolt + "<");
-    adapter.log.silly("hvsMaxTemp      >" + hvsMaxTemp + "<");
-    adapter.log.silly("hvsMinTemp      >" + hvsMinTemp + "<");
-    adapter.log.silly("hvsDiffVolt     >" + hvsDiffVolt + "<");
-    adapter.log.silly("hvsPower        >" + hvsPower + "<");
-    adapter.log.silly("hvsParamT       >" + hvsParamT + "<");
-    adapter.log.silly("hvsBatTemp      >" + hvsBatTemp + "<");
-    adapter.log.silly("hvsOutVolt      >" + hvsOutVolt + "<");
-    adapter.log.silly("hvsError        >" + hvsError + "<");
-    adapter.log.silly("hvsErrorStr     >" + hvsErrorString + "<");
-    adapter.log.silly("BattType        >" + hvsBattType_fromSerial + "<");
-    adapter.log.silly("Invert. Type    >" + hvsInvType_String + ", Nr: " + hvsInvType + "<");
+    adapter.log.silly(`hvsSerial       >${hvsSerial}<
+hvsBMU          >${hvsBMU}<;
+hvsBMUA         >${hvsBMUA}<;
+hvsBMUB         >${hvsBMUB}<;
+hvsBMS          >${hvsBMS}<;
+hvsModules      >${hvsModules}<;
+hvsGrid         >${hvsGrid}<;
+hvsSOC          >${hvsSOC}<;
+hvsMaxVolt      >${hvsMaxVolt}<;
+hvsMinVolt      >${hvsMinVolt}<;
+hvsSOH          >${hvsSOH}<;
+hvsA            >${hvsA}<;
+hvsBattVolt     >${hvsBattVolt}<;
+hvsMaxTemp      >${hvsMaxTemp}<;
+hvsMinTemp      >${hvsMinTemp}<;
+hvsDiffVolt     >${hvsDiffVolt}<;
+hvsPower        >${hvsPower}<;
+hvsParamT       >${hvsParamT}<;
+hvsBatTemp      >${hvsBatTemp}<;
+hvsOutVolt      >${hvsOutVolt}<,
+hvsError        >${hvsError}<,
+hvsErrorStr     >${hvsErrorString}<,
+BattType        >${hvsBattType_fromSerial}<,
+Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
 
     adapter.setState("System.Serial", hvsSerial, true);
     adapter.setState("System.BMU", hvsBMU, true);
@@ -732,10 +732,10 @@ function setStates() {
                 adapter.setState(`Diagnosis.Tower_${t+1}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
 
                 for (let i = 1; i <= hvsNumCells; i++) {
-                    adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
+                    adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
                 }
                 for (let i = 1; i <= hvsNumTemps; i++) {
-                    adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
+                    adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
                 }
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
@@ -765,11 +765,11 @@ function stopPoll() {
 }
 
 IPClient.on("data", function (data) {
-    adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
-    if (ConfTestMode) {
+    adapter.log.silly("Received, State: " + myState + ", Data: " + data.toString("hex"));
+    /* if (ConfTestMode) {
         const PacketNumber = myState - 1;
         adapter.log.info("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
-    }
+    } */
     if (checkPacket(data) == false) {
         adapter.log.error("error: no valid data");
         IPClient.destroy();
@@ -778,6 +778,7 @@ IPClient.on("data", function (data) {
     }
     setConnected(adapter, true);
     const waitTime = 8000;
+    const timeout = 2000;
     switch (myState) {
         case 2:
             decodePacket0(data); // decode request 0
@@ -803,21 +804,23 @@ IPClient.on("data", function (data) {
                 myState = 0;
             } else {
                 myNumberforDetails = 0; //restart counting
-                IPClient.setTimeout(1000);
+                IPClient.setTimeout(timeout);
                 setTimeout(() => {
                     myState = 5;
+                    adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[3].toString('hex')}`);
                     IPClient.write(myRequests[3]);
                 }, 200);
             }
             break;
         case 5:
             decodePacketNOP(data);
-            IPClient.setTimeout(waitTime);
-            myState = 6;
+            IPClient.setTimeout(waitTime + timeout);
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
+                myState = 6;
+                adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[4].toString('hex')}`);
                 IPClient.write(myRequests[4]);
-            }, 3000);
+            }, waitTime);
             break;
         case 6:
             decodePacketNOP(data);
@@ -859,7 +862,7 @@ IPClient.on("data", function (data) {
                     IPClient.write(myRequests[9]); // Switch to second turn for the last module
                 }, 200);
             } else {
-                if(adapter.config.ConfBydTowerCont > 1 ) {
+                if(adapter.config.ConfBydTowerCount > 1 ) {
                     myState = 16;
                     IPClient.setTimeout(1000);
                     setTimeout(() => {
@@ -921,12 +924,12 @@ IPClient.on("data", function (data) {
             break;
         case 16:
             decodePacketNOP(data);
-            IPClient.setTimeout(waitTime);
+            IPClient.setTimeout(waitTime + timeout);
             myState = 17;
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
                 IPClient.write(myRequests[4]);
-            }, 3000);
+            }, waitTime);
             break;
         case 17:
             // MK Package: 01 03 02 88 01 1f 84
@@ -976,8 +979,8 @@ IPClient.on("data", function (data) {
 IPClient.on("timeout", function () {
     IPClient.destroy();
     setConnected(adapter, false);
+    adapter.log.error(`no connection in state ${myState} to IP: ${adapter.config.ConfIPAdress}`);
     myState = 0;
-    adapter.log.error("no connection to IP: " + adapter.config.ConfIPAdress);
 });
 
 IPClient.on("error", function () {
