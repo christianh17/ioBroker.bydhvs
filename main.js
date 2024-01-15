@@ -976,8 +976,8 @@ IPClient.on("data", function (data) {
 IPClient.on("timeout", function () {
     IPClient.destroy();
     setConnected(adapter, false);
+    adapter.log.error(`no connection in state ${myState} to IP: ${adapter.config.ConfIPAdress}`);
     myState = 0;
-    adapter.log.error("no connection to IP: " + adapter.config.ConfIPAdress);
 });
 
 IPClient.on("error", function () {
