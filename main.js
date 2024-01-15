@@ -765,7 +765,7 @@ function stopPoll() {
 }
 
 IPClient.on("data", function (data) {
-    adapter.log.silly("Received, State: " + myState + " Data: " + data.toString("hex"));
+    adapter.log.silly("Received, State: " + myState + ", Data: " + data.toString("hex"));
     /* if (ConfTestMode) {
         const PacketNumber = myState - 1;
         adapter.log.info("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
@@ -778,6 +778,7 @@ IPClient.on("data", function (data) {
     }
     setConnected(adapter, true);
     const waitTime = 8000;
+    const timeout = 2000;
     switch (myState) {
         case 2:
             decodePacket0(data); // decode request 0
@@ -803,19 +804,21 @@ IPClient.on("data", function (data) {
                 myState = 0;
             } else {
                 myNumberforDetails = 0; //restart counting
-                IPClient.setTimeout(waitTime);
+                IPClient.setTimeout(timeout);
                 setTimeout(() => {
                     myState = 5;
+                    adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[3]}`);
                     IPClient.write(myRequests[3]);
-                }, waitTime);
+                }, 200);
             }
             break;
         case 5:
             decodePacketNOP(data);
-            IPClient.setTimeout(waitTime);
-            myState = 6;
+            IPClient.setTimeout(timeout);
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
+                myState = 6;
+                adapter.log.silly(`Send, State: ${myState}, Data: ${myRequests[4]}`);
                 IPClient.write(myRequests[4]);
             }, waitTime);
             break;
