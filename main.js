@@ -718,28 +718,31 @@ function setStates() {
         // For every tower
         adapter.log.silly("Tower attributes: " + JSON.stringify(towerAttributes));
         for(let t = 1; t < towerAttributes.length + 1; t++) {
-            adapter.setState(`Diagnosis.Tower_${t}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
-            adapter.setState(`Diagnosis.Tower_${t}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
-            adapter.setState(`Diagnosis.Tower_${t}.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true);
-            adapter.setState(`Diagnosis.Tower_${t}.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
-            adapter.setState(`Diagnosis.Tower_${t}.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
-            adapter.setState(`Diagnosis.Tower_${t}.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
-            adapter.setState(`Diagnosis.Tower_${t}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
+            try {
+                adapter.setState(`Diagnosis.Tower_${t}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
+                adapter.setState(`Diagnosis.Tower_${t}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
+                adapter.setState(`Diagnosis.Tower_${t}.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true);
+                adapter.setState(`Diagnosis.Tower_${t}.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
+                adapter.setState(`Diagnosis.Tower_${t}.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
+                adapter.setState(`Diagnosis.Tower_${t}.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
+                adapter.setState(`Diagnosis.Tower_${t}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
 
-            for (let i = 1; i <= hvsNumCells; i++) {
-                adapter.setState("CellDetails.CellVolt" + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
+                for (let i = 1; i <= hvsNumCells; i++) {
+                    adapter.setState("CellDetails.CellVolt" + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i], true);
+                }
+                for (let i = 1; i <= hvsNumTemps; i++) {
+                    adapter.setState("CellDetails.CellTemp" + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
+                }
+                adapter.log.silly(`Tower_${1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
+                adapter.log.silly(`Tower_${1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
+                adapter.log.silly(`Tower_${1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
+                adapter.log.silly(`Tower_${1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
+                adapter.log.silly(`Tower_${1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
+                adapter.log.silly(`Tower_${1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
+                adapter.log.silly(`Tower_${1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
+            } catch(err) {
+                adapter.log.error(`Cant read in Tower ${t} with ${err.message}` );
             }
-            for (let i = 1; i <= hvsNumTemps; i++) {
-                adapter.setState("CellDetails.CellTemp" + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i], true);
-            }
-            adapter.log.silly(`Tower_${1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
-            adapter.log.silly(`Tower_${1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
-            adapter.log.silly(`Tower_${1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
-            adapter.log.silly(`Tower_${1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
-            adapter.log.silly(`Tower_${1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
-            adapter.log.silly(`Tower_${1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
-            adapter.log.silly(`Tower_${1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
-
         }
     }
 
