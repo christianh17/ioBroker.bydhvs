@@ -78,7 +78,7 @@ systemDictionary = {
         "pl": "Tryb testowy - pokaż dane w dzienniku błędów",
         "zh-cn": "测试模式-在错误日志中显示数据"
     },
-    "ConfBydTowerCont": {
+    "ConfBydTowerCount": {
         "en": "Count of towers",
         "de": "Anzahl der Türme",
         "ru": "Количество башен",

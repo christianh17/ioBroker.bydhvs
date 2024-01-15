@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "news": {
       "1.5.1": {
         "en": "Working with parallel towers. you can setup it in admin page."
@@ -150,7 +150,7 @@
     "ConfPollInterval": "60",
     "ConfIPAdress": "192.168.16.254",
     "ConfDetailshowoften": 60,
-    "ConfBydTowerCont": 1,
+    "ConfBydTowerCount": 1,
     "pingInterval": 15000
   },
   "objects": [],
