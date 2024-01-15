@@ -716,6 +716,7 @@ function setStates() {
 
     if (myNumberforDetails == 0) {
         // For every tower
+        adapter.log.silly("Tower attributes: " + JSON.stringify(towerAttributes));
         for(let t = 1; t < towerAttributes.length + 1; t++) {
             adapter.setState(`Diagnosis.Tower_${t}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
             adapter.setState(`Diagnosis.Tower_${t}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
@@ -851,9 +852,17 @@ IPClient.on("data", function (data) {
                     IPClient.write(myRequests[9]); // Switch to second turn for the last module
                 }, 200);
             } else {
-                setStates();
-                IPClient.destroy();
-                myState = 0;
+                if(adapter.config.ConfBydTowerCont > 1 ) {
+                    myState = 16;
+                    IPClient.setTimeout(1000);
+                    setTimeout(() => {
+                        myState = 16;
+                        IPClient.write(myRequests[16]);
+                    }, 200);
+                } else {
+                    IPClient.destroy();
+                    myState = 0;
+                }
             }
             break;
         case 11:
@@ -894,10 +903,11 @@ IPClient.on("data", function (data) {
                 myState = 16;
                 IPClient.setTimeout(1000);
                 setTimeout(() => {
-                    myState = 5;
+                    myState = 16;
                     IPClient.write(myRequests[16]);
                 }, 200);
             } else {
+                setStates();
                 IPClient.destroy();
                 myState = 0;
             }
