@@ -1003,7 +1003,7 @@ async function main() {
     setObjects();
     myState = 0;
     // Erstelle die Arrays
-    for(let towerNumber = 0; t < adapter.config.ConfBydTowerCont; towerNumber++) {
+    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCont; towerNumber++) {
         towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
         towerAttributes[towerNumber].hvsBatteryTempperCell = [];
     }
