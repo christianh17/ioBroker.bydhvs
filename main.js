@@ -557,6 +557,7 @@ function decodePacket5(data, towerNumber = 1) {
     towerAttributes[towerNumber].hvsMinTempCell = byteArray[16];
     towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
     towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
+    towerAttributes[towerNumber].hvsBatteryTempperCell = [];
     //starting with byte 101, ending with 131, Cell voltage 1-16
     const MaxCells = 16;
     for (let i = 0; i < MaxCells; i++) {
