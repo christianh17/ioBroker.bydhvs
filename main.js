@@ -814,7 +814,7 @@ IPClient.on("data", function (data) {
             break;
         case 5:
             decodePacketNOP(data);
-            IPClient.setTimeout(timeout);
+            IPClient.setTimeout(waitTime + timeout);
             adapter.log.silly(`waiting ${waitTime / 1000} seconds to measure cells`);
             setTimeout(() => {
                 myState = 6;
