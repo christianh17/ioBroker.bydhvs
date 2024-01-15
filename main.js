@@ -238,67 +238,72 @@ function startAdapter(options) {
 
 function setObjectsCells() {
     //Diagnose-data only if necessary.
-    const myObjects = [
-        ["Diagnosis.Tower_1.mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-        ["Diagnosis.Tower_1.mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-        ["Diagnosis.Tower_1.mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-        ["Diagnosis.Tower_1.mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-        ["Diagnosis.Tower_1.TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.Tower_1.TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
-        ["Diagnosis.Tower_1.SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
-    ];
+    let myObjects = [];
 
-    for (let i = 0; i < myObjects.length; i++) {
-        adapter.setObjectNotExists(myObjects[i][0], {
-            type: myObjects[i][1],
-            common: {
-                name: myObjects[i][2],
-                type: myObjects[i][3],
-                role: myObjects[i][4],
-                read: myObjects[i][5],
-                write: myObjects[i][6],
-                unit: myObjects[i][7],
-            },
-            native: {}
-        });
-    }
-    for (let i = 0; i < myObjects.length; i++) {
-        //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
-        checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][5]);
-    }
+    for(let towerNumber = 0; towernumber < adapter.config.ConfBydTowerCount; towerNumber++) {
+        myObjects = [
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+        ];
 
-
-    for (let i = 1; i <= hvsNumCells; i++) {
-        adapter.setObjectNotExists("CellDetails.CellVolt" + pad(i, 3), {
-            type: "state",
-            common: {
-                name: "Voltage Cell: " + pad(i, 3),
-                type: "number",
-                role: "value.voltage",
-                read: true,
-                write: false,
-                unit: "mV"
-            },
-            native: {}
-        });
-        checkandrepairUnit("CellDetails.CellVolt" + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
-
-        for (let i = 1; i <= hvsNumTemps; i++) {
-            adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
-                type: "state",
+        for (let i = 0; i < myObjects.length; i++) {
+            adapter.setObjectNotExists(myObjects[i][0], {
+                type: myObjects[i][1],
                 common: {
-                    name: "Temp Cell: " + pad(i, 3),
-                    type: "number",
-                    role: "value.temperature",
-                    read: true,
-                    write: false,
-                    unit: "°C"
+                    name: myObjects[i][2],
+                    type: myObjects[i][3],
+                    role: myObjects[i][4],
+                    read: myObjects[i][5],
+                    write: myObjects[i][6],
+                    unit: myObjects[i][7],
                 },
                 native: {}
             });
-            checkandrepairUnit("CellDetails.CellTemp" + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
+        }
+        for (let i = 0; i < myObjects.length; i++) {
+            //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
+            checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][5]);
+        }
+
+
+        for (let i = 1; i <= hvsNumCells; i++) {
+            adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber}.CellVolt` + pad(i, 3), {
+                type: "state",
+                common: {
+                    name: "Voltage Cell: " + pad(i, 3),
+                    type: "number",
+                    role: "value.voltage",
+                    read: true,
+                    write: false,
+                    unit: "mV"
+                },
+                native: {}
+            });
+            checkandrepairUnit(`CellDetails.Tower_${towerNumber}.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
+
+            for (let i = 1; i <= hvsNumTemps; i++) {
+                adapter.setObjectNotExists("CellDetails.CellTemp" + pad(i, 3), {
+                    type: "state",
+                    common: {
+                        name: "Temp Cell: " + pad(i, 3),
+                        type: "number",
+                        role: "value.temperature",
+                        read: true,
+                        write: false,
+                        unit: "°C"
+                    },
+                    native: {}
+                });
+                checkandrepairUnit("CellDetails.CellTemp" + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
+            }
         }
     }
+
 }
 
 function setObjects() {
