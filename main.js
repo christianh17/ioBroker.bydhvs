@@ -992,6 +992,7 @@ function Poll(adapter) {
     // Erstelle die Arrays
     for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCont; towerNumber++) {
         adapter.log.silly("Empty tower " + towerNumber);
+        towerAttributes[towerNumber] = {};
         towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
         towerAttributes[towerNumber].hvsBatteryTempperCell = [];
     }
