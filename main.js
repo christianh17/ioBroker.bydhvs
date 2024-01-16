@@ -249,6 +249,8 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -734,9 +736,13 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 for (let i = 1; i <= hvsNumCells; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
                 }
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltDefDeviation`, stabw(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0)) ,true);
+
                 for (let i = 1; i <= hvsNumTemps; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
                 }
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempDefDeviation`, stabw(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0)) ,true);
+
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
@@ -1052,6 +1058,17 @@ async function main() {
         adapter.checkGroup("admin", "admin", (res) => {
             adapter.log.info("check group user admin group admin: " + res);
         });*/
+}
+
+var stabw = function (array) {
+    var len =0;
+    var sum = array.reduce(function (pv, cv) { ++len; return pv+cv;}, 0);
+    var mean = sum / len;
+    var result = 0;
+    for(var i = 0; i <len; i++)
+        result += Math.pow(array[i] - mean, 2);
+    len = (len == 1) ? len :len - 1;
+    return Math.sqrt(result / len);
 }
 
 // @ts-ignore parent is a valid property on module
