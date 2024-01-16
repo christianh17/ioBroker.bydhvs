@@ -77,5 +77,18 @@ systemDictionary = {
         "es": "Modo de prueba: muestra datos en el registro de errores",
         "pl": "Tryb testowy - pokaż dane w dzienniku błędów",
         "zh-cn": "测试模式-在错误日志中显示数据"
-    }
+    },
+    "ConfBydTowerCount": {
+        "en": "Count of towers",
+        "de": "Anzahl der Türme",
+        "ru": "Количество башен",
+        "pt": "Contagem de torres",
+        "nl": "Aantal torens",
+        "fr": "Nombre de tours",
+        "it": "Conte di torri",
+        "es": "Conde de torres",
+        "pl": "Liczba wież",
+        "uk": "Кількість веж",
+        "zh-cn": "塔数"
+      }
 };
