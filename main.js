@@ -254,10 +254,10 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -761,8 +761,8 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 const mVoltMean = mean(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0));
                 adapter.setState(`Diagnosis.Tower_${t+1}.mVoltDefDeviation`, mVoltDefDeviation,true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMean`, mVoltMean, true);
-                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltGt150DefVar`, towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > (mVoltMean + (mVoltDefDeviation * 1.5))).length);
-                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltLt150DefVar`, towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0).filter((v) => v < (mVoltMean - (mVoltDefDeviation * 1.5))).length);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltGt150DefVar`, towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > (mVoltMean + (mVoltDefDeviation * 1.5))).length, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltLt150DefVar`, towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0).filter((v) => v < (mVoltMean - (mVoltDefDeviation * 1.5))).length, true);
 
                 for (let i = 1; i <= hvsNumTemps; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
@@ -771,8 +771,8 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 const tempMean = mean(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0));
                 adapter.setState(`Diagnosis.Tower_${t+1}.TempDefDeviation`, tempDefDeviation,true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.TempMean`, tempMean, true);
-                adapter.setState(`Diagnosis.Tower_${t+1}.TempGt150DefVar`, towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > (tempMean + (tempDefDeviation * 1.5))).length);
-                adapter.setState(`Diagnosis.Tower_${t+1}.TempLt150DefVar`, towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0).filter((v) => v < (tempMean - (tempDefDeviation * 1.5))).length);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempGt150DefVar`, towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > (tempMean + (tempDefDeviation * 1.5))).length, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempLt150DefVar`, towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0).filter((v) => v < (tempMean - (tempDefDeviation * 1.5))).length, true);
 
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
