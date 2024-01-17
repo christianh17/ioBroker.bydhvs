@@ -122,10 +122,11 @@ const myRequests = [
 
 
 /* Während des Updates des BMS funktioniert das Auslesen offensichtlich nicht, hier die Antworten des Speichers (Seriennummer verfälscht und CRC des ersten Paketes nicht neu berechnet)
-0103cc503030303030303030303030303030303030307878787878030d030f031401000312020101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000015040c12382b82b2
-0103320043014a014a0063fff852a80015001400140000030f0000000000000902000252761703000013840000000209020000042c925b
-010306031202010100c8ad
-0190044dc3 <- Das scheint eine Fehlercondition zu sein.
+ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+01 03 cc 50 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 78 78 78 78 78 03 0d 03 0f 03 14 01 00 03 12 02 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00 00 00 15 04 0c 12 38 2b 82 b2
+01 03 32 00 43 01 4a 01 4a 00 63 ff f8 52 a8 00 15 00 14 00 14 00 00 03 0f 00 00 00 00 00 00 09 02 00 02 52 76 17 03 00 00 13 84 00 00 00 02 09 02 00 00 04 2c 92 5b
+01 03 06 03 12 02 01 01 00 c8 ad
+01 90 04 4d c3 <- Das scheint eine Fehlercondition zu sein.
 5 min. später klappte es wieder und dann war auch die neue F/W-Version in der Antwort enthalten
 */
 const myErrors = [
@@ -309,7 +310,7 @@ function setObjectsCells() {
 }
 
 function setObjects() {
-    const myObjects = [
+    let myObjects = [
         ["System.Serial", "state", "Serial number", "string", "text", true, false, ""],
         ["System.BMU", "state", "F/W BMU", "string", "text", true, false, ""],
         ["System.BMS", "state", "F/W BMS", "string", "text", true, false, ""],
@@ -338,6 +339,14 @@ function setObjects() {
         //["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""], // ERROR ERROR ERROR
         ["System.ErrorStr", "state", "Error (string)", "string", "text", true, false, ""],
     ];
+
+    const rawObjects = [
+        ["System.Raw_00", "state", "Raw Message of sequence 00", "string", "text", true, false, ""],
+        ["System.Raw_01", "state", "Raw Message of sequence 01", "string", "text", true, false, ""],
+        ["System.Raw_02", "state", "Raw Message of sequence 02", "string", "text", true, false, ""],
+    ]
+    if(adapter.config.ConfStoreRawMessages)
+        myObjects = myObjects.concat(rawObjects);
 
     for (let i = 0; i < myObjects.length; i++) {
         adapter.setObjectNotExists(myObjects[i][0], {

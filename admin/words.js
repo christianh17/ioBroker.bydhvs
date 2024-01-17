@@ -90,5 +90,8 @@ systemDictionary = {
         "pl": "Liczba wież",
         "uk": "Кількість веж",
         "zh-cn": "塔数"
+      },
+      "ConfStoreRawMessages": {
+        "en": "Enable to store the raw messages"
       }
 };
