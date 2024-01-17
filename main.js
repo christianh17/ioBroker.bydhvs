@@ -252,6 +252,8 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -752,11 +754,13 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
                 }
                 adapter.setState(`Diagnosis.Tower_${t+1}.mVoltDefDeviation`, stabw(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0)) ,true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMean`, mean(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0)), true);
 
                 for (let i = 1; i <= hvsNumTemps; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
                 }
                 adapter.setState(`Diagnosis.Tower_${t+1}.TempDefDeviation`, stabw(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0)) ,true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempMean`, mean(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0)), true);
 
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
@@ -1074,7 +1078,9 @@ async function main() {
             adapter.log.info("check group user admin group admin: " + res);
         });*/
 }
-
+/*
+ * Calculate default deviation / Standardabweichung
+ */
 var stabw = function (array) {
     var len =0;
     var sum = array.reduce(function (pv, cv) { ++len; return pv+cv;}, 0);
@@ -1084,6 +1090,14 @@ var stabw = function (array) {
         result += Math.pow(array[i] - mean, 2);
     len = (len == 1) ? len :len - 1;
     return Math.sqrt(result / len);
+}
+
+/*
+ * Calculate the average / mean
+ */
+var mean = function (array) {
+    const sum = array.reduce((a, b) => a + b, 0);
+    return (sum / array.length) || 0;
 }
 
 // @ts-ignore parent is a valid property on module
