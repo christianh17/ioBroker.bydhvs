@@ -450,7 +450,7 @@ function buf2int16US(byteArray, pos) { //unsigned
 
 function decodePacket0(data) {
     if(adapter.config.ConfStoreRawMessages)
-        adapter.setState("System.Raw_00", data, true);
+        adapter.setState("System.Raw_00", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsSerial = "";
     for (let i = 3; i < 22; i++) {
@@ -481,7 +481,7 @@ function decodePacket0(data) {
 
 function decodePacket1(data) {
     if(adapter.config.ConfStoreRawMessages)
-        adapter.setState("System.Raw_01", data, true);
+        adapter.setState("System.Raw_01", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16SI(byteArray, 3);
     hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2));
@@ -516,7 +516,7 @@ function decodePacketNOP(data) {
 
 function decodePacket2(data) {
     if(adapter.config.ConfStoreRawMessages)
-        adapter.setState("System.Raw_0", data, true);
+        adapter.setState("System.Raw_02", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsBattType = byteArray[5];
     hvsInvType = byteArray[3];
