@@ -760,7 +760,7 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
                 }
                 adapter.setState(`Diagnosis.Tower_${t+1}.TempDefDeviation`, stabw(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0)) ,true);
-                adapter.setState(`Diagnosis.Tower_${t+1}.TempMean`, mean(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0)), true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempMean`, mean(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0)), true);
 
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
