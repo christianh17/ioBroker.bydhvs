@@ -1,6 +1,5 @@
 .git
 .idea
-.gitea
 *.code-workspace
 node_modules
 nbproject
