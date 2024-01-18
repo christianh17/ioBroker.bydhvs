@@ -53,6 +53,7 @@ let hvsBatTemp;
 let hvsOutVolt;
 let hvsError;
 let hvsModules;
+let hvsTowers;
 let hvsDiffVolt;
 let hvsPower;
 let hvsBattType;
@@ -324,6 +325,7 @@ function setObjects() {
         ["System.BMUBankA", "state", "F/W BMU-BankA", "string", "text", true, false, ""],
         ["System.BMUBankB", "state", "F/W BMU-BankB", "string", "text", true, false, ""],
         ["System.Modules", "state", "modules (count)", "number", "value", true, false, ""],
+        ["System.Towers", "state", "towers (count)", "number", "value", true, false, ""],
         ["System.Grid", "state", "Parameter Table", "string", "text", true, false, ""],
         ["System.ParamT", "state", "F/W BMU", "string", "text", true, false, ""],
         ["System.BattType", "state", "Battery Type", "string", "text", true, false, ""],
@@ -477,7 +479,8 @@ function decodePacket0(data) {
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
     // 1st Byte - Count of towers
     // 2nd Byte - Amount of Modules (per Tower)
-    hvsModules = parseInt((byteArray[36] - 16).toString());
+    hvsModules = parseInt((byteArray[36] % 16).toString());
+    hvsTowers  = parseInt((Math.floor(byteArray[36] / 16)).toString());
     if (byteArray[38] === 0) {hvsGrid = "OffGrid";}
 	if (byteArray[38] === 1) {hvsGrid = "OnGrid";}
 	if (byteArray[38] === 2) {hvsGrid = "Backup";}
@@ -716,6 +719,7 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
     adapter.setState("System.BMUBankB", hvsBMUB, true);
     adapter.setState("System.BMS", hvsBMS, true);
     adapter.setState("System.Modules", hvsModules, true);
+    adapter.setState("System.Towers", hvsTowers, true);
     adapter.setState("System.Grid", hvsGrid, true);
     adapter.setState("State.SOC", hvsSOC, true);
     adapter.setState("State.VoltMax", hvsMaxVolt, true);
@@ -1096,24 +1100,24 @@ async function main() {
 /*
  * Calculate default deviation / Standardabweichung
  */
-var stabw = function (array) {
-    var len =0;
-    var sum = array.reduce(function (pv, cv) { ++len; return pv+cv;}, 0);
-    var mean = sum / len;
-    var result = 0;
-    for(var i = 0; i <len; i++)
+const stabw = function (array) {
+    let len =0;
+    const sum = array.reduce(function (pv, cv) { ++len; return pv+cv;}, 0);
+    const mean = sum / len;
+    let result = 0;
+    for(let i = 0; i <len; i++)
         result += Math.pow(array[i] - mean, 2);
     len = (len == 1) ? len :len - 1;
     return Math.sqrt(result / len);
-}
+};
 
 /*
  * Calculate the average / mean
  */
-var mean = function (array) {
+const mean = function (array) {
     const sum = array.reduce((a, b) => a + b, 0);
     return (sum / array.length) || 0;
-}
+};
 
 // @ts-ignore parent is a valid property on module
 if (module.parent) {
