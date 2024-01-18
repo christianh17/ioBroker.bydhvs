@@ -475,7 +475,8 @@ function decodePacket0(data) {
         hvsBMU = hvsBMUB + "-B";
     }
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
-    // TODO: hier gibt es einen Fehler: Ich habe mit je 3 Modulen in zwei Tower 0x23 (35) (MK-2001)
+    // 1st Byte - Count of towers
+    // 2nd Byte - Amount of Modules (per Tower)
     hvsModules = parseInt((byteArray[36] - 16).toString());
     if (byteArray[38] === 0) {hvsGrid = "OffGrid";}
 	if (byteArray[38] === 1) {hvsGrid = "OnGrid";}
