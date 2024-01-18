@@ -1,0 +1,46 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: Development Deployment
+
+on:
+  push:
+    branches:
+      - onprem
+
+jobs:
+  build:
+    runs-on: docker
+    steps:
+      - uses: http://gitea.com/actions/checkout@v3
+      - run: npm ci
+      - run: npm test
+
+  deploy-npm:
+    needs: build
+    runs-on: docker
+    steps:
+      - uses: http://gitea.com/actions/checkout@v3
+      - run: npm i
+        name: Build
+      - run: |
+          npm pack --json | jq -r '.[0] | "filename=" + .filename + "\nid=" + .id + "\nversion=" + .version' | sed 's/\\n/\n/g' >> "$GITHUB_OUTPUT"
+        name: Pack NPM File
+        id: npmpack
+      - name: List files in the repository
+        run: |
+          ls ${{ gitea.workspace }}
+      - name: Output information
+        run: echo "Filename = ${{ steps.npmpack.outputs.filename }}" && echo "ID = ${{ steps.npmpack.outputs.id }}" && echo "Version = ${{ steps.npmpack.outputs.version }}" && if [ -z "${{ steps.npmpack.outputs.filename }}" ]; then echo "Filename wrong!" && exit 1; else echo "filename fine"; fi && if [ -z "${{ steps.npmpack.outputs.version }}" ]; then echo "Version wrong!" && exit 1; else echo "Version fine"; fi
+      - name: Move files
+        run: |
+          cp -f ${{ gitea.workspace }}/${{ steps.npmpack.outputs.filename }} /deploy/iobroker/data/install/
+      - name: Install on ioBroker
+        run: |
+          docker exec -it iobroker /bin/bash -c "iobroker url /opt/iobroker/install/${{ steps.npmpack.outputs.filename }}"
+      - name: Upload new Admin files
+        run : |
+          docker exec -it iobroker /bin/bash -c "iobroker upload bydhvs"
+      - name: Restart the adapter
+        run: |
+          docker exec -it iobroker /bin/bash -c "iobroker restart bydhvs.0"
