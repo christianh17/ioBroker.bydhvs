@@ -62,6 +62,7 @@ let hvsInvType_String;
 let hvsNumCells; //number of cells in system
 let hvsNumTemps; // number of temperatures to count with
 let ConfBatDetailshowoften;
+let ConfBydTowerCount;
 let confBatPollTime;
 let myNumberforDetails;
 let ConfTestMode;
@@ -241,7 +242,7 @@ function setObjectsCells() {
     //Diagnose-data only if necessary.
     let myObjects = [];
 
-    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCount; towerNumber++) {
+    for(let towerNumber = 0; towerNumber < ConfBydTowerCount; towerNumber++) {
         myObjects = [
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
@@ -899,7 +900,7 @@ IPClient.on("data", function (data) {
                     IPClient.write(myRequests[9]); // Switch to second turn for the last module
                 }, 200);
             } else {
-                if(adapter.config.ConfBydTowerCount > 1 ) {
+                if(ConfBydTowerCount > 1 ) {
                     myState = 16;
                     IPClient.setTimeout(1000);
                     setTimeout(() => {
@@ -945,7 +946,7 @@ IPClient.on("data", function (data) {
             break;
         case 15:
             decodeResponse13(data);
-            if(adapter.config.ConfBydTowerCount > 1 ) {
+            if(ConfBydTowerCount > 1 ) {
                 adapter.log.silly("Start to read Tower 2");
                 myState = 16;
                 IPClient.setTimeout(1000);
@@ -1064,6 +1065,7 @@ async function main() {
         confBatPollTime = 60;
         adapter.log.error("polling to often - max once per minute ");
     }
+    ConfBydTowerCount = adapter.config.ConfBydTowerCount ? adapter.config.ConfBydTowerCount : 1;
     adapter.log.info("BYD IP Adress: " + adapter.config.ConfIPAdress);
     ConfBatDetails = (adapter.config.ConfBatDetails ? true : false);
     adapter.log.info("Bat Details  : " + adapter.config.ConfBatDetails);
