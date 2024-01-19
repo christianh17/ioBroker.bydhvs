@@ -661,7 +661,7 @@ function decodePacket5(data, towerNumber = 0) {
     towerAttributes[towerNumber].outVolt = buf2int16SI(byteArray, 51);
     towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
     towerAttributes[towerNumber].soh = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
-    towerAttributes[towerNumber].state = Buffer.from(byteArray[59]).toString("hex") + Buffer.from(byteArray[60]).toString("hex");
+    towerAttributes[towerNumber].state = byteArray[59].toString(16) + byteArray[60].toString(16);
 }
 
 function decodePacket6(data, towerNumber = 0) {
