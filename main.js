@@ -831,7 +831,6 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
-                adapter.setState(`Diagnosis.Tower_${t+1}.Balancing`, towerAttributes[t].balacing, true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.ChargeTotal`, towerAttributes[t].chargeTotal, true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.DischargeTotal`, towerAttributes[t].dischargeTotal, true);
                 adapter.setState(`Diagnosis.Tower_${t+1}.ETA`, towerAttributes[t].eta, true);
