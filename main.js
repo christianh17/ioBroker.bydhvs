@@ -842,7 +842,7 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 adapter.setState(`Diagnosis.Tower_${t+1}.State`, towerAttributes[t].state, true);
 
                 adapter.setState(`Diagnosis.Tower_${t+1}.BalancingOne`, towerAttributes[t].balacing, true);
-                adapter.setState(`Diagnosis.Tower_${t+1}.BalancingTwo`, towerAttributes[t].balacing_two, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.BalancingTwo`, towerAttributes[t].balacing_two ? towerAttributes[t].balacing_two : "", true);
 
                 for (let i = 1; i <= hvsNumCells; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
