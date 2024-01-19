@@ -289,8 +289,8 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOH", "state", "State of Health", "number", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".State", "state", "tower state", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingOne", "state", "tower state", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingTwo", "state", "tower state", "number", "value", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingOne", "state", "tower state", "string", "value", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingTwo", "state", "tower state", "string", "value", true, false, ""],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
