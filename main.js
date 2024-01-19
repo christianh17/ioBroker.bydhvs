@@ -288,7 +288,7 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".OutVolt", "state", "Output voltage", "number", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOH", "state", "State of Health", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".State", "state", "tower state", "number", "value", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".State", "state", "tower state", "string", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingOne", "state", "tower state", "string", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingTwo", "state", "tower state", "string", "value", true, false, ""],
         ];
@@ -660,7 +660,7 @@ function decodePacket5(data, towerNumber = 0) {
     towerAttributes[towerNumber].batteryVolt = buf2int16SI(byteArray, 45);
     towerAttributes[towerNumber].outVolt = buf2int16SI(byteArray, 51);
     towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
-    towerAttributes[towerNumber].soh = parseFloat((buf2int16SI(byteArray, 53) * 1.0 / 10.0).toFixed(1));
+    towerAttributes[towerNumber].soh = parseFloat((buf2int16SI(byteArray, 55) * 1.0 / 10.0).toFixed(1));
     towerAttributes[towerNumber].state = byteArray[59].toString(16) + byteArray[60].toString(16);
 }
 
