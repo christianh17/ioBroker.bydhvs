@@ -287,6 +287,14 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".BatteryVolt", "state", "Wirkungsgrad of that tower", "number", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".OutVolt", "state", "Output voltage", "number", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOH", "state", "State of Health", "number", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".State", "state", "tower state", "string", "value", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingOne", "state", "tower state", "string", "value", true, false, ""],
@@ -523,13 +531,13 @@ function decodePacket0(data) {
         hvsBMU = hvsBMUB + "-B";
     }
     hvsBMS = "V" + byteArray[31].toString() + "." + byteArray[32].toString() + "-" + String.fromCharCode(byteArray[34] + 65);
-
+  
     // Amount of towers
     // 1st Byte - Count of towers
     // 2nd Byte - Amount of Modules (per Tower)
     hvsModules = parseInt((byteArray[36] % 16).toString());
     hvsTowers  = parseInt((Math.floor(byteArray[36] / 16)).toString());
-
+  
     // Architecture type
     if (byteArray[38] === 0) {hvsGrid = "OffGrid";}
     if (byteArray[38] === 1) {hvsGrid = "OnGrid";}
@@ -825,6 +833,7 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
         adapter.log.silly("Tower attributes: " + JSON.stringify(towerAttributes));
         for(let t = 0; t < towerAttributes.length; t++) {
             try {
+
                 // Test if all required msg received.
                 if(towerAttributes[t].hvsMaxmVolt) {
                     adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
