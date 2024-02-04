@@ -62,6 +62,7 @@ let hvsInvType_String;
 let hvsNumCells; //number of cells in system
 let hvsNumTemps; // number of temperatures to count with
 let ConfBatDetailshowoften;
+let ConfBydTowerCount;
 let confBatPollTime;
 let myNumberforDetails;
 let ConfTestMode;
@@ -122,10 +123,11 @@ const myRequests = [
 
 
 /* Während des Updates des BMS funktioniert das Auslesen offensichtlich nicht, hier die Antworten des Speichers (Seriennummer verfälscht und CRC des ersten Paketes nicht neu berechnet)
-0103cc503030303030303030303030303030303030307878787878030d030f031401000312020101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000015040c12382b82b2
-0103320043014a014a0063fff852a80015001400140000030f0000000000000902000252761703000013840000000209020000042c925b
-010306031202010100c8ad
-0190044dc3 <- Das scheint eine Fehlercondition zu sein.
+ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+01 03 cc 50 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 78 78 78 78 78 03 0d 03 0f 03 14 01 00 03 12 02 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00 00 00 15 04 0c 12 38 2b 82 b2
+01 03 32 00 43 01 4a 01 4a 00 63 ff f8 52 a8 00 15 00 14 00 14 00 00 03 0f 00 00 00 00 00 00 09 02 00 02 52 76 17 03 00 00 13 84 00 00 00 02 09 02 00 00 04 2c 92 5b
+01 03 06 03 12 02 01 01 00 c8 ad
+01 90 04 4d c3 <- Das scheint eine Fehlercondition zu sein.
 5 min. später klappte es wieder und dann war auch die neue F/W-Version in der Antwort enthalten
 */
 const myErrors = [
@@ -240,7 +242,7 @@ function setObjectsCells() {
     //Diagnose-data only if necessary.
     let myObjects = [];
 
-    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCount; towerNumber++) {
+    for(let towerNumber = 0; towerNumber < ConfBydTowerCount; towerNumber++) {
         myObjects = [
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
@@ -249,6 +251,14 @@ function setObjectsCells() {
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
             ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -307,7 +317,7 @@ function setObjectsCells() {
 }
 
 function setObjects() {
-    const myObjects = [
+    let myObjects = [
         ["System.Serial", "state", "Serial number", "string", "text", true, false, ""],
         ["System.BMU", "state", "F/W BMU", "string", "text", true, false, ""],
         ["System.BMS", "state", "F/W BMS", "string", "text", true, false, ""],
@@ -336,6 +346,14 @@ function setObjects() {
         //["State.ErrorNum", "state", "Error (numeric)", "number", "", true, false, ""], // ERROR ERROR ERROR
         ["System.ErrorStr", "state", "Error (string)", "string", "text", true, false, ""],
     ];
+
+    const rawObjects = [
+        ["System.Raw_00", "state", "Raw Message of sequence 00", "string", "text", true, false, ""],
+        ["System.Raw_01", "state", "Raw Message of sequence 01", "string", "text", true, false, ""],
+        ["System.Raw_02", "state", "Raw Message of sequence 02", "string", "text", true, false, ""],
+    ]
+    if(adapter.config.ConfStoreRawMessages)
+        myObjects = myObjects.concat(rawObjects);
 
     for (let i = 0; i < myObjects.length; i++) {
         adapter.setObjectNotExists(myObjects[i][0], {
@@ -438,6 +456,8 @@ function buf2int16US(byteArray, pos) { //unsigned
 }
 
 function decodePacket0(data) {
+    if(adapter.config.ConfStoreRawMessages)
+        adapter.setState("System.Raw_00", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsSerial = "";
     for (let i = 3; i < 22; i++) {
@@ -467,6 +487,8 @@ function decodePacket0(data) {
 }
 
 function decodePacket1(data) {
+    if(adapter.config.ConfStoreRawMessages)
+        adapter.setState("System.Raw_01", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16SI(byteArray, 3);
     hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2));
@@ -500,6 +522,8 @@ function decodePacketNOP(data) {
 }
 
 function decodePacket2(data) {
+    if(adapter.config.ConfStoreRawMessages)
+        adapter.setState("System.Raw_02", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsBattType = byteArray[5];
     hvsInvType = byteArray[3];
@@ -734,9 +758,23 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 for (let i = 1; i <= hvsNumCells; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
                 }
+                const mVoltDefDeviation = stabw(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0));
+                const mVoltMean = mean(towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0));
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltDefDeviation`, mVoltDefDeviation,true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltMean`, mVoltMean, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltGt150DefVar`, towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > (mVoltMean + (mVoltDefDeviation * 1.5))).length);
+                adapter.setState(`Diagnosis.Tower_${t+1}.mVoltLt150DefVar`, towerAttributes[t].hvsBatteryVoltsperCell.filter((v) => v > 0).filter((v) => v < (mVoltMean - (mVoltDefDeviation * 1.5))).length);
+
                 for (let i = 1; i <= hvsNumTemps; i++) {
                     adapter.setState(`CellDetails.Tower_${t+1}.CellTemp` + pad(i, 3), towerAttributes[t].hvsBatteryTempperCell[i] ? towerAttributes[t].hvsBatteryTempperCell[i] : 0, true);
                 }
+                const tempDefDeviation = stabw(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0));
+                const tempMean = mean(towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0));
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempDefDeviation`, tempDefDeviation,true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempMean`, tempMean, true);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempGt150DefVar`, towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > (tempMean + (tempDefDeviation * 1.5))).length);
+                adapter.setState(`Diagnosis.Tower_${t+1}.TempLt150DefVar`, towerAttributes[t].hvsBatteryTempperCell.filter((v) => v > 0).filter((v) => v < (tempMean - (tempDefDeviation * 1.5))).length);
+
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
                 adapter.log.silly(`Tower_${t+1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
@@ -862,7 +900,7 @@ IPClient.on("data", function (data) {
                     IPClient.write(myRequests[9]); // Switch to second turn for the last module
                 }, 200);
             } else {
-                if(adapter.config.ConfBydTowerCount > 1 ) {
+                if(ConfBydTowerCount > 1 ) {
                     myState = 16;
                     IPClient.setTimeout(1000);
                     setTimeout(() => {
@@ -908,7 +946,7 @@ IPClient.on("data", function (data) {
             break;
         case 15:
             decodeResponse13(data);
-            if(adapter.config.ConfBydTowerCount > 1 ) {
+            if(ConfBydTowerCount > 1 ) {
                 adapter.log.silly("Start to read Tower 2");
                 myState = 16;
                 IPClient.setTimeout(1000);
@@ -1027,6 +1065,7 @@ async function main() {
         confBatPollTime = 60;
         adapter.log.error("polling to often - max once per minute ");
     }
+    ConfBydTowerCount = adapter.config.ConfBydTowerCount ? adapter.config.ConfBydTowerCount : 1;
     adapter.log.info("BYD IP Adress: " + adapter.config.ConfIPAdress);
     ConfBatDetails = (adapter.config.ConfBatDetails ? true : false);
     adapter.log.info("Bat Details  : " + adapter.config.ConfBatDetails);
@@ -1052,6 +1091,27 @@ async function main() {
         adapter.checkGroup("admin", "admin", (res) => {
             adapter.log.info("check group user admin group admin: " + res);
         });*/
+}
+/*
+ * Calculate default deviation / Standardabweichung
+ */
+var stabw = function (array) {
+    var len =0;
+    var sum = array.reduce(function (pv, cv) { ++len; return pv+cv;}, 0);
+    var mean = sum / len;
+    var result = 0;
+    for(var i = 0; i <len; i++)
+        result += Math.pow(array[i] - mean, 2);
+    len = (len == 1) ? len :len - 1;
+    return Math.sqrt(result / len);
+}
+
+/*
+ * Calculate the average / mean
+ */
+var mean = function (array) {
+    const sum = array.reduce((a, b) => a + b, 0);
+    return (sum / array.length) || 0;
 }
 
 // @ts-ignore parent is a valid property on module

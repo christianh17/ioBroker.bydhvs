@@ -195,6 +195,7 @@
     "ConfIPAdress": "192.168.16.254",
     "ConfDetailshowoften": 60,
     "ConfBydTowerCount": 1,
+    "ConfStoreRawMessages": false,
     "pingInterval": 15000
   },
   "objects": [],
