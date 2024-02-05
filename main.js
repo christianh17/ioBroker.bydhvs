@@ -1136,7 +1136,7 @@ function Poll(adapter) {
     adapter.log.silly("myNumberforDetails:" + myNumberforDetails);
     adapter.log.silly("Poll start, IP:" + adapter.config.ConfIPAdress);
     // Erstelle die Arrays
-    for(let towerNumber = 0; towerNumber < adapter.config.ConfBydTowerCont; towerNumber++) {
+    for(let towerNumber = 0; towerNumber < ConfBydTowerCount; towerNumber++) {
         adapter.log.silly("Empty tower " + towerNumber);
         towerAttributes[towerNumber] = {};
         towerAttributes[towerNumber].hvsBatteryVoltsperCell = [];
