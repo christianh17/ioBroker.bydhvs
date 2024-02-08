@@ -1008,6 +1008,7 @@ IPClient.on("data", function (data) {
                         IPClient.write(myRequests[16]);
                     }, 200);
                 } else {
+                    setStates(); //write out objects if only one Tower
                     IPClient.destroy();
                     myState = 0;
                 }
