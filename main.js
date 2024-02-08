@@ -264,41 +264,45 @@ function startAdapter(options) {
 function setObjectsCells() {
     //Diagnose-data only if necessary.
     let myObjects = [];
+    let ObjTowerString = "";
 
     for(let towerNumber = 0; towerNumber < ConfBydTowerCount; towerNumber++) {
+        if (ConfBydTowerCount > 1) {
+           ObjTowerString = ".Tower_" +(towerNumber + 1);
+        }
         myObjects = [
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".ChargeTotal", "state", "Total Charge in that tower", "number", "value.watt", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".DischargeTotal", "state", "Total Discharge in that tower", "number", "value.watt", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".ETA", "state", "Wirkungsgrad of that tower", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BatteryVolt", "state", "Wirkungsgrad of that tower", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".OutVolt", "state", "Output voltage", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".SOH", "state", "State of Health", "number", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".State", "state", "tower state", "string", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingOne", "state", "tower state", "string", "value", true, false, ""],
-            ["Diagnosis.Tower_" + (towerNumber + 1) + ".BalancingTwo", "state", "tower state", "string", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltMax", "state", "Max Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".ChargeTotal", "state", "Total Charge in that tower", "number", "value.watt", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".DischargeTotal", "state", "Total Discharge in that tower", "number", "value.watt", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".ETA", "state", "Wirkungsgrad of that tower", "number", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".BatteryVolt", "state", "Wirkungsgrad of that tower", "number", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".OutVolt", "state", "Output voltage", "number", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltDefDeviation", "state", "default deviation of the cells", "number", "value.battery", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".TempDefDeviation", "state", "default deviation of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltMean", "state", "mean of the cells", "number", "value.temperature", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".TempMean", "state", "mean of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".SOH", "state", "State of Health", "number", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".State", "state", "tower state", "string", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".BalancingOne", "state", "tower state", "string", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".BalancingTwo", "state", "tower state", "string", "value", true, false, ""],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -322,7 +326,7 @@ function setObjectsCells() {
 
 
         for (let i = 1; i <= hvsNumCells; i++) {
-            adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber+1}.CellVolt` + pad(i, 3), {
+            adapter.setObjectNotExists(`CellDetails`+ObjTowerString +`.CellVolt` + pad(i, 3), {
                 type: "state",
                 common: {
                     name: "Voltage Cell: " + pad(i, 3),
@@ -334,10 +338,10 @@ function setObjectsCells() {
                 },
                 native: {}
             });
-            checkandrepairUnit(`CellDetails.Tower_${towerNumber+1}.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
+            checkandrepairUnit(`CellDetails`+ObjTowerString +`.CellVolt` + pad(i, 3), "mV", "value.voltage"); //repair forgotten units in first version
 
             for (let i = 1; i <= hvsNumTemps; i++) {
-                adapter.setObjectNotExists(`CellDetails.Tower_${towerNumber+1}.CellTemp` + pad(i, 3), {
+                adapter.setObjectNotExists(`CellDetails`+ObjTowerString +`.CellTemp` + pad(i, 3), {
                     type: "state",
                     common: {
                         name: "Temp Cell: " + pad(i, 3),
@@ -349,7 +353,7 @@ function setObjectsCells() {
                     },
                     native: {}
                 });
-                checkandrepairUnit(`CellDetails.Tower_${towerNumber+1}.CellTemp` + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
+                checkandrepairUnit(`CellDetails`+ObjTowerString +`.CellTemp` + pad(i, 3), "°C", "value.temperature"); //repair forgotten units in first version
             }
         }
     }
