@@ -840,7 +840,7 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
         for(let t = 0; t < towerAttributes.length; t++) {
             try {
                 if (ConfBydTowerCount > 1) {
-                    ObjTowerString = ".Tower_" +(towerNumber + 1);
+                    ObjTowerString = ".Tower_" +(t + 1);
                 }
 
                 // Test if all required msg received.
