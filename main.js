@@ -1139,7 +1139,8 @@ IPClient.on("error", function () {
 });
 
 
-function Poll(adapter) {
+function Poll(adapter) {    
+    if (myState > 0) return;
     myState = 1;
     IPClient.setTimeout(1000);
     myNumberforDetails += 1;
@@ -1171,9 +1172,9 @@ async function main() {
     // adapter.config:
     adapter.log.info("Poll Interval: " + adapter.config.ConfPollInterval);
     confBatPollTime = parseInt(adapter.config.ConfPollInterval);
-    if (confBatPollTime < 60) {
-        confBatPollTime = 60;
-        adapter.log.error("polling to often - max once per minute ");
+    if (confBatPollTime < 3) {
+        //confBatPollTime = 60;
+        adapter.log.warn("poll to often - recommendation is not more than every 3 seconds");
     }
     ConfBydTowerCount = adapter.config.ConfBydTowerCount ? adapter.config.ConfBydTowerCount : 1;
     adapter.log.info("BYD IP Adress: " + adapter.config.ConfIPAdress);
