@@ -303,6 +303,8 @@ function setObjectsCells() {
             ["Diagnosis"+ ObjTowerString + ".State", "state", "tower state", "string", "value", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".BalancingOne", "state", "tower state", "string", "value", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".BalancingTwo", "state", "tower state", "string", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".BalancingCountOne", "state", "tower state", "number", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".BalancingCountTwo", "state", "tower state", "number", "value", true, false, ""],            
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -665,6 +667,7 @@ function decodePacket5(data, towerNumber = 0) {
     // Balancing Flags
     // 17 bis 32
     towerAttributes[towerNumber].balancing = data.slice(17,33).toString("hex");
+    towerAttributes[towerNumber].balancingcount = countSetBits (data.slice(17,33).toString("hex"));
 
     towerAttributes[towerNumber].chargeTotal = buf2int32US(byteArray, 33);
     towerAttributes[towerNumber].dischargeTotal = buf2int32US(byteArray, 37);
@@ -733,8 +736,9 @@ function decodeResponse12(data, towerNumber = 0) {
     const byteArray = new Uint8Array(data);
     //starting with byte 101, ending with 131, Cell voltage 129-144
 
-    // Blanacing Flags
-    towerAttributes[towerNumber].balancing_two = data.slice(17,33).toString("hex");
+    // Balancing Flags
+    towerAttributes[towerNumber].balancing = data.slice(17,33).toString("hex");
+    towerAttributes[towerNumber].balancingcount = countSetBits (data.slice(17,33).toString("hex"));    
 
     const MaxCells = 16;
     for (let i = 0; i < MaxCells; i++) {
@@ -859,10 +863,22 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.SOH`, towerAttributes[t].soh, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.State`, towerAttributes[t].state, true);
+                    adapter.log.debug(`Tower_${t+1} balancing     >${towerAttributes[t].balancing}<`);
+                    adapter.log.debug(`Tower_${t+1} balcount      >${towerAttributes[t].balancingcount}<`);                    
+                    if (t == 0) {
 
-                    if (towerAttributes[t].balancing) adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`, towerAttributes[t].balancing, true);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingTwo`, towerAttributes[t].balancing_two ? towerAttributes[t].balancing_two : "", true);
-
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,      towerAttributes[t].balancing ? towerAttributes[t].balancing : "", true);
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountOne`, towerAttributes[t].balancingcount, true);
+                    } else {
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingTwo`,      towerAttributes[t].balancing ?      towerAttributes[t].balancing : "", true);
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountTwo`, towerAttributes[t].balancingcount,  true );
+                    }
+/*
+                    if (towerAttributes[t].balancing)          adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,      towerAttributes[t].balancing_one, true);
+                    if (towerAttributes[t].balancingcount_one)  adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,      towerAttributes[t].balancing_one, true);                    
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingTwo`,      towerAttributes[t].balancing_two ?      towerAttributes[t].balancing_two : "", true);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountTwo`, towerAttributes[t].balancingcount_two ? towerAttributes[t].balancingcount_two : 0, true );
+*/
                     for (let i = 1; i <= hvsNumCells; i++) {
                         adapter.setState(`CellDetails` + ObjTowerString + `.CellVolt` + pad(i, 3), towerAttributes[t].hvsBatteryVoltsperCell[i] ? towerAttributes[t].hvsBatteryVoltsperCell[i] : 0 , true);
                     }
@@ -1232,4 +1248,24 @@ if (module.parent) {
 } else {
     // otherwise start the instance directly
     startAdapter();
+}
+
+
+function countSetBits(hexString) {
+    // Hexadezimale Zeichen in einen Binärstring umwandeln
+    let binaryString = '';
+    for (let i = 0; i < hexString.length; i++) {
+        // Jeder Hex-Char in einen Binär-String umwandeln und auf 4 Stellen auffüllen
+        binaryString += parseInt(hexString[i], 16).toString(2).padStart(4, '0');
+    }
+    
+    // Anzahl der '1' Bits im Binärstring zählen
+    let setBitsCount = 0;
+    for (let i = 0; i < binaryString.length; i++) {
+        if (binaryString[i] === '1') {
+            setBitsCount++;
+        }
+    }
+    
+    return setBitsCount;
 }
