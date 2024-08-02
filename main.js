@@ -275,16 +275,18 @@ function setObjectsCells() {
             ["Diagnosis"+ ObjTowerString + ".mVoltMin", "state", "Min Cell Voltage (mv)", "number", "value.voltage", true, false, "mV"],
             ["Diagnosis"+ ObjTowerString + ".mVoltMaxCell", "state", "Max Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".mVoltMinCell", "state", "Min Cell Volt (Cellnr)", "number", "value.voltage", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempMax", "state", "Max Cell Temperature", "number", "value.voltage", true, false, "°C"],
+            ["Diagnosis"+ ObjTowerString + ".TempMin", "state", "Min Cell Temperature", "number", "value.voltage", true, false, "°C"],
             ["Diagnosis"+ ObjTowerString + ".TempMaxCell", "state", "Max Cell Temp (Cellnr)", "number", "value.temperature", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".TempMinCell", "state", "Min Cell Temp(Cellnr)", "number", "value.temperature", true, false, ""],
-            ["Diagnosis"+ ObjTowerString + ".mVoltDefDeviation", "state", "default voltage deviation of the cells", "number", "value.voltage", true, false, "mV"],
-            ["Diagnosis"+ ObjTowerString + ".TempDefDeviation", "state", "default temperature deviation of the cells", "number", "value.temperature", true, false, "°C"],
+            ["Diagnosis"+ ObjTowerString + ".mVoltDefDeviation", "state", "voltage std-dev of the cells", "number", "value.voltage", true, false, "mV"],
+            ["Diagnosis"+ ObjTowerString + ".TempDefDeviation", "state", "temperature std-dev of the cells", "number", "value.temperature", true, false, "°C"],
             ["Diagnosis"+ ObjTowerString + ".mVoltMean", "state", "mean voltage of the cells", "number", "value.voltage", true, false, "mV"],
             ["Diagnosis"+ ObjTowerString + ".TempMean", "state", "mean temperature of the cells", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis"+ ObjTowerString + ".mVoltGt150DefVar", "state", "mean of the cells", "number", "value.voltage", true, false, ""],
-            ["Diagnosis"+ ObjTowerString + ".mVoltLt150DefVar", "state", "mean of the cells", "number", "value.voltage", true, false, ""],
-            ["Diagnosis"+ ObjTowerString + ".TempGt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
-            ["Diagnosis"+ ObjTowerString + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltGt150DefVar", "state", "#cells voltage above 150% std-dev", "number", "value.voltage", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".mVoltLt150DefVar", "state", "#cells voltage below 150% std-dev", "number", "value.voltage", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempGt150DefVar", "state", "#cells temperature above 150% std-dev", "number", "value.temperature", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".TempLt150DefVar", "state", "#cells temperature below 150% std-dev", "number", "value.temperature", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".ChargeTotal", "state", "Total Charge in that tower", "number", "value.energy", true, false, "Wh"],
             ["Diagnosis"+ ObjTowerString + ".DischargeTotal", "state", "Total Discharge in that tower", "number", "value.energy", true, false, "Wh"],
             ["Diagnosis"+ ObjTowerString + ".ETA", "state", "Efficiency of that tower", "number", "value", true, false, ""],
@@ -644,6 +646,8 @@ function decodePacket5(data, towerNumber = 0) {
     towerAttributes[towerNumber].hvsMinmVolt = buf2int16SI(byteArray, 7);
     towerAttributes[towerNumber].hvsMaxmVoltCell = byteArray[9];
     towerAttributes[towerNumber].hvsMinmVoltCell = byteArray[10];
+    towerAttributes[towerNumber].hvsMaxmTemp = buf2int16SI(byteArray,11);
+    towerAttributes[towerNumber].hvsMinmTemp = buf2int16SI(byteArray,13);
     towerAttributes[towerNumber].hvsMaxTempCell = byteArray[15];
     towerAttributes[towerNumber].hvsMinTempCell = byteArray[16];
 
@@ -843,6 +847,8 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMax`, towerAttributes[t].hvsMaxmTemp, true);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMin`, towerAttributes[t].hvsMinmTemp, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.TempMinCell`, towerAttributes[t].hvsMinTempCell, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.ChargeTotal`, towerAttributes[t].chargeTotal, true);
