@@ -287,7 +287,7 @@ function setObjectsCells() {
             ["Diagnosis"+ ObjTowerString + ".TempLt150DefVar", "state", "mean of the cells", "number", "value.temperature", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".ChargeTotal", "state", "Total Charge in that tower", "number", "value.energy", true, false, "Wh"],
             ["Diagnosis"+ ObjTowerString + ".DischargeTotal", "state", "Total Discharge in that tower", "number", "value.energy", true, false, "Wh"],
-            ["Diagnosis"+ ObjTowerString + ".ETA", "state", "Wirkungsgrad of that tower", "number", "value", true, false, ""],
+            ["Diagnosis"+ ObjTowerString + ".ETA", "state", "Efficiency of that tower", "number", "value", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".BatteryVolt", "state", "Voltage of battery tower", "number", "value", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".OutVolt", "state", "Output voltage", "number", "value", true, false, ""],
             ["Diagnosis"+ ObjTowerString + ".SOC", "state", "SOC (Diagnosis)", "number", "value.battery", true, false, "%"],
