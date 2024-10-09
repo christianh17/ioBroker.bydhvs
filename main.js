@@ -559,8 +559,8 @@ function decodePacket1(data) {
         adapter.setState("System.Raw_01", data.toString("hex"), true);
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16SI(byteArray, 3);
-    hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(2));
-    hvsMinVolt = parseFloat((buf2int16SI(byteArray, 7) * 1.0 / 100.0).toFixed(2));
+    hvsMaxVolt = parseFloat((buf2int16SI(byteArray, 5) * 1.0 / 100.0).toFixed(3));
+    hvsMinVolt = parseFloat((buf2int16SI(byteArray, 7) * 1.0 / 100.0).toFixed(3));
     hvsSOH = buf2int16SI(byteArray, 9);
     hvsA = parseFloat((buf2int16SI(byteArray, 11) * 1.0 / 10.0).toFixed(1));
     hvsBattVolt = parseFloat((buf2int16US(byteArray, 13) * 1.0 / 100.0).toFixed(1));
@@ -571,7 +571,7 @@ function decodePacket1(data) {
     hvsParamT = byteArray[31].toString() + "." + byteArray[32].toString();
     hvsOutVolt = parseFloat((buf2int16US(byteArray, 35) * 1.0 / 100.0).toFixed(1));
     hvsPower = Math.round((hvsA * hvsOutVolt) * 100) / 100;
-    hvsDiffVolt = Math.round((hvsMaxVolt - hvsMinVolt) * 100) / 100;
+    hvsDiffVolt = Math.round((hvsMaxVolt - hvsMinVolt) * 1000) / 1000;
     hvsErrorString = "";
     //        hvsError = 65535;
     for (let j = 0; j < 16; j++) {
