@@ -654,6 +654,8 @@ function decodePacket5(data, towerNumber = 0) {
     towerAttributes[towerNumber].hvsMinmVolt = buf2int16SI(byteArray, 7);
     towerAttributes[towerNumber].hvsMaxmVoltCell = byteArray[9];
     towerAttributes[towerNumber].hvsMinmVoltCell = byteArray[10];
+    towerAttributes[towerNumber].hvsMaxTemp = byteArray[12];
+    towerAttributes[towerNumber].hvsMinTemp = byteArray[14];    
     towerAttributes[towerNumber].hvsMaxTempCell = byteArray[15];
     towerAttributes[towerNumber].hvsMinTempCell = byteArray[16];
 
@@ -903,6 +905,8 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.log.silly(`Tower_${t+1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
                     adapter.log.silly(`Tower_${t+1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
                     adapter.log.silly(`Tower_${t+1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
+                    adapter.log.silly(`Tower_${t+1} hvsMaxTemp  >${towerAttributes[t].hvsMaxTemp}<`);
+                    adapter.log.silly(`Tower_${t+1} hvsMinTemp  >${towerAttributes[t].hvsMinTemp}<`);
                     adapter.log.silly(`Tower_${t+1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
                     adapter.log.silly(`Tower_${t+1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
                     adapter.log.silly(`Tower_${t+1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
