@@ -10,7 +10,10 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
-const crc = require('crc');
+let crc;
+import('crc').then(module => {
+    crc = module.default;
+});
 //const ioBLib = require('strathcole/iob-lib').ioBLib;
 const net = require('net');
 const IPClient = new net.Socket();
