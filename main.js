@@ -22,6 +22,7 @@ const IPClient = new net.Socket();
 
 /**
  * The adapter instance
+ *
  * @type {ioBroker.Adapter}
  */
 let adapter;
@@ -149,6 +150,7 @@ const myErrors = [
     'Low Temperature Discharging (Cells)',
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const byd_stat_tower = [
     'Battery Over Voltage', // Bit 0
     'Battery Under Voltage', // Bit 1
@@ -215,6 +217,7 @@ const myINVsLVS = [
     'unknown',
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const myBattTypes = ['HVL', 'HVM', 'HVS'];
 /* HVM: 16 cells per module
    HVS: 32 cells per module
@@ -246,6 +249,7 @@ function startAdapter(options) {
                     IPClient.destroy();
 
                     callback();
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (e) {
                     callback();
                 }
@@ -580,6 +584,8 @@ function setObjectsCells() {
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             adapter.setObjectNotExists(myObjects[i][0], {
                 type: myObjects[i][1],
                 common: {
@@ -677,6 +683,8 @@ function setObjects() {
     }
 
     for (let i = 0; i < myObjects.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         adapter.setObjectNotExists(myObjects[i][0], {
             type: myObjects[i][1],
             common: {
@@ -725,13 +733,18 @@ async function checkandrepairUnit(id, NewUnit, NewRole) {
     try {
         const obj = await adapter.getObjectAsync(id);
         if (NewUnit != '') {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             if (obj.common.unit != NewUnit) {
                 adapter.extendObject(id, { common: { unit: NewUnit } });
             }
         }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         if (obj.common.role == '') {
             adapter.extendObject(id, { common: { role: NewRole } });
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
         //dann eben nicht.
     }
@@ -787,7 +800,9 @@ function buf2int32US(byteArray, pos) {
 }
 
 function decodePacket0(data) {
-    if (adapter.config.ConfStoreRawMessages) adapter.setState('System.Raw_00', data.toString('hex'), true);
+    if (adapter.config.ConfStoreRawMessages) {
+        adapter.setState('System.Raw_00', data.toString('hex'), true);
+    }
     const byteArray = new Uint8Array(data);
 
     // Serialnumber
@@ -842,7 +857,9 @@ function decodePacket0(data) {
 }
 
 function decodePacket1(data) {
-    if (adapter.config.ConfStoreRawMessages) adapter.setState('System.Raw_01', data.toString('hex'), true);
+    if (adapter.config.ConfStoreRawMessages) {
+        adapter.setState('System.Raw_01', data.toString('hex'), true);
+    }
     const byteArray = new Uint8Array(data);
     hvsSOC = buf2int16SI(byteArray, 3);
     hvsMaxVolt = parseFloat(((buf2int16SI(byteArray, 5) * 1.0) / 100.0).toFixed(2));
@@ -877,12 +894,14 @@ function decodePacket1(data) {
     hvsETA = hvsDischargeTotal / hvsChargeTotal;
 }
 
-function decodePacketNOP(data) {
+function decodePacketNOP(_data) {
     adapter.log.silly('Packet NOP');
 }
 
 function decodePacket2(data) {
-    if (adapter.config.ConfStoreRawMessages) adapter.setState('System.Raw_02', data.toString('hex'), true);
+    if (adapter.config.ConfStoreRawMessages) {
+        adapter.setState('System.Raw_02', data.toString('hex'), true);
+    }
     const byteArray = new Uint8Array(data);
     hvsBattType = byteArray[5];
     hvsInvType = byteArray[3];
@@ -1286,6 +1305,8 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.log.silly(`Tower_${t + 1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
                 }
             } catch (err) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 adapter.log.error(`Cant read in Tower ${t} with ${err.message}`);
             }
         }
@@ -1533,7 +1554,9 @@ IPClient.on('error', function () {
 });
 
 function Poll(adapter) {
-    if (myState > 0) return;
+    if (myState > 0) {
+        return;
+    }
     myState = 1;
     IPClient.setTimeout(1000);
     myNumberforDetails += 1;
@@ -1570,14 +1593,22 @@ async function main() {
     }
     ConfBydTowerCount = adapter.config.ConfBydTowerCount ? adapter.config.ConfBydTowerCount : 1;
     adapter.log.info('BYD IP Adress: ' + adapter.config.ConfIPAdress);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     ConfBatDetails = adapter.config.ConfBatDetails ? true : false;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     adapter.log.info('Bat Details  : ' + adapter.config.ConfBatDetails);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     ConfBatDetailshowoften = parseInt(adapter.config.ConfDetailshowoften);
     adapter.log.info('Tower count: ' + adapter.config.ConfBydTowerCount);
     /*if (ConfBatDetailshowoften < 10) {
         ConfBatDetails = false;
         adapter.log.error("Details polling to often - disabling ");
     }*/
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     ConfTestMode = adapter.config.ConfTestMode ? true : false;
     adapter.log.info('BatDetailshowoften: ' + ConfBatDetailshowoften);
     adapter.log.silly('TestMode= ' + ConfTestMode);
@@ -1606,7 +1637,9 @@ const stabw = function (array) {
     }, 0);
     const mean = sum / len;
     let result = 0;
-    for (let i = 0; i < len; i++) result += Math.pow(array[i] - mean, 2);
+    for (let i = 0; i < len; i++) {
+        result += Math.pow(array[i] - mean, 2);
+    }
     len = len == 1 ? len : len - 1;
     return Math.sqrt(result / len);
 };
