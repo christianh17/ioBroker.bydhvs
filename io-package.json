@@ -126,9 +126,11 @@
     "keywords": [
       "byd hvs battery pv"
     ],
-    "license": "MIT",
+    "licenseInformation": {
+        "license": "MIT",
+        "type": "free"
+    },
     "platform": "Javascript/Node.js",
-    "main": "main.js",
     "icon": "bydhvs.png",
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/ChristianH17/ioBroker.bydhvs/master/admin/bydhvs.png",
@@ -186,9 +188,10 @@
     "materialize": true,
     "dependencies": [
       {
-        "js-controller": ">=2.0.0"
+        "js-controller": ">=5.0.19"
       }
-    ]
+    ],
+    "tier": 2
   },
   "native": {
     "ConfPollInterval": "60",
