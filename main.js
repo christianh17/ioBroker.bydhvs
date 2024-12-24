@@ -23,11 +23,9 @@ const IPClient = new net.Socket();
 /**
  * The adapter instance
  *
- * @type {ioBroker.Adapter}
  */
 let adapter;
 // globale Variablen
-/** @type {number | any } */
 let myState; // Aktueller Status
 let hvsSOC;
 let hvsMaxVolt;
@@ -74,7 +72,6 @@ let myNumberforDetails;
 let ConfTestMode;
 let FirstRun;
 
-/** @type {string} */
 let hvsSerial;
 let hvsBMU;
 let hvsBMUA;
@@ -84,7 +81,6 @@ let hvsGrid;
 let hvsErrorString;
 let hvsParamT;
 
-/** @type {boolean} */
 let ConfBatDetails;
 
 /*const myStates = [
@@ -95,7 +91,6 @@ let ConfBatDetails;
 
 ];*/
 
-/** @type {NodeJS.Timeout} */
 let idInterval1;
 let idTimeout1;
 
@@ -225,9 +220,10 @@ const myBattTypes = ['HVL', 'HVM', 'HVS'];
 */
 
 /**
- * Starts the adapter instance
+ * Startet den Adapter und definiert seine Methoden.
  *
- * @param {Partial<utils.AdapterOptions>} [options]
+ * @param [options] - Die Optionen für den Adapter.
+ * @returns Der erstellte Adapter.
  */
 function startAdapter(options) {
     // Create the adapter and define its methods
@@ -583,8 +579,6 @@ function setObjectsCells() {
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
             adapter.setObjectNotExists(myObjects[i][0], {
                 type: myObjects[i][1],
                 common: {
@@ -682,8 +676,6 @@ function setObjects() {
     }
 
     for (let i = 0; i < myObjects.length; i++) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         adapter.setObjectNotExists(myObjects[i][0], {
             type: myObjects[i][1],
             common: {
@@ -698,9 +690,9 @@ function setObjects() {
         });
     }
     //repair forgotten units in first version and required roles
-    for (let i = 0; i < myObjects.length; i++) {
+    for (const myObject of myObjects) {
         //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
-        checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][4]);
+        checkandrepairUnit(myObject[0], myObject[7], myObject[4]);
     }
 }
 
@@ -732,19 +724,14 @@ async function checkandrepairUnit(id, NewUnit, NewRole) {
     try {
         const obj = await adapter.getObjectAsync(id);
         if (NewUnit != '') {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
             if (obj.common.unit != NewUnit) {
                 adapter.extendObject(id, { common: { unit: NewUnit } });
             }
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         if (obj.common.role == '') {
             adapter.extendObject(id, { common: { role: NewRole } });
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
         //dann eben nicht.
     }
 }
@@ -953,7 +940,7 @@ function decodePacket2(data) {
         FirstRun = false;
         setObjectsCells();
     }
-    adapter.log.silly('NumCells: ' + hvsNumCells + ' Numtemps: ' + hvsNumTemps + ' Modules: ' + hvsModules);
+    adapter.log.debug(`NumCells: ${hvsNumCells} Numtemps: ${hvsNumTemps} Modules: ${hvsModules}`);
 }
 
 function decodePacket5(data, towerNumber = 0) {
@@ -1304,9 +1291,11 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.log.silly(`Tower_${t + 1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
                 }
             } catch (err) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                adapter.log.error(`Cant read in Tower ${t} with ${err.message}`);
+                if (err instanceof Error) {
+                    adapter.log.error(`Cant read in Tower ${t} with ${err.message}`);
+                } else {
+                    adapter.log.error(`Cant read in Tower ${t} with unknown error`);
+                }
             }
         }
     }
@@ -1327,7 +1316,7 @@ function stopPoll() {
 }
 
 IPClient.on('data', function (data) {
-    adapter.log.silly('Received, State: ' + myState + ', Data: ' + data.toString('hex'));
+    adapter.log.debug('Received, State: ' + myState + ', Data: ' + data.toString('hex'));
     /* if (ConfTestMode) {
         const PacketNumber = myState - 1;
         adapter.log.info("Received, Packet: " + PacketNumber + " Data: " + data.toString("hex"));
@@ -1592,22 +1581,14 @@ async function main() {
     }
     ConfBydTowerCount = adapter.config.ConfBydTowerCount ? adapter.config.ConfBydTowerCount : 1;
     adapter.log.info('BYD IP Adress: ' + adapter.config.ConfIPAdress);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     ConfBatDetails = adapter.config.ConfBatDetails ? true : false;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     adapter.log.info('Bat Details  : ' + adapter.config.ConfBatDetails);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     ConfBatDetailshowoften = parseInt(adapter.config.ConfDetailshowoften);
     adapter.log.info('Tower count: ' + adapter.config.ConfBydTowerCount);
     /*if (ConfBatDetailshowoften < 10) {
         ConfBatDetails = false;
         adapter.log.error("Details polling to often - disabling ");
     }*/
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     ConfTestMode = adapter.config.ConfTestMode ? true : false;
     adapter.log.info('BatDetailshowoften: ' + ConfBatDetailshowoften);
     adapter.log.silly('TestMode= ' + ConfTestMode);
