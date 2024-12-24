@@ -283,7 +283,7 @@ function setObjectsCells() {
             ['Diagnosis' + ObjTowerString + '.ChargeTotal', 'state', 'Total Charge in that tower', 'number', 'value.watt', true, false, '', ],
             ['Diagnosis' + ObjTowerString + '.DischargeTotal', 'state', 'Total Discharge in that tower', 'number', 'value.watt', true, false, '', ],
             ['Diagnosis' + ObjTowerString + '.ETA', 'state', 'Wirkungsgrad of that tower', 'number', 'value', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.BatteryVolt', 'state', 'Wirkungsgrad of that tower', 'number', 'value', true, false, '', ],
+            ['Diagnosis' + ObjTowerString + '.BatteryVolt', 'state', 'Voltage of that tower', 'number', 'value', true, false, '', ],
             ['Diagnosis' + ObjTowerString + '.OutVolt', 'state', 'Output voltage', 'number', 'value', true, false, ''],
             ['Diagnosis' + ObjTowerString + '.SOC', 'state', 'SOC (Diagnosis)', 'number', 'value.battery', true, false, '%',],
             ['Diagnosis' + ObjTowerString + '.mVoltDefDeviation', 'state', 'default deviation of the cells', 'number', 'value.battery', true, false, 'mV',],
