@@ -92,6 +92,16 @@ systemDictionary = {
         "zh-cn": "塔数"
       },
       "ConfStoreRawMessages": {
-        "en": "Enable to store the raw messages"
+        "en": "Enable to store the raw messages",
+        "de": "Aktivieren Sie die Rohnachrichten",
+        "ru": "Позволить хранить необработанные сообщения",
+        "pt": "Permite armazenar as mensagens cruas",
+        "nl": "Rauwe berichten opslaan inschakelen",
+        "fr": "Activer le stockage des messages bruts",
+        "it": "In grado di memorizzare i messaggi grezzi",
+        "es": "Permite almacenar los mensajes crudos",
+        "pl": "Włącz do przechowywania surowych wiadomości",
+        "uk": "Увімкнути зберігати сирі повідомлення",
+        "zh-cn": "启用存储原始信件"
       }
 };

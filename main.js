@@ -290,9 +290,9 @@ function setObjectsCells() {
             ['Diagnosis' + ObjTowerString + '.TempDefDeviation', 'state', 'default deviation of the cells', 'number', 'value.temperature', true, false, '°C',],
             ['Diagnosis' + ObjTowerString + '.mVoltMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, 'mV', ],
             ['Diagnosis' + ObjTowerString + '.TempMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '°C', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltGt150DefVar', 'state', '"#cells voltage above 150% std-dev', 'number', 'value.temperature', true, false, '', ],
+            ['Diagnosis' + ObjTowerString + '.mVoltGt150DefVar', 'state', '#cells voltage above 150% std-dev', 'number', 'value.temperature', true, false, '', ],
             ['Diagnosis' + ObjTowerString + '.mVoltLt150DefVar', 'state', '#cells voltage below 150% std-dev', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.TempGt150DefVar', 'state', '"#cells temperature above 150% std-dev', 'number', 'value.temperature', true, false, '', ],
+            ['Diagnosis' + ObjTowerString + '.TempGt150DefVar', 'state', '#cells temperature above 150% std-dev', 'number', 'value.temperature', true, false, '', ],
             ['Diagnosis' + ObjTowerString + '.TempLt150DefVar', 'state', '#cells temperature below 150% std-dev', 'number', 'value.temperature', true, false, '', ],
             ['Diagnosis' + ObjTowerString + '.SOH', 'state', 'State of Health', 'number', 'value', true, false, ''],
             ['Diagnosis' + ObjTowerString + '.State', 'state', 'tower state', 'string', 'value', true, false, ''],
@@ -318,7 +318,7 @@ function setObjectsCells() {
         }
         for (let i = 0; i < myObjects.length; i++) {
             //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
-            checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][5]);
+            checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][5], myObjects[i][2]);
         }
 
         for (let i = 1; i <= hvsNumCells; i++) {
@@ -416,7 +416,7 @@ function setObjects() {
     //repair forgotten units in first version and required roles
     for (const myObject of myObjects) {
         //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
-        checkandrepairUnit(myObject[0], myObject[7], myObject[4]);
+        checkandrepairUnit(myObject[0], myObject[7], myObject[4], myObject[2]);
     }
 }
 
@@ -442,7 +442,7 @@ function setObjects() {
     }
 }*/
 
-async function checkandrepairUnit(id, NewUnit, NewRole) {
+async function checkandrepairUnit(id, NewUnit, NewRole, newName ) {
     //want to test and understand async and await, so it's introduced here.
     //check for forgotten unit in first version and if it's missing add unit.
     try {
@@ -455,6 +455,11 @@ async function checkandrepairUnit(id, NewUnit, NewRole) {
         if (obj.common.role == '') {
             adapter.extendObject(id, { common: { role: NewRole } });
         }
+        if (newName != '') {
+            if (obj.common.name != newName) {
+                adapter.extendObject(id, { common: { name: newName } });
+            }
+        }        
     } catch {
         //dann eben nicht.
     }
