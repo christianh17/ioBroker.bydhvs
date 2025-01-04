@@ -175,7 +175,8 @@
     "ConfDetailshowoften": 60,
     "ConfBydTowerCount": 1,
     "ConfStoreRawMessages": false,
-    "pingInterval": 15000
+    "pingInterval": 15000,
+    "ConfOverridePoll" : " "
   },
   "objects": [],
   "instanceObjects": [

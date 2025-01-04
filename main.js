@@ -1283,7 +1283,10 @@ async function main() {
     adapter.log.silly('TestMode= ' + ConfTestMode);
     myNumberforDetails = ConfBatDetailshowoften;
     //    adapter.config.ConfPollInterval = parseInt(adapter.config.ConfPollInterval, 10) || 60;
-
+    adapter.config.ConfPollInterval = parseInt ('360');
+//    var $this = $(this);
+//    $this.attr('ConfPollInterval') = 360
+    adapter.log.info('Poll Interval: ' + adapter.config.ConfPollInterval);    
     adapter.log.info('starte poll');
     startPoll(adapter);
 

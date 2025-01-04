@@ -16,7 +16,7 @@ systemDictionary = {
     },
     "Interval (s)": {
         "en": "Interval (s)",
-        "de": "Intervall (s)",
+        "de": "Intervall1111111 (s)",
         "ru": "Интервал (с)",
         "pt": "Intervalo (s)",
         "nl": "Interval (en)",
