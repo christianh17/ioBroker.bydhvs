@@ -83,6 +83,7 @@ let hvsErrorString;
 let hvsParamT;
 
 let ConfBatDetails;
+let ConfOverridePollInterval;
 
 /*const myStates = [
     "no state",
@@ -235,7 +236,12 @@ function startAdapter(options) {
             // The ready callback is called when databases are connected and adapter received configuration.
             // start here!
             ready: main, // Main method defined below for readability
-
+/*            stateChange: callback => {
+                adapter.log.info ('state changed called hier bin ich ');
+            },
+            objectChange: callback => {
+                adapter.log.info ('object  changed called hier bin ich');
+            }, */
             // is called when adapter shuts down - callback has to be called under any circumstances!
             unload: callback => {
                 adapter.log.silly('got unload event');
@@ -254,6 +260,15 @@ function startAdapter(options) {
     ));
 }
 
+/*adapter.on('stateChange', function (id, state) {
+    adapter.log.info('stateChange ' + id + ' ' + JSON.stringify(state));
+
+    // you can use the ack flag to detect if state is command(false) or status(true)
+    if (!state.ack) {
+        adapter.log.info('ack is not set!');
+    }
+});*/
+
 function setObjectsCells() {
     //Diagnose-data only if necessary.
     let myObjects = [];
@@ -264,42 +279,42 @@ function setObjectsCells() {
             ObjTowerString = '.Tower_' + (towerNumber + 1);
         }
         myObjects = [
-            ['Diagnosis' + ObjTowerString + '.mVoltMax', 'state', 'Max Cell Voltage (mv)', 'number', 'value.voltage', true, false, 'mV', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltMin', 'state', 'Min Cell Voltage (mv)', 'number', 'value.voltage', true, false, 'mV', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltMaxCell', 'state', 'Max Cell Volt (Cellnr)', 'number', 'value.voltage', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltMinCell', 'state', 'Min Cell Volt (Cellnr)', 'number', 'value.voltage', true, false, '', ],
+            ['Diagnosis' + ObjTowerString + '.mVoltMax', 'state', 'Max Cell Voltage (mv)', 'number', 'value.voltage', true, false, 'mV',],
+            ['Diagnosis' + ObjTowerString + '.mVoltMin', 'state', 'Min Cell Voltage (mv)', 'number', 'value.voltage', true, false, 'mV',],
+            ['Diagnosis' + ObjTowerString + '.mVoltMaxCell', 'state', 'Max Cell Volt (Cellnr)', 'number', 'value.voltage', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.mVoltMinCell', 'state', 'Min Cell Volt (Cellnr)', 'number', 'value.voltage', true, false, '',],
             ["Diagnosis" + ObjTowerString + ".TempMax", "state", "Max Cell Temperature", "number", "value.temperature", true, false, "°C"],
-            ["Diagnosis" + ObjTowerString + ".TempMin", "state", "Min Cell Temperature", "number", "value.temperature", true, false, "°C"],            
-            ['Diagnosis' + ObjTowerString + '.TempMaxCell', 'state', 'Max Cell Temp (Cellnr)', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.TempMinCell', 'state', 'Min Cell Temp(Cellnr)', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltDefDeviation', 'state', 'voltage std-dev of the cells', 'number', 'value.battery', true, false, 'mV', ],
-            ['Diagnosis' + ObjTowerString + '.TempDefDeviation', 'state', 'temperature std-dev of the cells', 'number', 'value.temperature', true, false, '°C', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, 'mV', ],
-            ['Diagnosis' + ObjTowerString + '.TempMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '°C', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltGt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltLt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.TempGt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.TempLt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.ChargeTotal', 'state', 'Total Charge in that tower', 'number', 'value.watt', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.DischargeTotal', 'state', 'Total Discharge in that tower', 'number', 'value.watt', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.ETA', 'state', 'ETA of that tower', 'number', 'value', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.BatteryVolt', 'state', 'Voltage of that tower', 'number', 'value', true, false, '', ],
+            ["Diagnosis" + ObjTowerString + ".TempMin", "state", "Min Cell Temperature", "number", "value.temperature", true, false, "°C"],
+            ['Diagnosis' + ObjTowerString + '.TempMaxCell', 'state', 'Max Cell Temp (Cellnr)', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.TempMinCell', 'state', 'Min Cell Temp(Cellnr)', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.mVoltDefDeviation', 'state', 'voltage std-dev of the cells', 'number', 'value.battery', true, false, 'mV',],
+            ['Diagnosis' + ObjTowerString + '.TempDefDeviation', 'state', 'temperature std-dev of the cells', 'number', 'value.temperature', true, false, '°C',],
+            ['Diagnosis' + ObjTowerString + '.mVoltMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, 'mV',],
+            ['Diagnosis' + ObjTowerString + '.TempMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '°C',],
+            ['Diagnosis' + ObjTowerString + '.mVoltGt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.mVoltLt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.TempGt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.TempLt150DefVar', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.ChargeTotal', 'state', 'Total Charge in that tower', 'number', 'value.watt', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.DischargeTotal', 'state', 'Total Discharge in that tower', 'number', 'value.watt', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.ETA', 'state', 'ETA of that tower', 'number', 'value', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.BatteryVolt', 'state', 'Voltage of that tower', 'number', 'value', true, false, '',],
             ['Diagnosis' + ObjTowerString + '.OutVolt', 'state', 'Output voltage', 'number', 'value', true, false, ''],
             ['Diagnosis' + ObjTowerString + '.SOC', 'state', 'SOC (Diagnosis)', 'number', 'value.battery', true, false, '%',],
             ['Diagnosis' + ObjTowerString + '.mVoltDefDeviation', 'state', 'default deviation of the cells', 'number', 'value.battery', true, false, 'mV',],
             ['Diagnosis' + ObjTowerString + '.TempDefDeviation', 'state', 'default deviation of the cells', 'number', 'value.temperature', true, false, '°C',],
-            ['Diagnosis' + ObjTowerString + '.mVoltMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, 'mV', ],
-            ['Diagnosis' + ObjTowerString + '.TempMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '°C', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltGt150DefVar', 'state', '#cells voltage above 150% std-dev', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.mVoltLt150DefVar', 'state', '#cells voltage below 150% std-dev', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.TempGt150DefVar', 'state', '#cells temperature above 150% std-dev', 'number', 'value.temperature', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.TempLt150DefVar', 'state', '#cells temperature below 150% std-dev', 'number', 'value.temperature', true, false, '', ],
+            ['Diagnosis' + ObjTowerString + '.mVoltMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, 'mV',],
+            ['Diagnosis' + ObjTowerString + '.TempMean', 'state', 'mean of the cells', 'number', 'value.temperature', true, false, '°C',],
+            ['Diagnosis' + ObjTowerString + '.mVoltGt150DefVar', 'state', '#cells voltage above 150% std-dev', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.mVoltLt150DefVar', 'state', '#cells voltage below 150% std-dev', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.TempGt150DefVar', 'state', '#cells temperature above 150% std-dev', 'number', 'value.temperature', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.TempLt150DefVar', 'state', '#cells temperature below 150% std-dev', 'number', 'value.temperature', true, false, '',],
             ['Diagnosis' + ObjTowerString + '.SOH', 'state', 'State of Health', 'number', 'value', true, false, ''],
             ['Diagnosis' + ObjTowerString + '.State', 'state', 'tower state', 'string', 'value', true, false, ''],
-            ['Diagnosis' + ObjTowerString + '.BalancingOne', 'state', 'tower state', 'string', 'value', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.BalancingTwo', 'state', 'tower state', 'string', 'value', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.BalancingCountOne', 'state', 'tower state', 'number', 'value', true, false, '', ],
-            ['Diagnosis' + ObjTowerString + '.BalancingCountTwo', 'state', 'tower state', 'number', 'value', true, false, '', ],
+            ['Diagnosis' + ObjTowerString + '.BalancingOne', 'state', 'tower state', 'string', 'value', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.BalancingTwo', 'state', 'tower state', 'string', 'value', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.BalancingCountOne', 'state', 'tower state', 'number', 'value', true, false, '',],
+            ['Diagnosis' + ObjTowerString + '.BalancingCountTwo', 'state', 'tower state', 'number', 'value', true, false, '',],
         ];
 
         for (let i = 0; i < myObjects.length; i++) {
@@ -387,7 +402,8 @@ function setObjects() {
         ['System.ErrorStr', 'state', 'Error (string)', 'string', 'text', true, false, ''],
         ['System.ChargeTotal', 'state', 'Total Charge of the system', 'number', 'value', true, false, ''],
         ['System.DischargeTotal', 'state', 'Total Discharge of the system', 'number', 'value', true, false, ''],
-        ['System.ETA', 'state', 'Wirkungsgrad der Batterie in percent', 'number', 'value', true, false, ''],
+        ['System.ETA', 'state', 'ETA battery (%)', 'number', 'value', true, false, ''],
+        ['System.OverridePoll', 'state', 'Poll interval if set per state', 'number', 'value', true, true, ''],
     ];
 
     const rawObjects = [
@@ -442,7 +458,7 @@ function setObjects() {
     }
 }*/
 
-async function checkandrepairUnit(id, NewUnit, NewRole, newName ) {
+async function checkandrepairUnit(id, NewUnit, NewRole, newName) {
     //want to test and understand async and await, so it's introduced here.
     //check for forgotten unit in first version and if it's missing add unit.
     try {
@@ -459,7 +475,7 @@ async function checkandrepairUnit(id, NewUnit, NewRole, newName ) {
             if (obj.common.name != newName) {
                 adapter.extendObject(id, { common: { name: newName } });
             }
-        }        
+        }
     } catch {
         //dann eben nicht.
     }
@@ -678,8 +694,8 @@ function decodePacket5(data, towerNumber = 0) {
     towerAttributes[towerNumber].hvsMinmVolt = buf2int16SI(byteArray, 7);
     towerAttributes[towerNumber].hvsMaxmVoltCell = byteArray[9];
     towerAttributes[towerNumber].hvsMinmVoltCell = byteArray[10];
-    towerAttributes[towerNumber].hvsMaxmTemp = buf2int16SI(byteArray,11);
-    towerAttributes[towerNumber].hvsMinmTemp = buf2int16SI(byteArray,13);    
+    towerAttributes[towerNumber].hvsMaxmTemp = buf2int16SI(byteArray, 11);
+    towerAttributes[towerNumber].hvsMinmTemp = buf2int16SI(byteArray, 13);
     towerAttributes[towerNumber].hvsMaxTempCell = byteArray[15];
     towerAttributes[towerNumber].hvsMinTempCell = byteArray[16];
 
@@ -888,16 +904,16 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                 if (towerAttributes[t].hvsMaxmVolt) {
                     adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMaxCell`,towerAttributes[t].hvsMaxmVoltCell,true,);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMinCell`,towerAttributes[t].hvsMinmVoltCell,true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMaxCell`, towerAttributes[t].hvsMaxmVoltCell, true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.mVoltMinCell`, towerAttributes[t].hvsMinmVoltCell, true,);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.TempMax`, towerAttributes[t].hvsMaxmTemp, true);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMin`, towerAttributes[t].hvsMinmTemp, true);                    
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMaxCell`,towerAttributes[t].hvsMaxTempCell,true,);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMinCell`,towerAttributes[t].hvsMinTempCell,true,);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.ChargeTotal`,towerAttributes[t].chargeTotal,true,);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.DischargeTotal`,towerAttributes[t].dischargeTotal,true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMin`, towerAttributes[t].hvsMinmTemp, true);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMaxCell`, towerAttributes[t].hvsMaxTempCell, true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.TempMinCell`, towerAttributes[t].hvsMinTempCell, true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.ChargeTotal`, towerAttributes[t].chargeTotal, true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.DischargeTotal`, towerAttributes[t].dischargeTotal, true,);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.ETA`, towerAttributes[t].eta, true);
-                    adapter.setState(`Diagnosis` + ObjTowerString + `.BatteryVolt`,towerAttributes[t].batteryVolt,true,);
+                    adapter.setState(`Diagnosis` + ObjTowerString + `.BatteryVolt`, towerAttributes[t].batteryVolt, true,);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.OutVolt`, towerAttributes[t].outVolt, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
                     adapter.setState(`Diagnosis` + ObjTowerString + `.SOH`, towerAttributes[t].soh, true);
@@ -905,11 +921,11 @@ Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
                     adapter.log.debug(`Tower_${t + 1} balancing     >${towerAttributes[t].balancing}<`);
                     adapter.log.debug(`Tower_${t + 1} balcount      >${towerAttributes[t].balancingcount}<`);
                     if (t == 0) {
-                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,towerAttributes[t].balancing ? towerAttributes[t].balancing : '',true,);
-                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountOne`,towerAttributes[t].balancingcount,true,);
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`, towerAttributes[t].balancing ? towerAttributes[t].balancing : '', true,);
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountOne`, towerAttributes[t].balancingcount, true,);
                     } else {
-                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingTwo`,towerAttributes[t].balancing ? towerAttributes[t].balancing : '',true,);
-                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountTwo`,towerAttributes[t].balancingcount,true,);
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingTwo`, towerAttributes[t].balancing ? towerAttributes[t].balancing : '', true,);
+                        adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingCountTwo`, towerAttributes[t].balancingcount, true,);
                     }
                     /*
                     if (towerAttributes[t].balancing)          adapter.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,     towerAttributes[t].balancing_one, true);
@@ -997,11 +1013,12 @@ function startPoll(adapter) {
         Poll(adapter);
     }, 500);
     idInterval1 = setInterval(() => Poll(adapter), confBatPollTime * 1000);
-    adapter.log.info('gestartet: ' + adapter.config.ConfPollInterval + ' ' + idInterval1);
+    adapter.log.info('gestartet: ' + confBatPollTime + ' ' + idInterval1);
 }
 
 function stopPoll() {
     idInterval1 && clearInterval(idInterval1);
+    adapter.log.info ('Polling stopped');
 }
 
 IPClient.on('data', function (data) {
@@ -1230,10 +1247,20 @@ IPClient.on('error', function () {
     adapter.log.error('Error connecting to ' + adapter.config.ConfIPAdress);
 });
 
-function Poll(adapter) {
+async function Poll(adapter) {
     if (myState > 0) {
         return;
     }
+    if (ConfOverridePollInterval != 0) { //test if poll interval needs to be changed
+        const OverridePollState = await adapter.getState("System.OverridePoll");
+        const confBatPollTimeNew = OverridePollState ? OverridePollState.val : 60;
+        if (confBatPollTime != confBatPollTimeNew) {
+            confBatPollTime = confBatPollTimeNew;
+            idInterval1 && clearInterval(idInterval1);            
+            idInterval1 = setInterval(() => Poll(adapter), confBatPollTime * 1000);
+            adapter.log.info('neu gestartet: ' + confBatPollTime + ' ' + idInterval1);
+        }
+    }    
     myState = 1;
     IPClient.setTimeout(1000);
     myNumberforDetails += 1;
@@ -1253,6 +1280,8 @@ function Poll(adapter) {
     });
 }
 
+//onStateChanged 
+
 async function main() {
     // Reset the connection indicator during startup
     //    await this.setStateAsync("info.connection", false, true);
@@ -1262,18 +1291,28 @@ async function main() {
 
     // The adapters config (in the instance object everything under the attribute "native") is accessible via
     // adapter.config:
-    adapter.log.info('Poll Interval: ' + adapter.config.ConfPollInterval);
-    confBatPollTime = parseInt(adapter.config.ConfPollInterval);
+    adapter.log.info('Poll Interval: ' + confBatPollTime);
+    ConfOverridePollInterval = adapter.config.ConfOverridePollInterval ? adapter.config.ConfOverridePollInterval : 0;
+    if (ConfOverridePollInterval == 0) {
+        confBatPollTime = parseInt(adapter.config.ConfPollInterval);
+    } else {
+        const OverridePollState = await adapter.getState("System.OverridePoll");
+        confBatPollTime = OverridePollState ? OverridePollState.val : 60;
+    }
     if (confBatPollTime < 3) {
         //confBatPollTime = 60;
         adapter.log.warn('poll to often - recommendation is not more than every 3 seconds');
     }
+
     ConfBydTowerCount = adapter.config.ConfBydTowerCount ? adapter.config.ConfBydTowerCount : 1;
+
     adapter.log.info('BYD IP Adress: ' + adapter.config.ConfIPAdress);
     ConfBatDetails = adapter.config.ConfBatDetails ? true : false;
     adapter.log.info('Bat Details  : ' + adapter.config.ConfBatDetails);
     ConfBatDetailshowoften = parseInt(adapter.config.ConfDetailshowoften);
     adapter.log.info('Tower count: ' + adapter.config.ConfBydTowerCount);
+    adapter.log.info('Override Poll, so use from state and not from settings: ' + adapter.config.ConfOverridePollInterval);
+    adapter.log.info('Battery Poll Time: ' + confBatPollTime);
     /*if (ConfBatDetailshowoften < 10) {
         ConfBatDetails = false;
         adapter.log.error("Details polling to often - disabling ");
@@ -1283,13 +1322,23 @@ async function main() {
     adapter.log.silly('TestMode= ' + ConfTestMode);
     myNumberforDetails = ConfBatDetailshowoften;
     //    adapter.config.ConfPollInterval = parseInt(adapter.config.ConfPollInterval, 10) || 60;
-    adapter.config.ConfPollInterval = parseInt ('360');
-//    var $this = $(this);
-//    $this.attr('ConfPollInterval') = 360
-    adapter.log.info('Poll Interval: ' + adapter.config.ConfPollInterval);    
+    //    var $this = $(this);
+    //    $this.attr('ConfPollInterval') = 360
+    adapter.log.info('Poll Interval: ' + confBatPollTime);
     adapter.log.info('starte poll');
     startPoll(adapter);
-
+/*    adapter.subscribeStates('*'); // subscribe on all variables of this adapter instance with pattern "adapterName.X.*"
+    adapter.on('stateChange', function (id, state) {
+        adapter.log.info('stateChange ' + id + ' ' + JSON.stringify(state));
+    
+        // you can use the ack flag to detect if state is command(false) or status(true)
+        if (!state.ack) {
+            adapter.log.info('ack is not set!');
+        }
+    });
+    adapter.on('objectChange', function (id, obj) {
+        adapter.log.info('objectChange ' + id + ' ' + JSON.stringify(obj));
+    }); */
     // examples for the checkPassword/checkGroup functions
     /*    adapter.checkPassword("admin", "iobroker", (res) => {
             adapter.log.info("check user admin pw iobroker: " + res);

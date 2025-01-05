@@ -176,7 +176,7 @@
     "ConfBydTowerCount": 1,
     "ConfStoreRawMessages": false,
     "pingInterval": 15000,
-    "ConfOverridePoll" : " "
+    "ConfOverridePollInterval" : 0
   },
   "objects": [],
   "instanceObjects": [
