@@ -2,23 +2,26 @@
 * {
     box-sizing: border-box
 }
+
 .m {
     /* Don't cut off dropdowns! */
     overflow: initial;
 }
+
 .m.adapter-container,
-.m.adapter-container > div.App {
+.m.adapter-container>div.App {
     /* Fix layout/scrolling issues with tabs */
     height: 100%;
     width: 100%;
     position: relative;
 }
-.m .select-wrapper + label {
+
+.m .select-wrapper+label {
     /* The positioning for dropdown labels is messed up */
     transform: none !important;
 }
 
-label > i[title] {
+label>i[title] {
     /* Display the help cursor for the tooltip icons and fix their positioning */
     cursor: help;
     margin-left: 0.25em;
@@ -27,6 +30,16 @@ label > i[title] {
 .dropdown-content {
     /* Don't wrap text in dropdowns */
     white-space: nowrap;
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        overflow: hidden;
+    }
+
+    .adapter-body {
+        overflow: auto;
+    }
 }
 
 /* Add your styles here */
