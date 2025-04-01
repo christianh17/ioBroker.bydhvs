@@ -33,7 +33,7 @@
     "@iobroker/testing": "^5.0.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.3.11",
-    "@types/chai-as-promised": "^8.0.1",
+    "@types/chai-as-promised": "^8.0.2",
     "@types/gulp": "^4.0.17",
     "@types/mocha": "^10.0.9",
     "@types/node": "^22.10.2",
