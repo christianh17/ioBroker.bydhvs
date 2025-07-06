@@ -1,0 +1,11 @@
+{
+  "Adapter settings for BYD Battery": "Configurações do adaptador para a bateria BYD",
+  "Interval (s)": "Intervalo (s)",
+  "IP Address": "Endereço IP",
+  "Use poll interval from state and not from here": "Usar o intervalo de sondagem do estado e não daqui",
+  "Diagnosis Data from Battery (only tested with two and four modules)": "Dados de diagnóstico da bateria (testado apenas com dois e quatro módulos)",
+  "Test Mode - show data in error log": "Modo de teste: mostrar dados no log de erros",
+  "Battery-details - every ... cycles": "Detalhes da bateria: a cada ... ciclos",
+  "Count of towers": "Número de torres",
+  "Enable to store the raw messages": "Habilitar para armazenar as mensagens brutas"
+}

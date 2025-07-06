@@ -1,0 +1,105 @@
+{
+    "type": "panel",
+    "i18n": true,
+    "items": {
+        "Account settings": {
+            "type": "header",
+            "text": "Adapter settings for BYD Battery",
+            "size": 2,
+            "newLine": true
+        },
+
+        "ConfPollInterval": {
+            "type": "number",
+            "label": "Interval (s)",
+            "unit": "sec",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 3,
+            "xl": 3
+        },
+
+        "ConfIPAdress": {
+            "type": "text",
+            "label": "IP Address",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 3,
+            "xl": 3
+        },
+
+        "ConfOverridePollInterval": {
+            "type": "checkbox",
+            "label": "Use poll interval from state and not from here",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 8,
+            "lg": 4,
+            "xl": 4
+        },
+
+        "ConfBatDetails": {
+            "type": "checkbox",
+            "label": "Diagnosis Data from Battery (only tested with two and four modules)",
+            "xs": 12,
+            "sm": 12,
+            "md": 8,
+            "lg": 4,
+            "xl": 4
+        },
+
+        "ConfTestMode": {
+            "type": "checkbox",
+            "label": "Test Mode - show data in error log",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 8,
+            "lg": 4,
+            "xl": 4
+        },
+
+        "ConfDetailshowoften": {
+            "newLine": true,
+            "type": "number",
+            "label": "Battery-details - every ... cycles",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 3,
+            "xl": 3
+        },
+        "ConfBydTowerCount": {
+            "newLine": true,
+            "type": "select",
+            "label": "Count of towers",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 3,
+            "xl": 3,
+            "options": [
+                {
+                    "label": "1",
+                    "value": "1"
+                },
+                {
+                    "label": "2",
+                    "value": "2"
+                }
+            ]
+        },
+        "ConfStoreRawMessages": {
+            "type": "checkbox",
+            "label": "Enable to store the raw messages",
+            "xs": 12,
+            "sm": 12,
+            "md": 8,
+            "lg": 4,
+            "xl": 4
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "Adapter settings for BYD Battery": "Настройки адаптера для батареи BYD",
+  "Interval (s)": "Интервал (с)",
+  "IP Address": "IP-адрес",
+  "Use poll interval from state and not from here": "Использовать интервал опроса из состояния, а не отсюда",
+  "Diagnosis Data from Battery (only tested with two and four modules)": "Диагностические данные батареи (тестировалось только с двумя и четырьмя модулями)",
+  "Test Mode - show data in error log": "Тестовый режим: показывать данные в журнале ошибок",
+  "Battery-details - every ... cycles": "Детали батареи: каждые ... циклов",
+  "Count of towers": "Количество башен",
+  "Enable to store the raw messages": "Включить для сохранения необработанных сообщений"
+}
