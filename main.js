@@ -77,7 +77,7 @@ let hvsErrorString;
 let hvsParamT;
 
 let ConfBatDetails;
-let ConfOverridePollInterval;
+let ConfOverridePollInterval = 0;
 
 /*const myStates = [
     "no state",
@@ -88,7 +88,6 @@ let ConfOverridePollInterval;
 ];*/
 
 let idInterval1 = 0;
-let idTimeout1 = 0;
 
 const myBattTypes = ['HVL', 'HVM', 'HVS'];
 /* HVM: 16 cells per module
@@ -135,7 +134,6 @@ class bydhvsControll extends utils.Adapter {
     onUnload(callback) {
         try {
             clearTimeout(idInterval1);
-            clearInterval(idTimeout1);
             socket.destroy();
             this.log.info('Adapter bluelink cleaned up everything...');
             callback();
@@ -537,16 +535,22 @@ class bydhvsControll extends utils.Adapter {
     startQuery() {
         //erster Start sofort (500ms), dann entsprechend der Config - dann muss man nicht beim Entwickeln warten bis der erste Timer durch ist.
         _firstRun = true;
-        idTimeout1 = setTimeout(() => {
-            this.pollQuery();
-        }, 500);
-        idInterval1 = setInterval(() => this.pollQuery(), confBatPollTime * 1000);
-        this.log.info(`gestartet: ${confBatPollTime} ${idInterval1}`);
+
+        const runPoll = () => this.pollQuery();
+
+        // Start direkt nach 500ms
+        setTimeout(runPoll, 500);
+
+        // Danach zyklisch gemäß Konfiguration
+        idInterval1 = setInterval(runPoll, confBatPollTime * 1000);
+        this.log.info(`gestartet pollTime :${confBatPollTime} intervalId :${idInterval1}`);
     }
 
     async setupIPClientHandlers() {
         const waitTime = 8000;
         const timeout = 2000;
+
+        this.log.debug('hole Daten ab');
 
         return new Promise(resolve => {
             const cleanup = () => {
@@ -723,36 +727,36 @@ class bydhvsControll extends utils.Adapter {
             return;
         }
 
-        if (ConfOverridePollInterval != 0) {
-            //test if poll interval needs to be changed
-            const OverridePollState = await this.getState('System.OverridePoll');
-            const confBatPollTimeNew = OverridePollState ? OverridePollState.val : 60;
-            if (confBatPollTime != confBatPollTimeNew) {
-                confBatPollTime = confBatPollTimeNew;
-                idInterval1 && clearInterval(idInterval1);
+        // Prüfe und ggf. setze neues Poll-Intervall
+        if (ConfOverridePollInterval !== 0) {
+            const state = await this.getState('System.OverridePoll');
+            const newPollTime = state?.val ?? 60;
+
+            if (confBatPollTime !== newPollTime) {
+                confBatPollTime = newPollTime;
+                clearInterval(idInterval1);
                 idInterval1 = setInterval(() => this.startPoll(), confBatPollTime * 1000);
-                this.log.info(`neu gestartet: ${confBatPollTime} ${idInterval1}`);
+                this.log.info(`Poll-Intervall aktualisiert: ${confBatPollTime}s, Interval-ID: ${idInterval1}`);
             }
         }
 
         myState = 1;
-
         myNumberforDetails++;
 
-        this.log.silly(`myNumberforDetails:${myNumberforDetails}`);
-        this.log.silly(`Poll start, IP:${this.config.ConfIPAdress}`);
+        this.log.debug(`myNumberforDetails: ${myNumberforDetails}`);
+        this.log.debug(`Starte Polling an IP: ${this.config.ConfIPAdress}`);
 
-        // Erstelle die Arrays
-        for (let i = 0; i < ConfBydTowerCount; i++) {
-            this.log.silly(`Empty tower ${i}`);
-            towerAttributes[i] = {
+        // Tower-Attribute initialisieren
+        towerAttributes = Array.from({ length: ConfBydTowerCount }, (_, i) => {
+            this.log.debug(`Initialisiere Tower ${i}`);
+            return {
                 hvsBatteryVoltsperCell: [],
                 hvsBatteryTempperCell: [],
             };
-        }
+        });
 
-        let socketConnection = await this.setupIPClientHandlers();
-        this.setStateAsync(`info.socketConnection`, socketConnection, true);
+        const socketConnection = await this.setupIPClientHandlers();
+        await this.setStateAsync('info.socketConnection', socketConnection, true);
     }
 
     /*
