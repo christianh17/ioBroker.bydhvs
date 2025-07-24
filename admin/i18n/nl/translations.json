@@ -1,0 +1,11 @@
+{
+  "Adapter settings for BYD Battery": "Adapterinstellingen voor BYD-batterij",
+  "Interval (s)": "Interval (s)",
+  "IP Address": "IP-adres",
+  "Use poll interval from state and not from here": "Gebruik poll-interval van status en niet van hier",
+  "Diagnosis Data from Battery (only tested with two and four modules)": "Diagnosegegevens van batterij (alleen getest met twee en vier modules)",
+  "Test Mode - show data in error log": "Testmodus: gegevens weergeven in foutlogboek",
+  "Battery-details - every ... cycles": "Batterijdetails: elke ... cycli",
+  "Count of towers": "Aantal torens",
+  "Enable to store the raw messages": "Inschakelen om de ruwe berichten op te slaan"
+}

@@ -33,6 +33,10 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	### __WORK IN PROGRESS__
 -->
 ## **WORK IN PROGRESS**
+* (arteck) add socketConnection DP
+* (arteck) use jsconConfig
+* (arteck) refactoring to modern Code
+* (arteck) use direct socket connection without detour IPClient
 * first Version with two towers in NPM
 
 ### 1.5.1 (2024-01-15)
@@ -89,3 +93,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+

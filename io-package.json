@@ -103,8 +103,8 @@
       "byd hvs battery pv"
     ],
     "licenseInformation": {
-        "license": "MIT",
-        "type": "free"
+      "license": "MIT",
+      "type": "free"
     },
     "platform": "Javascript/Node.js",
     "icon": "bydhvs.png",
@@ -154,14 +154,17 @@
         },
         "link": "https://github.com/christianh17/ioBroker.bydhvs/pull/262",
         "linkText": "Reiew SourceCode of that change or report an issue",
-        "level":"warn",
+        "level": "warn",
         "buttons": [
           "agree",
           "cancel"
         ]
       }
     ],
-    "materialize": true,
+    "adminUI": {
+      "config": "json",
+      "tab": "materialize"
+    },
     "dependencies": [
       {
         "js-controller": ">=5.0.19"
@@ -176,7 +179,7 @@
     "ConfBydTowerCount": 1,
     "ConfStoreRawMessages": false,
     "pingInterval": 15000,
-    "ConfOverridePollInterval" : 0
+    "ConfOverridePollInterval": 0
   },
   "objects": [],
   "instanceObjects": [
@@ -194,6 +197,19 @@
       "common": {
         "role": "indicator.connected",
         "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.socketConnection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "is socket connected",
         "type": "boolean",
         "read": true,
         "write": false,
