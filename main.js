@@ -156,9 +156,9 @@ class bydhvsControll extends utils.Adapter {
             confBatPollTime = OverridePollState ? OverridePollState.val : 60;
         }
 
-        if (confBatPollTime < 3) {
+        if (confBatPollTime < 30) {
             //confBatPollTime = 60;
-            this.log.warn('poll to often - recommendation is not more than every 3 seconds');
+            this.log.warn('poll to often - recommendation is not more than every 30 seconds');
         }
 
         ConfBydTowerCount = this.config.ConfBydTowerCount ? this.config.ConfBydTowerCount : 1;
