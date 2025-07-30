@@ -13,6 +13,8 @@
             "type": "number",
             "label": "Interval (s)",
             "unit": "sec",
+            "min": 30,
+            "max": 3600,
             "xs": 12,
             "sm": 12,
             "md": 4,
