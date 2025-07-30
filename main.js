@@ -551,7 +551,7 @@ class bydhvsControll extends utils.Adapter {
         const timeout = 2000;
 
         this.log.debug('hole Daten ab');
-
+ try {
         return new Promise(resolve => {
             const cleanup = () => {
                 socket.destroy();
@@ -577,9 +577,9 @@ class bydhvsControll extends utils.Adapter {
             };
 
             socket.setTimeout(timeout);
-
+    try {
             socket.connect(8080, this.config.ConfIPAdress, async () => {
-                try {
+                
                     myState = 2;
                     await sendRequest(0, 2);
 
@@ -712,14 +712,21 @@ class bydhvsControll extends utils.Adapter {
                                 return resolve(false);
                         }
                     }
-                } catch (err) {
-                    this.log.error(`Error during socket communication: ${err.message}`);
+            
+            });
+        } catch (err) {
+                    this.log.error(`Error during socket communication: | ${err} | ${err.stack}`) | ${err.message}`);
                     this.setStateChanged('info.connection', { val: false, ack: true });
                     cleanup();
                     return resolve(false);
                 }
-            });
         });
+     } catch (err) {
+                    this.log.error(`Error during socket communication: | ${err} | ${err.stack}`) | ${err.message}`);
+                    this.setStateChanged('info.connection', { val: false, ack: true });
+                    cleanup();
+                    return resolve(false);
+                }
     }
 
     async pollQuery() {
