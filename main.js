@@ -549,176 +549,237 @@ class bydhvsControll extends utils.Adapter {
     async setupIPClientHandlers() {
         const waitTime = 8000;
         const timeout = 2000;
-
-        this.log.debug('hole Daten ab');
-
+    
+        this.log.debug('Starte Datenabfrage via TCP-Client...');
+    
         return new Promise(resolve => {
             const cleanup = () => {
+                this.log.debug('Schließe Socket-Verbindung und setze State zurück');
                 socket.destroy();
                 myState = 0;
             };
-
+    
             const sendRequest = (requestIndex, nextState, delay = 200) => {
                 return new Promise(res => {
                     setTimeout(() => {
+                        this.log.debug(`→ Sende Request [${requestIndex}] und wechsle in State ${nextState}`);
                         myState = nextState;
                         socket.write(myRequests[requestIndex]);
                         res();
                     }, delay);
                 });
             };
-
+    
             const waitForData = () => {
                 return new Promise((res, rej) => {
-                    socket.once('data', data => res(data));
-                    socket.once('timeout', () => rej(new Error('Timeout')));
+                    socket.once('data', data => {
+                        this.log.debug(`← Daten empfangen (Länge: ${data.length}) in State ${myState}`);
+                        res(data);
+                    });
+                    socket.once('timeout', () => rej(new Error('Socket Timeout')));
                     socket.once('error', err => rej(err));
                 });
             };
-
+    
             socket.setTimeout(timeout);
-
-            socket.connect(8080, this.config.ConfIPAdress, async () => {
-                try {
-                    myState = 2;
-                    await sendRequest(0, 2);
-
-                    while (true) {
-                        const data = await waitForData();
-
-                        if (!this.checkPacket(data)) {
-                            this.log.error('Invalid data');
-                            this.setStateChanged('info.connection', { val: false, ack: true });
-                            cleanup();
-                            return resolve(false);
-                        }
-
-                        this.setStateChanged('info.connection', { val: true, ack: true });
-
-                        switch (myState) {
-                            case 2:
-                                this.decodePacket0(data);
-                                socket.setTimeout(timeout);
-                                await sendRequest(1, 3);
-                                break;
-                            case 3:
-                                this.decodePacket1(data);
-                                socket.setTimeout(timeout);
-                                await sendRequest(2, 4);
-                                break;
-                            case 4:
-                                this.decodePacket2(data);
-                                if (myNumberforDetails < ConfBatDetailshowoften || !ConfBatDetails) {
-                                    this.setStates();
-                                    cleanup();
-                                    return resolve(true);
-                                }
-                                myNumberforDetails = 0;
-                                socket.setTimeout(timeout);
-                                await sendRequest(3, 5);
-
-                                break;
-                            case 5:
-                                this.decodePacketNOP(data);
-                                socket.setTimeout(waitTime + timeout);
-                                await new Promise(res => setTimeout(res, waitTime));
-                                await sendRequest(4, 6, 0);
-                                break;
-                            case 6:
-                                this.decodePacketNOP(data);
-                                await sendRequest(5, 7);
-                                break;
-                            case 7:
-                                this.decodePacket5(data);
-                                await sendRequest(6, 8);
-                                break;
-                            case 8:
-                                this.decodePacket6(data);
-                                await sendRequest(7, 9);
-                                break;
-                            case 9:
-                                this.decodePacket7(data);
-                                await sendRequest(8, 10);
-                                break;
-                            case 10:
-                                this.decodePacket8(data);
-                                if (hvsNumCells > 128) {
-                                    await sendRequest(9, 11);
-                                } else if (ConfBydTowerCount > 1) {
-                                    await sendRequest(16, 16);
-                                } else {
-                                    this.setStates();
-                                    cleanup();
-                                    return resolve(true);
-                                }
-                                break;
-                            case 11:
-                                this.decodePacketNOP(data);
-                                await sendRequest(10, 12);
-                                break;
-                            case 12:
-                                this.decodePacketNOP(data);
-                                socket.setTimeout(8000);
-                                await new Promise(res => setTimeout(res, 3000));
-                                await sendRequest(11, 13, 0);
-                                break;
-                            case 13:
-                                this.decodePacketNOP(data);
-                                await sendRequest(12, 14);
-                                break;
-                            case 14:
-                                this.decodeResponse12(data);
-                                await sendRequest(13, 15);
-                                break;
-                            case 15:
-                                this.decodeResponse13(data);
-                                if (ConfBydTowerCount > 1) {
-                                    await sendRequest(16, 16);
-                                } else {
-                                    this.setStates();
-                                    cleanup();
-                                    return resolve(true);
-                                }
-                                break;
-                            case 16:
-                                this.decodePacketNOP(data);
-                                socket.setTimeout(waitTime + timeout);
-                                await new Promise(res => setTimeout(res, waitTime));
-                                await sendRequest(4, 17, 0);
-                                break;
-                            case 17:
-                                this.decodePacketNOP(data);
-                                await sendRequest(5, 18);
-                                break;
-                            case 18:
-                                this.decodePacket5(data, 1);
-                                await sendRequest(6, 19);
-                                break;
-                            case 19:
-                                this.decodePacket6(data, 1);
-                                await sendRequest(7, 20);
-                                break;
-                            case 20:
-                                this.decodePacket7(data, 1);
-                                await sendRequest(8, 22);
-                                break;
-                            case 22:
-                                this.decodePacket8(data, 1);
-                                this.setStates();
-                                cleanup();
-                                return resolve(true);
-                            default:
+    
+            try {
+                socket.connect(8080, this.config.ConfIPAdress, async () => {
+                    this.log.debug(`Socket verbunden mit ${this.config.ConfIPAdress}:8080`);
+                    try {
+                        myState = 2;
+                        await sendRequest(0, 2);
+    
+                        while (true) {
+                            const data = await waitForData();
+    
+                            if (!this.checkPacket(data)) {
+                                this.log.warn(`⚠️ Ungültiges Paket empfangen in State ${myState}`);
+                                this.setStateChanged('info.connection', { val: false, ack: true });
                                 cleanup();
                                 return resolve(false);
+                            }
+    
+                            this.setStateChanged('info.connection', { val: true, ack: true });
+    
+                            switch (myState) {
+                                case 2:
+                                    this.log.debug('➡️ State 2: Verarbeite Paket 0');
+                                    this.decodePacket0(data);
+                                    socket.setTimeout(timeout);
+                                    await sendRequest(1, 3);
+                                    break;
+    
+                                case 3:
+                                    this.log.debug('➡️ State 3: Verarbeite Paket 1');
+                                    this.decodePacket1(data);
+                                    socket.setTimeout(timeout);
+                                    await sendRequest(2, 4);
+                                    break;
+    
+                                case 4:
+                                    this.log.debug('➡️ State 4: Verarbeite Paket 2');
+                                    this.decodePacket2(data);
+                                    if (myNumberforDetails < ConfBatDetailshowoften || !ConfBatDetails) {
+                                        this.log.debug('⚡ Details nicht notwendig – beende Zyklus');
+                                        this.setStates();
+                                        cleanup();
+                                        return resolve(true);
+                                    }
+                                    myNumberforDetails = 0;
+                                    socket.setTimeout(timeout);
+                                    await sendRequest(3, 5);
+                                    break;
+    
+                                case 5:
+                                    this.log.debug('➡️ State 5: NOP + Wartezeit');
+                                    this.decodePacketNOP(data);
+                                    socket.setTimeout(waitTime + timeout);
+                                    await new Promise(res => setTimeout(res, waitTime));
+                                    await sendRequest(4, 6, 0);
+                                    break;
+    
+                                case 6:
+                                    this.log.debug('➡️ State 6: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(5, 7);
+                                    break;
+    
+                                case 7:
+                                    this.log.debug('➡️ State 7: Paket 5');
+                                    this.decodePacket5(data);
+                                    await sendRequest(6, 8);
+                                    break;
+    
+                                case 8:
+                                    this.log.debug('➡️ State 8: Paket 6');
+                                    this.decodePacket6(data);
+                                    await sendRequest(7, 9);
+                                    break;
+    
+                                case 9:
+                                    this.log.debug('➡️ State 9: Paket 7');
+                                    this.decodePacket7(data);
+                                    await sendRequest(8, 10);
+                                    break;
+    
+                                case 10:
+                                    this.log.debug('➡️ State 10: Paket 8');
+                                    this.decodePacket8(data);
+                                    if (hvsNumCells > 128) {
+                                        this.log.debug('Mehr als 128 Zellen erkannt → sende weiteres Paket');
+                                        await sendRequest(9, 11);
+                                    } else if (ConfBydTowerCount > 1) {
+                                        this.log.debug('Mehrere Tower erkannt → Wechsel zu State 16');
+                                        await sendRequest(16, 16);
+                                    } else {
+                                        this.log.debug('Alle Daten empfangen, beende...');
+                                        this.setStates();
+                                        cleanup();
+                                        return resolve(true);
+                                    }
+                                    break;
+    
+                                case 11:
+                                    this.log.debug('➡️ State 11: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(10, 12);
+                                    break;
+    
+                                case 12:
+                                    this.log.debug('➡️ State 12: NOP + Wartezeit');
+                                    this.decodePacketNOP(data);
+                                    socket.setTimeout(8000);
+                                    await new Promise(res => setTimeout(res, 3000));
+                                    await sendRequest(11, 13, 0);
+                                    break;
+    
+                                case 13:
+                                    this.log.debug('➡️ State 13: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(12, 14);
+                                    break;
+    
+                                case 14:
+                                    this.log.debug('➡️ State 14: Response12');
+                                    this.decodeResponse12(data);
+                                    await sendRequest(13, 15);
+                                    break;
+    
+                                case 15:
+                                    this.log.debug('➡️ State 15: Response13');
+                                    this.decodeResponse13(data);
+                                    if (ConfBydTowerCount > 1) {
+                                        await sendRequest(16, 16);
+                                    } else {
+                                        this.log.debug('Beende nach Response13');
+                                        this.setStates();
+                                        cleanup();
+                                        return resolve(true);
+                                    }
+                                    break;
+    
+                                case 16:
+                                    this.log.debug('➡️ State 16: Zweiter Tower – NOP + Wartezeit');
+                                    this.decodePacketNOP(data);
+                                    socket.setTimeout(waitTime + timeout);
+                                    await new Promise(res => setTimeout(res, waitTime));
+                                    await sendRequest(4, 17, 0);
+                                    break;
+    
+                                case 17:
+                                    this.log.debug('➡️ State 17: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(5, 18);
+                                    break;
+    
+                                case 18:
+                                    this.log.debug('➡️ State 18: Paket 5 (Tower 2)');
+                                    this.decodePacket5(data, 1);
+                                    await sendRequest(6, 19);
+                                    break;
+    
+                                case 19:
+                                    this.log.debug('➡️ State 19: Paket 6 (Tower 2)');
+                                    this.decodePacket6(data, 1);
+                                    await sendRequest(7, 20);
+                                    break;
+    
+                                case 20:
+                                    this.log.debug('➡️ State 20: Paket 7 (Tower 2)');
+                                    this.decodePacket7(data, 1);
+                                    await sendRequest(8, 22);
+                                    break;
+    
+                                case 22:
+                                    this.log.debug('➡️ State 22: Paket 8 (Tower 2)');
+                                    this.decodePacket8(data, 1);
+                                    this.log.debug('✅ Alle Daten erfolgreich verarbeitet');
+                                    this.setStates();
+                                    cleanup();
+                                    return resolve(true);
+    
+                                default:
+                                    this.log.warn(`❓ Unerwarteter Zustand: ${myState}`);
+                                    cleanup();
+                                    return resolve(false);
+                            }
                         }
+                    } catch (err) {
+                        this.log.error(`❌ Fehler im Ablauf: ${err.message}`);
+                        this.log.debug(err.stack);
+                        this.setStateChanged('info.connection', { val: false, ack: true });
+                        cleanup();
+                        return resolve(false);
                     }
-                } catch (err) {
-                    this.log.error(`Error during socket communication: ${err.message}`);
-                    this.setStateChanged('info.connection', { val: false, ack: true });
-                    cleanup();
-                    return resolve(false);
-                }
-            });
+                });
+            } catch (err) {
+                this.log.error(`❌ Socket konnte nicht verbunden werden: ${err.message}`);
+                this.log.debug(err.stack);
+                this.setStateChanged('info.connection', { val: false, ack: true });
+                cleanup();
+                return resolve(false);
+            }
         });
     }
 
