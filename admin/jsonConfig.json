@@ -13,6 +13,7 @@
             "type": "number",
             "label": "Interval (s)",
             "unit": "sec",
+            "hidden": "data.ConfOverridePollInterval === false",
             "min": 30,
             "max": 3600,
             "xs": 12,
