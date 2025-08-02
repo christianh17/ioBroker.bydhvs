@@ -1,4 +1,17 @@
 # Older changes
+## 1.4.0 (2022-10-31)
+* Update of referred modules (mainly around testing)
+* improvmenets contributed by Tapter (5 modules, readme and better readable code)
+* Better detection of battery type and inverter
+* SOC not only from normal data but from diagnosis-data, too. There we have one decimal place more
+* removed frequency limit for battery detail data
+* increased max count of temperature measurements for HVS to 64
+* support for up to 5 HVS modules
+
+## 1.3.0 (2021-11-06)
+* updated even more dependencies
+* official release with new state SOH
+
 ## 1.2.4-0 (2021-11-02)
 * Added state: SOH
 * updated dependencies as suggested from bot

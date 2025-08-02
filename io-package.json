@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "news": {
+      "1.5.2": {
+        "en": "add socketConnection DP\nuse jsconConfig\nrefactoring to modern Code\nuse direct socket connection without detour IPClient\nfirst Version with two towers in NPM",
+        "de": "anschlussdose Anschluss DP\nverwendung jsconConfig\nrefactoring to modern Code\nverwendung direkter Steckdosenanschluss ohne Umweg IPClient\nerste Version mit zwei Türmen in NPM",
+        "ru": "скачать SocketConnection DP\nиспользовать jsconconfig\nрефакторинг современного кода\nиспользовать прямое сокетное соединение без обхода IPClient\nпервая версия с двумя башнями в NPM",
+        "pt": "add socketConnection DP\nusar o jsconConfig\nrefatorização para código moderno\nusar conexão direta do socket sem desvio IPClient\nprimeira versão com duas torres em NPM",
+        "nl": "socket toevoegenConnection DP\njsconConfig gebruiken\nrefactoring naar moderne code\ndirecte aansluiting gebruiken zonder omleiding IPClient\neerste versie met twee torens in NPM",
+        "fr": "ajouter socketConnection DP\nutiliser jsconConfig\nla révision du Code moderne\nutiliser la connexion à prise directe sans détour IPClient\npremière version avec deux tours en NPM",
+        "it": "aggiungere socketConnection DP\nuso jsconConfig\nrefactoring al moderno Codice\nutilizzare connessione presa diretta senza deviazione IPClient\nprima versione con due torri in NPM",
+        "es": "añadir socketConnection DP\njsconConfig\nrefactoring to modern Code\nuso de conexión de toma directa sin desvío IPClient\nprimera versión con dos torres en NPM",
+        "pl": "dodaj socketConnection DP\nużyj jsconConfig\nrefaktoring do nowoczesnego kodu\nkorzystanie z bezpośredniego połączenia gniazdka bez złącza IPClient\npierwsza wersja z dwiema wieżami w NPM",
+        "uk": "додати розеткиConnection DP\nвикористовуйте jsconConfig\nрефакторинг сучасного коду\nвикористовувати прямий з'єднання роз'єму без скидання IPClient\nперша версія з двома вежами в NPM",
+        "zh-cn": "添加套接字 DP\n使用 jscon 配置\n重构现代代码\n使用不绕路的直插座连接\n第一版,国家预防机制有两个塔"
+      },
       "1.5.1": {
         "en": "Working with parallel towers. you can setup it in admin page."
       },

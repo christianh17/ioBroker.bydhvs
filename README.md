@@ -32,7 +32,7 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
-## **WORK IN PROGRESS**
+### 1.5.2 (2025-08-02)
 * (arteck) add socketConnection DP
 * (arteck) use jsconConfig
 * (arteck) refactoring to modern Code
@@ -56,25 +56,12 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 * Removed some bugs in detecting inverter
 * Inverternumber ist logged, so I can easily add new inverters if neccerary, just send me the silly-log if inverter is unknown.
 
-### 1.4.0 (2022-10-31)
-* Update of referred modules (mainly around testing)
-* improvmenets contributed by Tapter (5 modules, readme and better readable code)
-* Better detection of battery type and inverter
-* SOC not only from normal data but from diagnosis-data, too. There we have one decimal place more
-* removed frequency limit for battery detail data
-* increased max count of temperature measurements for HVS to 64
-* support for up to 5 HVS modules
-
-### 1.3.0 (2021-11-06)
-* updated even more dependencies
-* official release with new state SOH
-
 ###
 
 ## License
 MIT License
 
-Copyright (c) 2023 Christian <github@familie-herrmann.de>
+Copyright (c) 2025 Christian <github@familie-herrmann.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -93,4 +80,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
