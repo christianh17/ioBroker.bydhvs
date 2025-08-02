@@ -89,26 +89,21 @@ jobs:
           BODY="${BODY//$'\n'/'%0A'}"
           BODY="${BODY//$'\r'/'%0D'}"
           echo "::set-output name=BODY::$BODY"
-
     
+      - name: Publish package to npm
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          npm whoami
+          npm publish
  
-# arteck we nedd a token
-
-   #   - name: Publish package to npm
-   #     run: |
-   #       npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-   #       npm whoami
-   #       npm publish
- 
-
-  #    - name: Create Github Release
-  #      uses: actions/create-release@v1
-  #      env:
-  #        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-  #      with:
-  #        tag_name: ${{ github.ref }}
-  #        release_name: Release v${{ steps.extract_release.outputs.VERSION }}
-  #        draft: false
-  #        # Prerelease versions create prereleases on Github
-  #        prerelease: ${{ contains(steps.extract_release.outputs.VERSION, '-') }}
-  #        body: ${{ steps.extract_release.outputs.BODY }}
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release v${{ steps.extract_release.outputs.VERSION }}
+          draft: false
+          # Prerelease versions create prereleases on Github
+          prerelease: ${{ contains(steps.extract_release.outputs.VERSION, '-') }}
+          body: ${{ steps.extract_release.outputs.BODY }}
