@@ -1,4 +1,43 @@
 # Older changes
+## 0.0.11 (2020-02-27)
+* changed Admin interface a little
+* added description for port
+* fixed UDM Pro writeable states
+
+## 0.0.10 (2020-02-26)
+* travis ci for integration tests fixed
+* actually use last x motion setting
+
+## 0.0.9 (2020-02-21)
+* lastMotion of camera only updating if neccessary
+* first UDM integrations, changing settings NOT working yet
+
+## 0.0.8 (2020-02-17)
+* made motion Events optional (Last Motion is always stored)
+* made interval and "last x seconds of motions" adjustable
+* properly delete old motions
+
+## 0.0.7 (2020-02-09)
+* continuosly refresh motion events
+* changed data structur
+* added lastMotion Datapoint to each camera
+
+## 0.0.6 (2020-02-08)
+* make some settings changeable (name, osdSettings.*, recordingSettings.mode, ledSettings.isEnabled)
+
+## 0.0.5 (2020-02-07)
+* new logo
+* added motion event data points
+
+## 0.0.4 (2020-02-05)
+* release-script test and some Readme changes
+
+## 0.0.3 (03.02.2020)
+* (Peter Baumert) first working rls on npm
+
+## 0.0.1
+* (Peter Baumert) initial release
+
 ## 1.4.1 (2023-09-24)
 * Compatibility with js.controller 5x
 * Removed some bugs in detecting inverter
