@@ -1,5 +1,17 @@
 ![Logo](admin/bydhvs.png)
 
+[![NPM version](https://img.shields.io/npm/v/iobroker.bydhvs.svg)](https://www.npmjs.com/package/iobroker.bydhvs)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.bydhvs.svg)](https://www.npmjs.com/package/iobroker.bydhvs)
+![Number of Installations](https://iobroker.live/badges/bydhvs-installed.svg)
+![Current version in stable repository](https://iobroker.live/badges/bydhvs-stable.svg)
+
+[![NPM](https://nodei.co/npm/iobroker.bydhvs.png?downloads=true)](https://nodei.co/npm/iobroker.bydhvs/)
+
+**Tests:**  
+![Test and Release](https://github.com/christianh17/ioBroker.bydhvs/workflows/Test%20and%20Release/badge.svg)
+![CodeQL](https://github.com/christianh17/ioBroker.bydhvs/actions/workflows/codeql.yml/badge.svg?branch=main)
+
+
 ## bydhvs adapter for ioBroker
 
 BYD HVS Battery poll data
@@ -79,4 +91,5 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+
 SOFTWARE.
