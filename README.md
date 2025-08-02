@@ -9,7 +9,6 @@
 
 **Tests:**  
 ![Test and Release](https://github.com/christianh17/ioBroker.bydhvs/workflows/Test%20and%20Release/badge.svg)
-![CodeQL](https://github.com/christianh17/ioBroker.bydhvs/actions/workflows/codeql.yml/badge.svg?branch=main)
 
 
 ## bydhvs adapter for ioBroker
@@ -89,5 +88,6 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+
 
 SOFTWARE.
