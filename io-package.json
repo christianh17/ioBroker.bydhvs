@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "news": {
+      "1.5.3": {
+        "en": "update dependecy",
+        "de": "aktualisierung abhängigkeit",
+        "ru": "обновление dependecy",
+        "pt": "atualizar dependência",
+        "nl": "afhankelijkheid bijwerken",
+        "fr": "mettre à jour la dépendance",
+        "it": "aggiornamento dipendenza",
+        "es": "dependencia de actualización",
+        "pl": "aktualizacja zależności",
+        "uk": "оновлення залежності",
+        "zh-cn": "更新依赖性"
+      },
       "1.5.2": {
         "en": "add socketConnection DP\nuse jsconConfig\nrefactoring to modern Code\nuse direct socket connection without detour IPClient\nfirst Version with two towers in NPM",
         "de": "anschlussdose Anschluss DP\nverwendung jsconConfig\nrefactoring to modern Code\nverwendung direkter Steckdosenanschluss ohne Umweg IPClient\nerste Version mit zwei Türmen in NPM",
@@ -70,18 +83,6 @@
         "pl": "5 modułów obsługiwanych, limit częstotliwości zanieczyszczeń, aktualizacja bezpieczeństwa",
         "uk": "5 модулів підтримуються, частотний ліміт для видалення пилу, оновлення безпеки",
         "zh-cn": "5个单元支助,清除的污染频率限制,安全更新"
-      },
-      "1.2.3": {
-        "en": "changed ratio of logo",
-        "de": "geändertes Verhältnis des Logos",
-        "ru": "изменено соотношение логотипа",
-        "pt": "proporção alterada do logotipo",
-        "nl": "gewijzigde verhouding van logo",
-        "fr": "rapport modifié du logo",
-        "it": "rapporto modificato del logo",
-        "es": "proporción cambiada del logotipo",
-        "pl": "zmieniony stosunek logo",
-        "zh-cn": "更改徽标比例"
       }
     },
     "title": "BYD HVS Battery",

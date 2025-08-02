@@ -1,4 +1,9 @@
 # Older changes
+## 1.4.1 (2023-09-24)
+* Compatibility with js.controller 5x
+* Removed some bugs in detecting inverter
+* Inverternumber ist logged, so I can easily add new inverters if neccerary, just send me the silly-log if inverter is unknown.
+
 ## 1.4.0 (2022-10-31)
 * Update of referred modules (mainly around testing)
 * improvmenets contributed by Tapter (5 modules, readme and better readable code)

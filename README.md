@@ -44,6 +44,9 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### 1.5.3 (2025-08-02)
+* (arteck) update dependecy
+
 ### 1.5.2 (2025-08-02)
 * (arteck) add socketConnection DP
 * (arteck) use jsconConfig
@@ -62,11 +65,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 
 ### 1.4.2 (2023-09-28)
 * Typo in version number removed
-
-### 1.4.1 (2023-09-24)
-* Compatibility with js.controller 5x
-* Removed some bugs in detecting inverter
-* Inverternumber ist logged, so I can easily add new inverters if neccerary, just send me the silly-log if inverter is unknown.
 
 ###
 
