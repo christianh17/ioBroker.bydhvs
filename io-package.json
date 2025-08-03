@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.3",
+    "version": "1.5.4",
     "news": {
+      "1.5.4": {
+        "en": "typo",
+        "de": "typo",
+        "ru": "опечатка",
+        "pt": "erro de digitação",
+        "nl": "type",
+        "fr": "typo",
+        "it": "tipo",
+        "es": "typo",
+        "pl": "typo",
+        "uk": "типи",
+        "zh-cn": "类型"
+      },
       "1.5.3": {
         "en": "update dependecy",
         "de": "aktualisierung abhängigkeit",
@@ -70,19 +83,6 @@
         "pl": "poparcie sterownika 5 i wykrycie bardziej intruzatorów",
         "uk": "підтримка js-controller 5 і виявлення більш інверторів",
         "zh-cn": "b. 支持控制巴士5和发现更多防火器"
-      },
-      "1.4.0": {
-        "en": "5 modules supported, frequency limit for polling removed, security updates",
-        "de": "5 Module unterstützt, Frequenzgrenze für die Abfrage entfernt, Sicherheitsupdates",
-        "ru": "5 поддерживаемых модулей, частотный лимит для удаления опроса, обновления безопасности",
-        "pt": "5 módulos suportados, limite de frequência para votação removido, atualizações de segurança",
-        "nl": "vijf modules ondersteund, frequentielimiet voor het vervullen van de beveiliging",
-        "fr": "5 modules supportés, limite de fréquence pour le polling supprimé, mises à jour de sécurité",
-        "it": "5 moduli supportati, limite di frequenza per la rimozione del polling, aggiornamenti di sicurezza",
-        "es": "5 módulos compatibles, límite de frecuencia para las encuestas eliminadas, actualizaciones de seguridad",
-        "pl": "5 modułów obsługiwanych, limit częstotliwości zanieczyszczeń, aktualizacja bezpieczeństwa",
-        "uk": "5 модулів підтримуються, частотний ліміт для видалення пилу, оновлення безпеки",
-        "zh-cn": "5个单元支助,清除的污染频率限制,安全更新"
       }
     },
     "title": "BYD HVS Battery",

@@ -1,111 +1,77 @@
-![Logo](admin/unifi-protect.png)
-# ioBroker.unifi-protect
+![Logo](admin/bydhvs.png)
 
-[![NPM version](http://img.shields.io/npm/v/iobroker.unifi-protect.svg)](https://www.npmjs.com/package/iobroker.unifi-protect)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.unifi-protect.svg)](https://www.npmjs.com/package/iobroker.unifi-protect)
-![Number of Installations (latest)](http://iobroker.live/badges/unifi-protect-installed.svg)
-![Number of Installations (stable)](http://iobroker.live/badges/unifi-protect-stable.svg)
-[![Dependency Status](https://img.shields.io/david/iobroker-community-adapters/iobroker.unifi-protect.svg)](https://david-dm.org/peterbaumert/iobroker.unifi-protect)
-[![Known Vulnerabilities](https://snyk.io/test/github/peterbaumert/ioBroker.unifi-protect/badge.svg)](https://snyk.io/test/github/peterbaumert/ioBroker.unifi-protect)
+[![NPM version](https://img.shields.io/npm/v/iobroker.bydhvs.svg)](https://www.npmjs.com/package/iobroker.bydhvs)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.bydhvs.svg)](https://www.npmjs.com/package/iobroker.bydhvs)
+![Number of Installations](https://iobroker.live/badges/bydhvs-installed.svg)
+![Current version in stable repository](https://iobroker.live/badges/bydhvs-stable.svg)
 
-[![NPM](https://nodei.co/npm/iobroker.unifi-protect.png?downloads=true)](https://nodei.co/npm/iobroker.unifi-protect/)
+[![NPM](https://nodei.co/npm/iobroker.bydhvs.png?downloads=true)](https://nodei.co/npm/iobroker.bydhvs/)
 
-
-## unifi-protect adapter for ioBroker
-
-Connects to Unifi Protect Controller and pulls all Data from added Cameras.
-
-Standard Ports if not changed by yourself:
- - Cloud Key Plus Gen2: 7443
- - UDM Pro: 443
+**Tests:**  
+![Test and Release](https://github.com/christianh17/ioBroker.bydhvs/workflows/Test%20and%20Release/badge.svg)
+![CodeQL](https://github.com/christianh17/ioBroker.bydhvs/actions/workflows/codeql.yml/badge.svg?branch=main)
 
 
-## Examples for getThumbnail and getSnapshot
+## bydhvs adapter for ioBroker
 
-```
-// Settings
-const path = '/opt/iobroker/tmp/temp.jpg';
-const threshold = 50;
+BYD HVS Battery poll data
 
-// Send to Telegram ( or what you prefer )
-function sendImage(path) {
-    sendTo('telegram.0', path);
-}
+## Introduction
 
-//Trigger Script
-on({ id: 'unifi-protect.0.motions.lastMotion.thumbnail', change: "ne" }, function () {
-    const thumb = getState('unifi-protect.0.motions.lastMotion.thumbnail'/*thumbnail*/).val;
-    const end = getState('unifi-protect.0.motions.lastMotion.end'/*thumbnail*/).val;
-    const cameraid = getState('unifi-protect.0.motions.lastMotion.camera'/*thumbnail*/).val;
-    const score = getState('unifi-protect.0.motions.lastMotion.score'/*thumbnail*/).val;
-    if (score < threshold) { return; }
-    // if Event has ended send the Thumbnail otherwise get current Snapshot
-    if (end != null) {
-        sendTo('unifi-protect.0', 'getThumbnail', { "thumbnail": thumb, "path": path }, function (res) {
-            sendImage(path);
-        });
-    } else {
-        sendTo('unifi-protect.0', 'getSnapshot', { "cameraid": cameraid, "path": path }, function (res) {
-            sendImage(path);
-        });
-    }
-});
-```
+This Adapter takes data from a byd PV battery ( https://www.bydbatterybox.com/ ) and puts them into datapoints in the adapter. Unfortunately there is no official API and no documentation, so I used wireshark and a byd-hvs-simulator to try to understand the communication. My adapter simulates the byd-app, sends similar packets to the device and analyses the responses.
 
-```
-sendTo('unifi-protect.0', 'getSnapshot', { "cameraid": "5e4a861c01d12503870003f9", "path": path }, function (res) {
-    sendImage(path);
-});
-```
-## Credits
-This adapter would not have been possible without the great work of Peter Baumert <ioBroker.unifi-protect@outlook.com> who implemented the inital release of this adapter.
+## be careful
+
+There are two steps in the beConnect app, in the first step you get the normal data, in the second step you get detail-data for all cells (individual cell temperature and voltage and some more details) To get the detail-data there has to be a delay after one of the data-packets till I can get the result. I think in the meantime alle cells are measured, but I am not sure. I am definitely not sure if you harm your battery with polling this data too often, so be aware: You are on your own risk!
+
+## support for up to 5 modules
+
+Up to 5 HVS Modules are now supported.
+
+## settings
+
+Interval: That's easy: how often (s) shall the data be polled
+IP-Adress: Thats self explaining. Either you use the standard address ( 192.168.16.254 ) and change the routing at home, e.g.: https://www.photovoltaikforum.com/thread/150898-byd-hvs-firmware-update/?postID=2215343#post2215343 . The advantage is: The beConnect app works, too. Other possibility: You change the IP-Adress of the box. But: Be warned: the text on the webpage is confusing and if you are not absolutely shure about the things you do: PLEASE do not touch the settings. In the German forums I read from people who were locked out of their system and there is no way back, either byd sends you a replacement HVU or you have to buy a new one.
+Battery-details: As explained above: Do you need the details of the battery? If so: set the checkobx.
+Battery-details - every ... cycles :Also like above, should be clear
+Test Mode - show data in error log: If you check this box: the sent and recieved data are displayed in the error-log, so you can easily download the data and send it to me in case of errors.
+Copy and Paste does not work - the data is cut at the end. You will have to download it before you send it to me.
+
+[Link zur nativen deutschen Readme:](README-German.md)
 
 ## Changelog
-
 <!--
-    Placeholder for the next version (at the beginning of the line):
-    ### **WORK IN PROGRESS**
+	Placeholder for the next version (at the beginning of the line):
+	### __WORK IN PROGRESS__
 -->
-### 1.0.2 (2025-08-02)
-* (arteck) fix login
-* (arteck) BREAKING: Adapter requires node.js 20 now
-* (arteck) Dependencies have been updated
+### 1.5.4 (2025-08-03)
+* (arteck) typo
 
-### 1.0.1 (2024-06-06)
-* (Scrounger) A Problem accessing the 'manual snapshot' folder has been fixed.
-* (mcm1957) Dependencies have been updated
+### 1.5.3 (2025-08-02)
+* (arteck) update dependecy
 
-### 1.0.0 (2024-03-28)
-* (mcm1957) BREAKING: Adapter requires node.js 18 and js-controller >= 5 now
-* (mcm1957) Adapter has been moved to iobroker-community-adapters organisation
-* (mcm1957) Dependencies have been updated
+### 1.5.2 (2025-08-02)
+* (arteck) add socketConnection DP
+* (arteck) use jsconConfig
+* (arteck) refactoring to modern Code
+* (arteck) use direct socket connection without detour IPClient
+* first Version with two towers in NPM
 
-### 0.0.13 (2023-01-23)
-* dependencies updates
-* first implementation of realtime updates api
-* lastMotion, lastRing, lcdMessage and smartDetectZone in realTimeEvents
-* (Scrounger) Button to take manual snapshot added
-* (Scrounger) real time events datapoints for every cam added
-* (Scrounger) take snapshot and thumbnail for real time events added (base64 images)
-* (Scrounger) thumbnail image for list of motion events added (base64 images)
-* (Scrounger) small thumbnail image for list of motion events and real time events added (base64 images)
-* (Scrounger) camera name for list of motion events added
+### 1.5.1 (2024-01-15)
+* Enable the possibility to get informations from a two tower setup
+* BREAKING CHANGE of Structure.
 
-### 0.0.12 (2021-03-14)
-* added smart detections
-* fixed some lastMotion stuff
-* added UnifiOs Support for CloudKey
+### 1.5.0 (2023-11-04)
+* Breaking change: nodejs 16 minimum required
+* automated checks and release-script repaired (thanks to mcm1957, he did the work)
+* nothing else changed in code
 
-## Code Usage
-The code in [protect_api](./protect_api) is mostly copied from [hjdhjd's homebridge-unifi-protect](https://github.com/hjdhjd/homebridge-unifi-protect).
-Thank you very much for providing this code. His codes license you can find [here](https://github.com/hjdhjd/homebridge-unifi-protect/blob/master/LICENSE.md).
-
+###
 
 ## License
 MIT License
 
-Copyright (c) 2025 iobroker-community-adapters <iobroker-community-adapters@gmx.de>
-Copyright (c) 2020-2022 Peter Baumert
+Copyright (c) 2025 Christian <github@familie-herrmann.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -123,4 +89,5 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+
 SOFTWARE.

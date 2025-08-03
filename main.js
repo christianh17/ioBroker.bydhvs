@@ -1,1743 +1,1461 @@
 'use strict';
 
 /*
- * Created with @iobroker/create-adapter v1.21.0
+ * Created with @iobroker/create-adapter v1.31.0
  */
 
-// The adapter-core module gives you access to the core ioBroker functions
-// you need to create an adapter
-const utils = require('@iobroker/adapter-core');
-const tools = require('./lib/tools');
-const https = require('https');
-const Stream = require('stream').Transform;
-const fs = require('fs');
-const ProtectApi = require('./protect_api/protect-api');
-const ProtectUpdateEvents = require('./protect_api/protect-update-events');
+const utils = require('@iobroker/adapter-core'); // Get common adapter utils
+const crc = require('crc');
+const net = require('net');
 
-// Load your modules here, e.g.:
-// const fs = require("fs");
+const _methods = require('./lib/methods');
 
-class UnifiProtect extends utils.Adapter {
-    /**
-     * @param {Partial<ioBroker.AdapterOptions>} [options]
-     */
-    constructor(options) {
+const myRequests = require('./lib/constants').myRequests;
+/* eslint-disable @typescript-eslint/no-unused-vars */
+const byd_stat_tower = require('./lib/constants').byd_stat_tower;
+const myINVs = require('./lib/constants').myINVs;
+const myINVsLVS = require('./lib/constants').myINVsLVS;
+
+const socket = new net.Socket();
+/**
+ * The adapter instance
+ *
+ */
+let myState; // Aktueller Status
+let hvsSOC;
+let hvsMaxVolt;
+let hvsMinVolt;
+let hvsSOH;
+/**
+ * Removed attributes because they can now occour mor than once.
+ * let hvsMaxmVolt;
+ * let hvsMinmVolt;
+ * let hvsMaxmVoltCell;
+ * let hvsMinmVoltCell;
+ * let hvsMaxTempCell;
+ * let hvsMinTempCell;
+ * let hvsSOCDiagnosis;
+ * const hvsBatteryVoltsperCell = [];
+ * const hvsBatteryTempperCell = [];
+ */
+let towerAttributes = [];
+
+let hvsA;
+let hvsBattVolt;
+let hvsMaxTemp;
+let hvsMinTemp;
+let hvsBatTemp;
+let hvsOutVolt;
+let hvsChargeTotal;
+let hvsDischargeTotal;
+let hvsETA;
+let hvsError;
+let hvsModules;
+let hvsTowers;
+let hvsDiffVolt;
+let hvsPower;
+let hvsBattType;
+let hvsBattType_fromSerial;
+let hvsInvType;
+let hvsInvType_String;
+let hvsNumCells; //number of cells in system
+let hvsNumTemps; // number of temperatures to count with
+let ConfBatDetailshowoften;
+let ConfBydTowerCount;
+let confBatPollTime;
+let myNumberforDetails;
+let ConfTestMode;
+let _firstRun = false;
+
+let hvsSerial;
+let hvsBMU;
+let hvsBMUA;
+let hvsBMUB;
+let hvsBMS;
+let hvsGrid;
+let hvsErrorString;
+let hvsParamT;
+
+let ConfBatDetails;
+let ConfOverridePollInterval = 0;
+
+/*const myStates = [
+    "no state",
+    "waiting for initial connect",
+    "waiting for 1st answer",
+    "waiting for 2nd answer"
+
+];*/
+
+let idInterval1 = 0;
+
+const myBattTypes = ['HVL', 'HVM', 'HVS'];
+/* HVM: 16 cells per module
+   HVS: 32 cells per module
+   HVL: unknown so I count 0 cells per module
+*/
+
+class bydhvsControll extends utils.Adapter {
+    constructor(options = {}) {
         super({
             ...options,
-            name: 'unifi-protect',
+            name: 'bydhvs',
         });
 
-        this.isUnifiOS = false;
-        this.csrfToken = null;
-        this.cookies = null;
-        this.camerasDone = true;
-        this.motionsDone = true;
-        this.gotToken = false;
-
-        this.writeables = [
-            'name',
-            'isRtspEnabled',
-            'chimeDuration',
-            'ledSettings.isEnabled',
-            'osdSettings.isNameEnabled',
-            'osdSettings.isDebugEnabled',
-            'osdSettings.isLogoEnabled',
-            'osdSettings.isDateEnabled',
-            'recordingSettings.mode',
-        ];
-
-        this.cameraSubscribleStates = ['lastMotionEvent.thumbnail'];
-
-        this.paths = {
-            login: '/api/auth',
-            loginUnifiOS: '/api/auth/login',
-            bootstrap: '/api/bootstrap',
-            bootstrapUnifiOS: '/proxy/protect/api/bootstrap',
-            events: '/api/events',
-            eventsUnifiOS: '/proxy/protect/api/events',
-            cameras: '/api/cameras/',
-            camerasUnifiOS: '/proxy/protect/api/cameras/',
-            thumb: '/api/thumbnails/',
-            thumbUnifiOS: '/proxy/protect/api/thumbnails/',
-            thumbSmallUnifiOS: '/proxy/protect/api/events/{0}/thumbnail',
-            heatmap: '/api/heatmaps/',
-            heatmapUnifiOS: '/proxy/protect/api/heatmaps/',
-        };
-
         this.on('ready', this.onReady.bind(this));
-        //this.on("objectChange", this.onObjectChange.bind(this));
-        this.on('stateChange', this.onStateChange.bind(this));
-        this.on('message', this.onMessage.bind(this));
+        //      this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
     }
 
-    /**
-     * Is called when databases are connected and adapter received configuration.
-     */
     async onReady() {
-        this.getForeignObject('system.config', (err, systemConfig) => {
-            if (
-                this.config.password &&
-                (!this.supportsFeature || !this.supportsFeature('ADAPTER_AUTO_DECRYPT_NATIVE'))
-            ) {
-                this.config.password = tools.decrypt(
-                    (systemConfig && systemConfig.native && systemConfig.native.secret) || 'Y5JQ6qCfnhysf9NG',
-                    this.config.password,
-                );
-            }
-        });
-        try {
-            await this.updateData(true);
-        } catch (error) {
-            this.log.error(`[onReady: <updateData>] ${error}`);
-        }
-        if (this.isUnifiOS) {
-            this.api = new ProtectApi(this.config, this.log);
-            this.events = new ProtectUpdateEvents(this);
-        }
-    }
+        //first check account settings
+        this.setState('info.connection', false, true);
+        this.setState('info.socketConnection', false, true);
 
-    async errorHandling(codePart, error) {
-        this.log.error(`[${codePart}] error: ${error.message}, stack: ${error.stack}`);
-        if (this.supportsFeature && this.supportsFeature('PLUGINS')) {
-            const sentryInstance = this.getPluginInstance('sentry');
-            if (sentryInstance) {
-                sentryInstance.getSentryObject().captureException(error);
-            }
-        }
+        this.buf2int16SI = _methods.buf2int16SI.bind(this);
+        this.buf2int16US = _methods.buf2int16US.bind(this);
+        this.buf2int32US = _methods.buf2int32US.bind(this);
+        this.decodePacketNOP = _methods.decodePacketNOP.bind(this);
+        this.countSetBits = _methods.countSetBits.bind(this);
+
+        this.setStateAsync(`info.socketConnection`, false, true);
+
+        this.initData();
+
+        this.log.info('starte polling');
+        this.startQuery();
     }
 
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      *
-     * @param {() => void} callback
+     * @param callback
      */
     onUnload(callback) {
         try {
-            if (this.timer) {
-                clearTimeout(this.timer);
-            }
-            if (this.api) {
-                this.api.unload();
-            }
-            if (this.events) {
-                this.events.unload();
-            }
-            this.log.info('cleaned everything up...');
+            clearTimeout(idInterval1);
+            socket.destroy();
+            this.log.info('Adapter bluelink cleaned up everything...');
             callback();
-        } catch (e) {
+        } catch (error) {
             callback();
         }
     }
 
-    // /**
-    //  * Is called if a subscribed object changes
-    //  * @param {string} id
-    //  * @param {ioBroker.Object | null | undefined} obj
-    //  */
-    // onObjectChange(id, obj) {
-    // 	if (obj) {
-    // 		// The object was changed
-    // 		this.log.silly(`object ${id} changed: ${JSON.stringify(obj)}`);
-    // 	} else {
-    // 		// The object was deleted
-    // 		this.log.silly(`object ${id} deleted`);
-    // 	}
-    // }
+    initData() {
+        this.setObjects();
 
-    /**
-     * Is called if a subscribed state changes
-     *
-     * @param {string} id
-     * @param {ioBroker.State | null | undefined} state
-     */
-    onStateChange(id, state) {
-        if (state) {
-            // The state was changed
-            this.log.silly(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+        myState = 0;
 
-            const idSplitted = id.split('.');
-            if (
-                id.includes(`${this.namespace}.cameras.`) &&
-                idSplitted[idSplitted.length - 2] === 'lastMotionEvent' &&
-                idSplitted[idSplitted.length - 1] === 'thumbnail' &&
-                this.config.downloadLastMotionThumb
-            ) {
-                const camId = id.replace(`${this.namespace}.cameras.`, '').replace('.lastMotionEvent.thumbnail', '');
+        ConfOverridePollInterval = this.config.ConfOverridePollInterval ? this.config.ConfOverridePollInterval : 0;
 
-                if (this.config.takeSnapshotForLastMotion) {
-                    const that = this;
+        if (ConfOverridePollInterval == 0) {
+            confBatPollTime = parseInt(this.config.ConfPollInterval);
+        } else {
+            const OverridePollState = this.getState('System.OverridePoll');
+            confBatPollTime = OverridePollState ? OverridePollState.val : 60;
+        }
 
-                    // this.getForeignState(id.replace(`.lastMotion.thumbnail`, '.host'), function (err, host) {
-                    // 	if (!err && host && host.val) {
-                    // 		that.getSnapshotFromCam(host.val, `/unifi-protect/lastMotion/${camId}_snapshot.jpg`, function (res) { }, true);
-                    // 	}
-                    // });
+        if (confBatPollTime < 30) {
+            //confBatPollTime = 60;
+            this.log.warn('poll to often - recommendation is not more than every 30 seconds');
+        }
 
-                    setTimeout(
-                        function () {
-                            that.getSnapshot(
-                                camId,
-                                `/unifi-protect/lastMotion/${camId}_snapshot.jpg`,
-                                function () {},
-                                that.config.takeSnapshotForLastMotionWidth || 640,
+        ConfBydTowerCount = this.config.ConfBydTowerCount ? this.config.ConfBydTowerCount : 1;
+        ConfBatDetails = this.config.ConfBatDetails ? true : false;
+        ConfBatDetailshowoften = parseInt(this.config.ConfDetailshowoften);
+        ConfTestMode = this.config.ConfTestMode ? true : false;
+        myNumberforDetails = ConfBatDetailshowoften;
+
+        this.log.info(`BYD IP Adress: ${this.config.ConfIPAdress}`);
+        this.log.info(`Bat Details  : ${this.config.ConfBatDetails}`);
+        this.log.info(`Tower count: ${this.config.ConfBydTowerCount}`);
+        this.log.info(
+            `Override Poll, so use from state and not from settings: ${this.config.ConfOverridePollInterval}`,
+        );
+        this.log.info(`Battery Poll Time: ${confBatPollTime}`);
+        this.log.info(`BatDetailshowoften: ${ConfBatDetailshowoften}`);
+        this.log.silly(`TestMode= ${ConfTestMode}`);
+    }
+
+    async checkandrepairUnit(id, NewUnit, NewRole, newName) {
+        //want to test and understand async and await, so it's introduced here.
+        //check for forgotten unit in first version and if it's missing add unit.
+        try {
+            const obj = await this.getObjectAsync(id);
+            if (NewUnit != '') {
+                if (obj.common.unit != NewUnit) {
+                    this.extendObject(id, { common: { unit: NewUnit } });
+                }
+            }
+            if (obj.common.role == '') {
+                this.extendObject(id, { common: { role: NewRole } });
+            }
+            if (newName != '') {
+                if (obj.common.name != newName) {
+                    this.extendObject(id, { common: { name: newName } });
+                }
+            }
+        } catch {
+            //dann eben nicht.
+        }
+    }
+
+    checkPacket(data) {
+        const byteArray = new Uint8Array(data);
+        const packetLength = data[2] + 5; // 3 header, 2 crc
+        if (byteArray[0] != 1) {
+            return false;
+        }
+        if (byteArray[1] === 3) {
+            //habe die Kodierung der Antwort mit 1 an zweiter Stelle nicht verstanden, daher hier keine Längenprüfung
+            if (packetLength != byteArray.length) {
+                return false;
+            }
+        } else {
+            if (byteArray[1] != 16) {
+                return false;
+            }
+        }
+        return crc.crc16modbus(byteArray) === 0;
+    }
+
+    pad(n, width, z) {
+        z = z || '0';
+        n = `${n}`;
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
+    setObjects() {
+        let myObjects = [
+            ['System.Serial', 'state', 'Serial number', 'string', 'text', true, false, ''],
+            ['System.BMU', 'state', 'F/W BMU', 'string', 'text', true, false, ''],
+            ['System.BMS', 'state', 'F/W BMS', 'string', 'text', true, false, ''],
+            ['System.BMUBankA', 'state', 'F/W BMU-BankA', 'string', 'text', true, false, ''],
+            ['System.BMUBankB', 'state', 'F/W BMU-BankB', 'string', 'text', true, false, ''],
+            ['System.Modules', 'state', 'modules (count)', 'number', 'value', true, false, ''],
+            ['System.Towers', 'state', 'towers (count)', 'number', 'value', true, false, ''],
+            ['System.Grid', 'state', 'Parameter Table', 'string', 'text', true, false, ''],
+            ['System.ParamT', 'state', 'F/W BMU', 'string', 'text', true, false, ''],
+            ['System.BattType', 'state', 'Battery Type', 'string', 'text', true, false, ''],
+            ['System.InvType', 'state', 'Inverter Type', 'string', 'text', true, false, ''],
+            ['State.SOC', 'state', 'SOC', 'number', 'value.battery', true, false, '%'],
+            ['State.VoltMax', 'state', 'Max Cell Voltage', 'number', 'value.voltage', true, false, 'V'],
+            ['State.VoltMin', 'state', 'Min Cell Voltage', 'number', 'value.voltage', true, false, 'V'],
+            ['State.SOH', 'state', 'SOH', 'number', 'value.battery', true, false, '%'],
+            ['State.Current', 'state', 'Charge / Discharge Current', 'number', 'value.current', true, false, 'A'],
+            ['State.Power_Consumption', 'state', 'Charge Power', 'number', 'value.power', true, false, 'W'],
+            ['State.Power_Delivery', 'state', 'Discharge Power', 'number', 'value.power', true, false, 'W'],
+            ['State.VoltBatt', 'state', 'Battery Voltage', 'number', 'value.voltage', true, false, 'V'],
+            ['State.TempMax', 'state', 'Max Cell Temp', 'number', 'value.temperature', true, false, '°C'],
+            ['State.TempMin', 'state', 'Min Cell Temp', 'number', 'value.temperature', true, false, '°C'],
+            ['State.VoltDiff', 'state', 'Max - Min Cell Voltage', 'number', 'value.temperature', true, false, 'V'],
+            ['State.Power', 'state', 'Power', 'number', 'value.power', true, false, 'W'],
+            ['State.TempBatt', 'state', 'Battery Temperature', 'number', 'value.temperature', true, false, '°C'],
+            ['State.VoltOut', 'state', 'Output Voltage', 'number', 'value.voltage', true, false, 'V'],
+            ['System.ErrorNum', 'state', 'Error (numeric)', 'number', 'value', true, false, ''],
+            ['System.ErrorStr', 'state', 'Error (string)', 'string', 'text', true, false, ''],
+            ['System.ChargeTotal', 'state', 'Total Charge of the system', 'number', 'value.energy', true, false, 'Wh'],
+            [
+                'System.DischargeTotal',
+                'state',
+                'Total Discharge of the system',
+                'number',
+                'value.energy',
+                true,
+                false,
+                'Wh',
+            ],
+            ['System.ETA', 'state', 'Efficiency of in percent', 'number', 'value', true, false, ''],
+            ['System.OverridePoll', 'state', 'Poll interval if set per state', 'number', 'value', true, true, ''],
+        ];
+
+        const rawObjects = [
+            ['System.Raw_00', 'state', 'Raw Message of sequence 00', 'string', 'text', true, false, ''],
+            ['System.Raw_01', 'state', 'Raw Message of sequence 01', 'string', 'text', true, false, ''],
+            ['System.Raw_02', 'state', 'Raw Message of sequence 02', 'string', 'text', true, false, ''],
+        ];
+        if (this.config.ConfStoreRawMessages) {
+            myObjects = myObjects.concat(rawObjects);
+        }
+
+        for (let i = 0; i < myObjects.length; i++) {
+            this.setObjectNotExists(myObjects[i][0], {
+                type: myObjects[i][1],
+                common: {
+                    name: myObjects[i][2],
+                    type: myObjects[i][3],
+                    role: myObjects[i][4],
+                    read: myObjects[i][5],
+                    write: myObjects[i][6],
+                    unit: myObjects[i][7], //works only for new objects, so check later for existing objects
+                },
+                native: {},
+            });
+        }
+        //repair forgotten units in first version and required roles
+        for (const myObject of myObjects) {
+            //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
+            this.checkandrepairUnit(myObject[0], myObject[7], myObject[4], myObject[2]);
+        }
+    }
+
+    setStates() {
+        let ObjTowerString = '';
+
+        this.log.silly(`hvsSerial       >${hvsSerial}<
+                        hvsBMU          >${hvsBMU}<;
+                        hvsBMUA         >${hvsBMUA}<;
+                        hvsBMUB         >${hvsBMUB}<;
+                        hvsBMS          >${hvsBMS}<;
+                        hvsModules      >${hvsModules}<;
+                        hvsGrid         >${hvsGrid}<;
+                        hvsSOC          >${hvsSOC}<;
+                        hvsMaxVolt      >${hvsMaxVolt}<;
+                        hvsMinVolt      >${hvsMinVolt}<;
+                        hvsSOH          >${hvsSOH}<;
+                        hvsA            >${hvsA}<;
+                        hvsBattVolt     >${hvsBattVolt}<;
+                        hvsMaxTemp      >${hvsMaxTemp}<;
+                        hvsMinTemp      >${hvsMinTemp}<;
+                        hvsDiffVolt     >${hvsDiffVolt}<;
+                        hvsPower        >${hvsPower}<;
+                        hvsParamT       >${hvsParamT}<;
+                        hvsBatTemp      >${hvsBatTemp}<;
+                        hvsOutVolt      >${hvsOutVolt}<,
+                        hvsError        >${hvsError}<,
+                        hvsErrorStr     >${hvsErrorString}<,
+                        BattType        >${hvsBattType_fromSerial}<,
+                        Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
+
+        this.setState('System.Serial', hvsSerial, true);
+        this.setState('System.BMU', hvsBMU, true);
+        this.setState('System.BMUBankA', hvsBMUA, true);
+        this.setState('System.BMUBankB', hvsBMUB, true);
+        this.setState('System.BMS', hvsBMS, true);
+        this.setState('System.Modules', hvsModules, true);
+        this.setState('System.Towers', hvsTowers, true);
+        this.setState('System.Grid', hvsGrid, true);
+        this.setState('State.SOC', hvsSOC, true);
+        this.setState('State.VoltMax', hvsMaxVolt, true);
+        this.setState('State.VoltMin', hvsMinVolt, true);
+        this.setState('State.SOH', hvsSOH, true);
+        this.setState('State.Current', hvsA, true);
+        this.setState('State.VoltBatt', hvsBattVolt, true);
+        this.setState('State.TempMax', hvsMaxTemp, true);
+        this.setState('State.TempMin', hvsMinTemp, true);
+        this.setState('State.VoltDiff', hvsDiffVolt, true);
+        this.setState('State.Power', hvsPower, true /*ack*/);
+        this.setState('System.ParamT', hvsParamT, true);
+        this.setState('State.TempBatt', hvsBatTemp, true);
+        this.setState('State.VoltOut', hvsOutVolt, true);
+        this.setState('System.ErrorNum', hvsError, true);
+        this.setState('System.ErrorStr', hvsErrorString, true);
+
+        if (hvsPower >= 0) {
+            this.setState('State.Power_Consumption', hvsPower, true);
+            this.setState('State.Power_Delivery', 0, true);
+        } else {
+            this.setState('State.Power_Consumption', 0, true);
+            this.setState('State.Power_Delivery', -hvsPower, true);
+        }
+
+        this.setState('System.BattType', hvsBattType_fromSerial, true);
+        this.setState('System.InvType', hvsInvType_String, true);
+        this.setState('System.ChargeTotal', hvsChargeTotal, true);
+        this.setState('System.DischargeTotal', hvsDischargeTotal, true);
+        this.setState('System.ETA', hvsETA, true);
+
+        if (myNumberforDetails == 0) {
+            // For every tower
+            this.log.silly(`Tower attributes: ${JSON.stringify(towerAttributes)}`);
+            for (let t = 0; t < towerAttributes.length; t++) {
+                try {
+                    if (ConfBydTowerCount > 1) {
+                        ObjTowerString = `.Tower_${t + 1}`;
+                    }
+
+                    // Test if all required msg received.
+                    if (towerAttributes[t].hvsMaxmVolt) {
+                        this.setState(`Diagnosis${ObjTowerString}.mVoltMax`, towerAttributes[t].hvsMaxmVolt, true);
+                        this.setState(`Diagnosis${ObjTowerString}.mVoltMin`, towerAttributes[t].hvsMinmVolt, true);
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.mVoltMaxCell`,
+                            towerAttributes[t].hvsMaxmVoltCell,
+                            true,
+                        );
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.mVoltMinCell`,
+                            towerAttributes[t].hvsMinmVoltCell,
+                            true,
+                        );
+                        this.setState(`Diagnosis${ObjTowerString}.TempMax`, towerAttributes[t].hvsMaxmTemp, true);
+                        this.setState(`Diagnosis${ObjTowerString}.TempMin`, towerAttributes[t].hvsMinmTemp, true);
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.TempMaxCell`,
+                            towerAttributes[t].hvsMaxTempCell,
+                            true,
+                        );
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.TempMinCell`,
+                            towerAttributes[t].hvsMinTempCell,
+                            true,
+                        );
+                        this.setState(`Diagnosis${ObjTowerString}.ChargeTotal`, towerAttributes[t].chargeTotal, true);
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.DischargeTotal`,
+                            towerAttributes[t].dischargeTotal,
+                            true,
+                        );
+                        this.setState(`Diagnosis${ObjTowerString}.ETA`, towerAttributes[t].eta, true);
+                        this.setState(`Diagnosis${ObjTowerString}.BatteryVolt`, towerAttributes[t].batteryVolt, true);
+                        this.setState(`Diagnosis${ObjTowerString}.OutVolt`, towerAttributes[t].outVolt, true);
+                        this.setState(`Diagnosis${ObjTowerString}.SOC`, towerAttributes[t].hvsSOCDiagnosis, true);
+                        this.setState(`Diagnosis${ObjTowerString}.SOH`, towerAttributes[t].soh, true);
+                        this.setState(`Diagnosis${ObjTowerString}.State`, towerAttributes[t].state, true);
+                        this.setState(`Diagnosis${ObjTowerString}.BalancingCells`, towerAttributes[t].balancing, true);
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.BalancingCellsCount`,
+                            towerAttributes[t].balancingcount,
+                            true,
+                        );
+
+                        this.log.debug(`Tower_${t + 1} balancing     >${towerAttributes[t].balancing}<`);
+                        this.log.debug(`Tower_${t + 1} balcount      >${towerAttributes[t].balancingcount}<`);
+
+                        if (t == 0) {
+                            this.setState(
+                                `Diagnosis${ObjTowerString}.BalancingOne`,
+                                towerAttributes[t].balancing ? towerAttributes[t].balancing : '',
                                 true,
                             );
-                        },
-                        that.config.takeSnapshotForLastMotionDelay * 1000 || 0,
-                    );
-                }
-
-                this.log.debug(`update lastMotion thumbnail for cam ${camId}`);
-                this.getThumbnail(
-                    state.val,
-                    `/unifi-protect/lastMotion/${camId}.jpg`,
-                    function () {},
-                    30,
-                    this.config.downloadLastMotionThumbWidth || 640,
-                    true,
-                );
-            } else {
-                for (let i = 0; i < this.writeables.length; i++) {
-                    if (id.match(this.writeables[i])) {
-                        this.changeSetting(id, state.val);
-                        continue;
-                    }
-                }
-
-                if (id.includes(`${this.namespace}.cameras.`) && id.includes(`.manualSnapshot`)) {
-                    const that = this;
-
-                    const camId = id.replace(`${this.namespace}.cameras.`, '').replace('.manualSnapshot', '');
-
-                    const snapshotUrl = `/unifi-protect/manual/${camId}/${new Date().getTime().toString()}.jpg`;
-                    this.getSnapshot(
-                        camId,
-                        snapshotUrl,
-                        function () {
-                            that.setStateAsync(
-                                id.replace(`.manualSnapshot`, `.manualSnapshotUrl`),
-                                `/vis.0${snapshotUrl}`,
+                            this.setState(
+                                `Diagnosis${ObjTowerString}.BalancingCountOne`,
+                                towerAttributes[t].balancingcount,
                                 true,
                             );
-                        },
-                        this.config.takeSnapshotManualWidth || 640,
-                        true,
-                    );
-                }
-            }
-        } else {
-            // The state was deleted
-            this.log.silly(`state ${id} deleted`);
-        }
-    }
-
-    async renewToken(force = false) {
-        if ((!this.apiAuthBearerToken && !this.isUnifiOS) || (!this.csrfToken && this.isUnifiOS) || force) {
-            const opt = await this.determineEndpointStyle().catch(() => {
-                this.log.error("Couldn't determine Endpoint Style.");
-            });
-            if (typeof opt === 'undefined') {
-                return;
-            }
-            this.isUnifiOS = opt.isUnifiOS;
-            this.csrfToken = opt.csrfToken;
-            this.apiAuthBearerToken = await this.login().catch(() => {
-                this.log.error("Couldn't login.");
-            });
-            this.gotToken = true;
-        }
-    }
-
-    updateCookie(cookie) {
-        if (cookie) {
-            this.cookies = cookie;
-            this.csrfToken = JSON.parse(new Buffer(cookie.split('.')[1], 'base64').toString('ascii')).csrfToken;
-        }
-    }
-
-    async updateData(onReady = false) {
-        if (this.config.protectip != '127.0.0.1') {
-            await this.renewToken();
-            if (this.camerasDone && this.gotToken) {
-                this.getCameraList(onReady);
-            }
-            if (this.motionsDone && this.gotToken) {
-                this.getMotionEvents(onReady);
-            }
-        }
-        if (this.api) {
-            this.api.refreshDevices();
-        }
-        this.timer = setTimeout(() => this.updateData(), this.config.interval * 1000);
-    }
-
-    determineEndpointStyle() {
-        return new Promise((resolve, reject) => {
-            const options = {
-                hostname: this.config.protectip,
-                port: this.config.protectport,
-                resolveWithFullResponse: true,
-                rejectUnauthorized: false,
-            };
-            const req = https.request(options, res => {
-                if (res.statusCode === 302 && res.headers['location'] === '/manage') {
-                    resolve({
-                        isUnifiOS: false,
-                        csrfToken: null,
-                        cookies: null,
-                    });
-                } else if (res.statusCode === 200) {
-                    if (res.headers['x-csrf-token']) {
-                        resolve({
-                            isUnifiOS: true,
-                            csrfToken: res.headers['x-csrf-token'],
-                        });
-                    } else {
-                        resolve({
-                            isUnifiOS: true,
-                            csrfToken: null,
-                            cookies: null,
-                        });
-                    }
-                } else {
-                    this.log.error('failed to detect UniFiOS status');
-                }
-            });
-
-            req.on('error', e => {
-                this.log.error(`determineEndpointStyle ${JSON.stringify(e)}`);
-                reject();
-            });
-            req.end();
-        });
-    }
-
-    login() {
-        return new Promise((resolve, reject) => {
-            const data = JSON.stringify({
-                username: this.config.username,
-                password: this.config.password,
-            });
-            let headers = {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Content-Length': Buffer.byteLength(data, 'utf8'),
-            };
-            if (this.isUnifiOS) {
-                headers = {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Content-Length': Buffer.byteLength(data, 'utf8'),
-                    'X-CSRF-Token': this.csrfToken,
-                };
-            }
-            const options = {
-                hostname: this.config.protectip,
-                port: this.config.protectport,
-                path: this.isUnifiOS ? this.paths.loginUnifiOS : this.paths.login,
-                method: 'POST',
-                rejectUnauthorized: false,
-                resolveWithFullResponse: true,
-                headers: headers,
-            };
-
-            const req = https.request(options, res => {
-                if (res.statusCode == 200) {
-                    if (this.isUnifiOS) {
-                        this.updateCookie(
-                            typeof res.headers['set-cookie'] !== 'undefined'
-                                ? res.headers['set-cookie'][0].replace(/(;.*)/i, '')
-                                : reject(),
-                        );
-                    }
-                    resolve(res.headers['authorization']);
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('getApiAuthBearerToken: Unifi Protect reported authorization failure');
-                    reject();
-                }
-            });
-
-            req.on('error', e => {
-                this.log.error(`login ${JSON.stringify(e)}`);
-                if (e['code'] == 'ECONNRESET') {
-                    this.renewToken(true);
-                }
-                reject();
-            });
-            req.write(data);
-            req.end();
-        });
-    }
-
-    // 		this.apiAccessKey = await this.getApiAccessKey();
-    getApiAccessKey() {
-        return new Promise((resolve, reject) => {
-            const options = {
-                hostname: this.config.protectip,
-                port: this.config.protectport,
-                path: `/api/auth/access-key`,
-                method: 'POST',
-                rejectUnauthorized: false,
-                headers: {
-                    Authorization: `Bearer ${this.apiAuthBearerToken}`,
-                },
-            };
-
-            const req = https.request(options, res => {
-                let data = '';
-                res.on('data', d => {
-                    data += d;
-                });
-                res.on('end', () => {
-                    if (res.statusCode == 200) {
-                        resolve(JSON.parse(data).accessKey);
-                    } else if (res.statusCode == 401 || res.statusCode == 403) {
-                        this.log.error('getApiAccessKey: Unifi Protect reported authorization failure');
-                        this.renewToken(true);
-                        reject();
-                    }
-                });
-            });
-
-            req.on('error', e => {
-                this.log.error(e.toString());
-                reject();
-            });
-            req.end();
-        });
-    }
-
-    getCameraList(onReady) {
-        const options = {
-            hostname: this.config.protectip,
-            port: this.config.protectport,
-            path: this.isUnifiOS ? this.paths.camerasUnifiOS : this.paths.cameras,
-            method: 'GET',
-            rejectUnauthorized: false,
-            resolveWithFullResponse: true,
-            headers: {},
-        };
-
-        if (this.isUnifiOS) {
-            options.headers = {
-                'X-CSRF-Token': this.csrfToken,
-                Cookie: this.cookies,
-            };
-        } else {
-            options.headers = {
-                Authorization: `Bearer ${this.apiAuthBearerToken}`,
-            };
-        }
-
-        const req = https.request(options, res => {
-            let data = '';
-            this.camerasDone = false;
-            res.on('data', d => {
-                data += d;
-            });
-            res.on('end', () => {
-                if (res.statusCode == 200) {
-                    if (this.isUnifiOS) {
-                        this.updateCookie(
-                            typeof res.headers['set-cookie'] !== 'undefined'
-                                ? res.headers['set-cookie'][0].replace(/(;.*)/i, '')
-                                : this.log.silly('Couldnt update cookie'),
-                        );
-                    }
-                    const cameras = JSON.parse(data);
-                    this.createOwnDevice('cameras', 'Cameras');
-                    let stateArray = [];
-
-                    cameras.forEach(camera => {
-                        this.createOwnChannel(`cameras.${camera.id}`, camera.name);
-                        Object.entries(camera).forEach(([key, value]) => {
-                            stateArray = this.createOwnState(
-                                `cameras.${camera.id}.${key}`,
-                                value,
-                                key,
-                                stateArray,
-                                this.config.statesFilter['cameras'],
-                                onReady,
-                            );
-                        });
-
-                        const channelFilter = this.config.statesFilter['cameras'].filter(x =>
-                            x.includes('lastMotionEvent'),
-                        );
-                        if (channelFilter.length > 0) {
-                            this.getLastMotionEventForCam(camera.id, camera.lastMotion, onReady);
-                        }
-
-                        if (onReady) {
-                            const thumbnailUrlId = `cameras.${camera.id}.lastMotionEvent.thumbnailUrl`;
-                            const that = this;
-                            if (this.config.downloadLastMotionThumb) {
-                                this.setObjectNotExists(
-                                    thumbnailUrlId,
-                                    {
-                                        type: 'state',
-                                        common: {
-                                            name: 'thumbnailUrl',
-                                            type: 'string',
-                                            read: true,
-                                            write: false,
-                                            role: 'value',
-                                        },
-                                        native: {},
-                                    },
-                                    function () {
-                                        that.setState(
-                                            thumbnailUrlId,
-                                            `/vis.0/unifi-protect/lastMotion/${camera.id}.jpg`,
-                                            true,
-                                        );
-                                    },
-                                );
-                            } else {
-                                this.delObject(thumbnailUrlId);
-                            }
-
-                            const snapshotUrl = `cameras.${camera.id}.lastMotionEvent.snapshotUrl`;
-                            if (this.config.takeSnapshotForLastMotion) {
-                                this.setObjectNotExists(
-                                    snapshotUrl,
-                                    {
-                                        type: 'state',
-                                        common: {
-                                            name: 'thumbnailUrl',
-                                            type: 'string',
-                                            read: true,
-                                            write: false,
-                                            role: 'value',
-                                        },
-                                        native: {},
-                                    },
-                                    function () {
-                                        that.setState(
-                                            snapshotUrl,
-                                            `/vis.0/unifi-protect/lastMotion/${camera.id}_snapshot.jpg`,
-                                            true,
-                                        );
-                                    },
-                                );
-                            } else {
-                                this.delObject(snapshotUrl);
-                            }
-
-                            for (const sub of this.cameraSubscribleStates) {
-                                this.subscribeStates(`cameras.${camera.id}.${sub}`);
-                            }
-
-                            // Create Button to take a snapshot
-                            const manualSnapshotBtnId = `cameras.${camera.id}.manualSnapshot`;
-                            this.setObjectNotExists(
-                                manualSnapshotBtnId,
-                                {
-                                    type: 'state',
-                                    common: {
-                                        name: 'take a manual snapshot',
-                                        type: 'boolean',
-                                        role: 'button',
-                                        read: false,
-                                        write: true,
-                                        desc: 'Take a snapshot and store it in /vis.0/unifi-protect/',
-                                    },
-                                    native: {},
-                                },
-                                function () {
-                                    that.subscribeStates(manualSnapshotBtnId);
-                                },
-                            );
-
-                            const manualSnapshotURL = `cameras.${camera.id}.manualSnapshotUrl`;
-                            this.setObjectNotExists(manualSnapshotURL, {
-                                type: 'state',
-                                common: {
-                                    name: 'manual snapshot url',
-                                    type: 'string',
-                                    read: true,
-                                    write: false,
-                                    role: 'value',
-                                },
-                                native: {},
-                            });
-
-                            this.createCameraRealTimeStates(camera.id);
-                        }
-                    });
-
-                    this.processStateChanges(stateArray, this, () => {
-                        this.camerasDone = true;
-                    });
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('getCameraList: Unifi Protect reported authorization failure');
-                    this.camerasDone = true;
-                    this.renewToken(true);
-                }
-            });
-        });
-
-        req.on('error', e => {
-            this.camerasDone = true;
-            this.log.error(`getCameraList ${JSON.stringify(e)}`);
-            if (e['code'] == 'ECONNRESET') {
-                this.renewToken(true);
-            }
-        });
-        req.end();
-    }
-
-    getLastMotionEventForCam(cameraId, lastMotitionTimestamp, onReady) {
-        const eventStart = lastMotitionTimestamp - 10 * 1000;
-        const eventEnd = lastMotitionTimestamp + 10 * 1000;
-
-        const options = {
-            hostname: this.config.protectip,
-            port: this.config.protectport,
-            path: this.isUnifiOS
-                ? `${this.paths.eventsUnifiOS}?limit=1&camera=${cameraId}&types=${Object.keys(this.config.motionTypes)
-                      .filter(key => this.config.motionTypes[key] === true)
-                      .join('&types=')}`
-                : `${this.paths.events}?type=motion&orderDirection=DESC&camera=${cameraId}&end=${eventEnd}&start=${eventStart}`,
-            method: 'GET',
-            rejectUnauthorized: false,
-            resolveWithFullResponse: true,
-            headers: {},
-        };
-
-        if (this.isUnifiOS) {
-            options.headers = {
-                'X-CSRF-Token': this.csrfToken,
-                Cookie: this.cookies,
-            };
-        } else {
-            options.headers = {
-                Authorization: `Bearer ${this.apiAuthBearerToken}`,
-            };
-        }
-
-        const req = https.request(options, res => {
-            let data = '';
-            res.on('data', d => {
-                data += d;
-            });
-            res.on('end', () => {
-                if (res.statusCode == 200) {
-                    if (this.isUnifiOS) {
-                        this.updateCookie(
-                            typeof res.headers['set-cookie'] !== 'undefined'
-                                ? res.headers['set-cookie'][0].replace(/(;.*)/i, '')
-                                : this.log.silly('Couldnt update cookie'),
-                        );
-                    }
-                    const motionEvents = JSON.parse(data);
-
-                    if (motionEvents.length > 0) {
-                        let stateArray = [];
-                        Object.entries(motionEvents[0]).forEach(([key, value]) => {
-                            stateArray = this.createOwnState(
-                                `cameras.${cameraId}.lastMotionEvent.${key}`,
-                                value,
-                                key,
-                                stateArray,
-                                this.config.statesFilter['cameras'],
-                                onReady,
-                            );
-                        });
-                        this.processStateChanges(stateArray, this, () => {
-                            this.motionsDone = true;
-                        });
-                    }
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('getMotionEvents: Unifi Protect reported authorization failure');
-                    this.motionsDone = true;
-                    this.renewToken(true);
-                } else {
-                    this.motionsDone = true;
-                    this.log.error(`Status Code: ${res.statusCode}`);
-                }
-            });
-        });
-
-        req.on('error', e => {
-            this.log.error(`getMotionEvents ${JSON.stringify(e)}`);
-            if (e['code'] == 'ECONNRESET') {
-                this.renewToken(true);
-            }
-            this.motionsDone = true;
-        });
-        req.end();
-    }
-
-    getMotionEvents(onReady) {
-        this.motionsDone = false;
-        const now = Date.now();
-        const eventStart = now - (this.config.getMotions ? this.config.secMotions : this.config.interval + 10) * 1000;
-        const eventEnd = now + 10 * 1000;
-
-        const options = {
-            hostname: this.config.protectip,
-            port: this.config.protectport,
-            path: this.isUnifiOS
-                ? `${this.paths.eventsUnifiOS}?end=${eventEnd}&start=${eventStart}&types=${Object.keys(
-                      this.config.motionTypes,
-                  )
-                      .filter(key => this.config.motionTypes[key] === true)
-                      .join('&types=')}`
-                : `${this.paths.events}?type=motion&end=${eventEnd}&start=${eventStart}`,
-            method: 'GET',
-            rejectUnauthorized: false,
-            resolveWithFullResponse: true,
-            headers: {},
-        };
-
-        if (this.isUnifiOS) {
-            options.headers = {
-                'X-CSRF-Token': this.csrfToken,
-                Cookie: this.cookies,
-            };
-        } else {
-            options.headers = {
-                Authorization: `Bearer ${this.apiAuthBearerToken}`,
-            };
-        }
-
-        const req = https.request(options, res => {
-            let data = '';
-            res.on('data', d => {
-                data += d;
-            });
-            res.on('end', () => {
-                if (res.statusCode == 200) {
-                    if (this.isUnifiOS) {
-                        this.updateCookie(
-                            typeof res.headers['set-cookie'] !== 'undefined'
-                                ? res.headers['set-cookie'][0].replace(/(;.*)/i, '')
-                                : this.log.silly('Couldnt update cookie'),
-                        );
-                    }
-                    const motionEvents = JSON.parse(data);
-                    this.createOwnDevice('motions', 'Motion Events');
-
-                    const cameras = {};
-                    const newMotionEvents = [];
-                    motionEvents
-                        .slice()
-                        .reverse()
-                        .forEach(motionEvent => {
-                            if (!cameras[motionEvent.camera]) {
-                                cameras[motionEvent.camera] = 0;
-                            }
-                            if (cameras[motionEvent.camera] < this.config.numMotions) {
-                                newMotionEvents.push(motionEvent);
-                                cameras[motionEvent.camera] = cameras[motionEvent.camera] + 1;
-                            }
-                        });
-                    newMotionEvents.reverse();
-
-                    this.deleteOldMotionEvents(newMotionEvents);
-                    this.addMotionEvents(newMotionEvents, onReady);
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('getMotionEvents: Unifi Protect reported authorization failure');
-                    this.motionsDone = true;
-                    this.renewToken(true);
-                } else {
-                    this.motionsDone = true;
-                    this.log.error(`Status Code: ${res.statusCode}`);
-                }
-            });
-        });
-
-        req.on('error', e => {
-            this.log.error(`getMotionEvents ${JSON.stringify(e)}`);
-            if (e['code'] == 'ECONNRESET') {
-                this.renewToken(true);
-            }
-            this.motionsDone = true;
-        });
-        req.end();
-    }
-
-    async getThumbnail(thumb, path, callback, retries = 5, width = 640, visCompatible = false, base64 = false) {
-        const height = width / 1.8;
-        const that = this;
-
-        const options = {
-            hostname: this.config.protectip,
-            port: this.config.protectport,
-            path: '',
-            method: 'GET',
-            rejectUnauthorized: false,
-            headers: {},
-        };
-
-        if (this.isUnifiOS) {
-            options.headers = {
-                'X-CSRF-Token': this.csrfToken,
-                Cookie: this.cookies,
-            };
-            if (thumb.startsWith('e-')) {
-                options.path = `${this.paths.thumbUnifiOS}${thumb}?h=${height}&w=${width}`;
-            } else {
-                options.path = this.paths.thumbSmallUnifiOS.replace('{0}', thumb);
-            }
-        } else {
-            options.headers = {
-                Authorization: `Bearer ${this.apiAuthBearerToken}`,
-            };
-            const apiAccessKey = await this.getApiAccessKey();
-            options.path = `${this.paths.thumb}${thumb}?accessKey=${apiAccessKey}&h=${height}&w=${width}`;
-        }
-
-        const req = https.request(options, res => {
-            const data = new Stream();
-            res.on('data', d => {
-                data.push(d);
-            });
-            res.on('end', () => {
-                if (res.statusCode == 200) {
-                    if (visCompatible) {
-                        this.writeFile('vis.0', path, data.read(), function () {
-                            that.log.debug(`[getThumbnail] thumb stored successfully -> /vis.0${path}`);
-                            callback(path);
-                        });
-                    } else {
-                        if (base64) {
-                            const jpgDataUrlPrefix = `data:${res.headers['content-type']};base64,`;
-                            const imageBuffer = Buffer.from(data.read());
-                            const imageBase64 = imageBuffer.toString('base64');
-                            const base64ImgString = jpgDataUrlPrefix + imageBase64;
-
-                            callback(base64ImgString);
                         } else {
-                            fs.writeFileSync(path, data.read());
-                            that.log.debug(`[getThumbnail] thumb stored successfully -> ${path}`);
-                            callback(path);
+                            this.setState(
+                                `Diagnosis${ObjTowerString}.BalancingTwo`,
+                                towerAttributes[t].balancing ? towerAttributes[t].balancing : '',
+                                true,
+                            );
+                            this.setState(
+                                `Diagnosis${ObjTowerString}.BalancingCountTwo`,
+                                towerAttributes[t].balancingcount,
+                                true,
+                            );
                         }
-                    }
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('getThumbnail: Unifi Protect reported authorization failure');
-                    this.renewToken(true);
-                    if (retries > 0) {
-                        setTimeout(() => {
-                            this.getThumbnail(thumb, path, callback, retries - 1, width, visCompatible, base64);
-                        }, 1000);
-                    } else {
-                        that.log.debug(`[getThumbnail] max. retries reached for ${thumb}`);
-                        callback(null);
-                    }
-                } else {
-                    if (!visCompatible) {
-                        if (res.statusCode !== 404) {
-                            this.log.error(`[getThumbnail]: Status Code: ${res.statusCode}`);
+                        /*
+                        if (towerAttributes[t].balancing)          this.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,     towerAttributes[t].balancing_one, true);
+                        if (towerAttributes[t].balancingcount_one)  this.setState(`Diagnosis` + ObjTowerString + `.BalancingOne`,     towerAttributes[t].balancing_one, true);
+                        this.setState(`Diagnosis` + ObjTowerString + `.BalancingTwo`,     towerAttributes[t].balancing_two ?      towerAttributes[t].balancing_two : "", true);
+                        this.setState(`Diagnosis` + ObjTowerString + `.BalancingCountTwo`, towerAttributes[t].balancingcount_two ? towerAttributes[t].balancingcount_two : 0, true );
+    */
+                        for (let i = 1; i <= hvsNumCells; i++) {
+                            this.setState(
+                                `CellDetails${ObjTowerString}.CellVolt${this.pad(i, 3)}`,
+                                towerAttributes[t].hvsBatteryVoltsperCell[i]
+                                    ? towerAttributes[t].hvsBatteryVoltsperCell[i]
+                                    : 0,
+                                true,
+                            );
                         }
-                    } else {
-                        // if refresh interval is very low -> protect needs time to save the image -> supress error message
-                        if (res.statusCode !== 404) {
-                            this.log.error(`[getThumbnail]: Status Code: ${res.statusCode}`);
-                        }
-                    }
+                        const mVoltDefDeviation = this.calcDeviation(
+                            towerAttributes[t].hvsBatteryVoltsperCell.filter(v => v > 0),
+                        );
+                        const mVoltMean = this.calcAverage(
+                            towerAttributes[t].hvsBatteryVoltsperCell.filter(v => v > 0),
+                        );
+                        this.setState(`Diagnosis${ObjTowerString}.mVoltDefDeviation`, mVoltDefDeviation, true);
+                        this.setState(`Diagnosis${ObjTowerString}.mVoltMean`, mVoltMean, true);
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.mVoltGt150DefVar`,
+                            towerAttributes[t].hvsBatteryVoltsperCell.filter(
+                                v => v > mVoltMean + mVoltDefDeviation * 1.5,
+                            ).length,
+                            true,
+                        );
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.mVoltLt150DefVar`,
+                            towerAttributes[t].hvsBatteryVoltsperCell
+                                .filter(v => v > 0)
+                                .filter(v => v < mVoltMean - mVoltDefDeviation * 1.5).length,
+                            true,
+                        );
 
-                    if (retries > 0) {
-                        setTimeout(() => {
-                            this.getThumbnail(thumb, path, callback, retries - 1, width, visCompatible, base64);
-                        }, 1000);
+                        for (let i = 1; i <= hvsNumTemps; i++) {
+                            this.setState(
+                                `CellDetails${ObjTowerString}.CellTemp${this.pad(i, 3)}`,
+                                towerAttributes[t].hvsBatteryTempperCell[i]
+                                    ? towerAttributes[t].hvsBatteryTempperCell[i]
+                                    : 0,
+                                true,
+                            );
+                        }
+                        const tempDefDeviation = this.calcDeviation(
+                            towerAttributes[t].hvsBatteryTempperCell.filter(v => v > 0),
+                        );
+                        const tempMean = this.calcAverage(towerAttributes[t].hvsBatteryTempperCell.filter(v => v > 0));
+                        this.setState(`Diagnosis${ObjTowerString}.TempDefDeviation`, tempDefDeviation, true);
+                        this.setState(`Diagnosis${ObjTowerString}.TempMean`, tempMean, true);
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.TempGt150DefVar`,
+                            towerAttributes[t].hvsBatteryTempperCell.filter(v => v > tempMean + tempDefDeviation * 1.5)
+                                .length,
+                            true,
+                        );
+                        this.setState(
+                            `Diagnosis${ObjTowerString}.TempLt150DefVar`,
+                            towerAttributes[t].hvsBatteryTempperCell
+                                .filter(v => v > 0)
+                                .filter(v => v < tempMean - tempDefDeviation * 1.5).length,
+                            true,
+                        );
+
+                        this.log.silly(`Tower_${t + 1} hvsMaxmVolt     >${towerAttributes[t].hvsMaxmVolt}<`);
+                        this.log.silly(`Tower_${t + 1} hvsMinmVolt     >${towerAttributes[t].hvsMinmVolt}<`);
+                        this.log.silly(`Tower_${t + 1} hvsMaxmVoltCell >${towerAttributes[t].hvsMaxmVoltCell}<`);
+                        this.log.silly(`Tower_${t + 1} hvsMinmVoltCell >${towerAttributes[t].hvsMinmVoltCell}<`);
+                        this.log.silly(`Tower_${t + 1} hvsMaxTempCell  >${towerAttributes[t].hvsMaxTempCell}<`);
+                        this.log.silly(`Tower_${t + 1} hvsMinTempCell  >${towerAttributes[t].hvsMinTempCell}<`);
+                        this.log.silly(`Tower_${t + 1} hvsSOC (Diag)   >${towerAttributes[t].hvsSOCDiagnosis}<`);
+                    }
+                } catch (err) {
+                    if (err instanceof Error) {
+                        this.log.error(`Cant read in Tower ${t} with ${err.message}`);
                     } else {
-                        that.log.debug(`[getThumbnail] max. retries reached for ${thumb}`);
-                        callback(null);
+                        this.log.error(`Cant read in Tower ${t} with unknown error`);
                     }
                 }
-            });
-        });
-
-        req.on('error', e => {
-            this.log.error(`getThumbnail ${JSON.stringify(e)}`);
-            if (e['code'] == 'ECONNRESET') {
-                this.renewToken(true);
             }
-        });
-        req.end();
-    }
-
-    async getSnapshot(camera, path, callback, width = 640, visCompatible = false, base64 = false) {
-        const ts = Date.now() * 1000;
-        const height = width / 1.8;
-        const that = this;
-
-        const options = {
-            hostname: this.config.protectip,
-            port: this.config.protectport,
-            path: '',
-            method: 'GET',
-            rejectUnauthorized: false,
-            headers: {},
-        };
-
-        if (this.isUnifiOS) {
-            options.headers = {
-                'X-CSRF-Token': this.csrfToken,
-                Cookie: this.cookies,
-            };
-            options.path = `/proxy/protect/api/cameras/${camera}/snapshot?ts=${ts}&h=${height}&w=${width}`;
-        } else {
-            options.headers = {
-                Authorization: `Bearer ${this.apiAuthBearerToken}`,
-            };
-            const apiAccessKey = await this.getApiAccessKey();
-            options.path = `/api/cameras/${camera}/snapshot?accessKey=${apiAccessKey}&ts=${ts}`;
         }
+    }
 
-        const req = https.request(options, res => {
-            const data = new Stream();
-            res.on('data', d => {
-                data.push(d);
-            });
-            res.on('end', () => {
-                if (res.statusCode == 200) {
-                    if (visCompatible) {
-                        this.writeFile('vis.0', path, data.read(), function () {
-                            that.log.debug(`[getSnapshot] thumb stored successfully -> /vis.0${path}`);
-                            callback(path);
-                        });
-                    } else {
-                        if (base64) {
-                            const jpgDataUrlPrefix = 'data:image/png;base64,';
-                            const imageBuffer = Buffer.from(data.read());
-                            const imageBase64 = imageBuffer.toString('base64');
-                            const base64ImgString = jpgDataUrlPrefix + imageBase64;
+    startQuery() {
+        //erster Start sofort (500ms), dann entsprechend der Config - dann muss man nicht beim Entwickeln warten bis der erste Timer durch ist.
+        _firstRun = true;
 
-                            callback(base64ImgString);
-                        } else {
-                            fs.writeFileSync(path, data.read());
-                            that.log.debug(`[getSnapshot] thumb stored successfully -> ${path}`);
-                            callback(path);
+        const runPoll = () => this.pollQuery();
+
+        // Start direkt nach 500ms
+        setTimeout(runPoll, 500);
+
+        // Danach zyklisch gemäß Konfiguration
+        idInterval1 = setInterval(runPoll, confBatPollTime * 1000);
+        this.log.info(`gestartet pollTime :${confBatPollTime} intervalId :${idInterval1}`);
+    }
+
+    async setupIPClientHandlers() {
+        const waitTime = 8000;
+        const timeout = 2000;
+
+        this.log.debug('Starte Datenabfrage via TCP-Client...');
+
+        return new Promise(resolve => {
+            const cleanup = () => {
+                this.log.debug('Schließe Socket-Verbindung und setze State zurück');
+                socket.destroy();
+                myState = 0;
+            };
+
+            const sendRequest = (requestIndex, nextState, delay = 200) => {
+                return new Promise(res => {
+                    setTimeout(() => {
+                        this.log.debug(`→ Sende Request [${requestIndex}] und wechsle in State ${nextState}`);
+                        myState = nextState;
+                        socket.write(myRequests[requestIndex]);
+                        res();
+                    }, delay);
+                });
+            };
+
+            const waitForData = () => {
+                return new Promise((res, rej) => {
+                    socket.once('data', data => {
+                        this.log.debug(`← Daten empfangen (Länge: ${data.length}) in State ${myState}`);
+                        res(data);
+                    });
+                    socket.once('timeout', () => rej(new Error('Socket Timeout')));
+                    socket.once('error', err => rej(err));
+                });
+            };
+
+            socket.setTimeout(timeout);
+
+            try {
+                socket.connect(8080, this.config.ConfIPAdress, async () => {
+                    this.log.debug(`Socket verbunden mit ${this.config.ConfIPAdress}:8080`);
+                    try {
+                        myState = 2;
+                        await sendRequest(0, 2);
+
+                        while (true) {
+                            const data = await waitForData();
+
+                            if (!this.checkPacket(data)) {
+                                this.log.warn(`⚠️ Ungültiges Paket empfangen in State ${myState}`);
+                                this.setStateChanged('info.connection', { val: false, ack: true });
+                                cleanup();
+                                return resolve(false);
+                            }
+
+                            this.setStateChanged('info.connection', { val: true, ack: true });
+
+                            switch (myState) {
+                                case 2:
+                                    this.log.debug('➡️ State 2: Verarbeite Paket 0');
+                                    this.decodePacket0(data);
+                                    socket.setTimeout(timeout);
+                                    await sendRequest(1, 3);
+                                    break;
+
+                                case 3:
+                                    this.log.debug('➡️ State 3: Verarbeite Paket 1');
+                                    this.decodePacket1(data);
+                                    socket.setTimeout(timeout);
+                                    await sendRequest(2, 4);
+                                    break;
+
+                                case 4:
+                                    this.log.debug('➡️ State 4: Verarbeite Paket 2');
+                                    this.decodePacket2(data);
+                                    if (myNumberforDetails < ConfBatDetailshowoften || !ConfBatDetails) {
+                                        this.log.debug('⚡ Details nicht notwendig – beende Zyklus');
+                                        this.setStates();
+                                        cleanup();
+                                        return resolve(true);
+                                    }
+                                    myNumberforDetails = 0;
+                                    socket.setTimeout(timeout);
+                                    await sendRequest(3, 5);
+                                    break;
+
+                                case 5:
+                                    this.log.debug('➡️ State 5: NOP + Wartezeit');
+                                    this.decodePacketNOP(data);
+                                    socket.setTimeout(waitTime + timeout);
+                                    await new Promise(res => setTimeout(res, waitTime));
+                                    await sendRequest(4, 6, 0);
+                                    break;
+
+                                case 6:
+                                    this.log.debug('➡️ State 6: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(5, 7);
+                                    break;
+
+                                case 7:
+                                    this.log.debug('➡️ State 7: Paket 5');
+                                    this.decodePacket5(data);
+                                    await sendRequest(6, 8);
+                                    break;
+
+                                case 8:
+                                    this.log.debug('➡️ State 8: Paket 6');
+                                    this.decodePacket6(data);
+                                    await sendRequest(7, 9);
+                                    break;
+
+                                case 9:
+                                    this.log.debug('➡️ State 9: Paket 7');
+                                    this.decodePacket7(data);
+                                    await sendRequest(8, 10);
+                                    break;
+
+                                case 10:
+                                    this.log.debug('➡️ State 10: Paket 8');
+                                    this.decodePacket8(data);
+                                    if (hvsNumCells > 128) {
+                                        this.log.debug('Mehr als 128 Zellen erkannt → sende weiteres Paket');
+                                        await sendRequest(9, 11);
+                                    } else if (ConfBydTowerCount > 1) {
+                                        this.log.debug('Mehrere Tower erkannt → Wechsel zu State 16');
+                                        await sendRequest(16, 16);
+                                    } else {
+                                        this.log.debug('Alle Daten empfangen, beende...');
+                                        this.setStates();
+                                        cleanup();
+                                        return resolve(true);
+                                    }
+                                    break;
+
+                                case 11:
+                                    this.log.debug('➡️ State 11: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(10, 12);
+                                    break;
+
+                                case 12:
+                                    this.log.debug('➡️ State 12: NOP + Wartezeit');
+                                    this.decodePacketNOP(data);
+                                    socket.setTimeout(8000);
+                                    await new Promise(res => setTimeout(res, 3000));
+                                    await sendRequest(11, 13, 0);
+                                    break;
+
+                                case 13:
+                                    this.log.debug('➡️ State 13: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(12, 14);
+                                    break;
+
+                                case 14:
+                                    this.log.debug('➡️ State 14: Response12');
+                                    this.decodeResponse12(data);
+                                    await sendRequest(13, 15);
+                                    break;
+
+                                case 15:
+                                    this.log.debug('➡️ State 15: Response13');
+                                    this.decodeResponse13(data);
+                                    if (ConfBydTowerCount > 1) {
+                                        await sendRequest(16, 16);
+                                    } else {
+                                        this.log.debug('Beende nach Response13');
+                                        this.setStates();
+                                        cleanup();
+                                        return resolve(true);
+                                    }
+                                    break;
+
+                                case 16:
+                                    this.log.debug('➡️ State 16: Zweiter Tower – NOP + Wartezeit');
+                                    this.decodePacketNOP(data);
+                                    socket.setTimeout(waitTime + timeout);
+                                    await new Promise(res => setTimeout(res, waitTime));
+                                    await sendRequest(4, 17, 0);
+                                    break;
+
+                                case 17:
+                                    this.log.debug('➡️ State 17: NOP');
+                                    this.decodePacketNOP(data);
+                                    await sendRequest(5, 18);
+                                    break;
+
+                                case 18:
+                                    this.log.debug('➡️ State 18: Paket 5 (Tower 2)');
+                                    this.decodePacket5(data, 1);
+                                    await sendRequest(6, 19);
+                                    break;
+
+                                case 19:
+                                    this.log.debug('➡️ State 19: Paket 6 (Tower 2)');
+                                    this.decodePacket6(data, 1);
+                                    await sendRequest(7, 20);
+                                    break;
+
+                                case 20:
+                                    this.log.debug('➡️ State 20: Paket 7 (Tower 2)');
+                                    this.decodePacket7(data, 1);
+                                    await sendRequest(8, 22);
+                                    break;
+
+                                case 22:
+                                    this.log.debug('➡️ State 22: Paket 8 (Tower 2)');
+                                    this.decodePacket8(data, 1);
+                                    this.log.debug('✅ Alle Daten erfolgreich verarbeitet');
+                                    this.setStates();
+                                    cleanup();
+                                    return resolve(true);
+
+                                default:
+                                    this.log.warn(`❓ Unerwarteter Zustand: ${myState}`);
+                                    cleanup();
+                                    return resolve(false);
+                            }
                         }
+                    } catch (err) {
+                        this.log.error(`❌ Fehler im Ablauf: ${err.message}`);
+                        this.log.debug(err.stack);
+                        this.setStateChanged('info.connection', { val: false, ack: true });
+                        cleanup();
+                        return resolve(false);
                     }
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('[getSnapshot]: Unifi Protect reported authorization failure');
-                    this.renewToken(true);
-                } else {
-                    this.log.error(`[getSnapshot] Status Code: ${res.statusCode}`);
-                }
-            });
-        });
-
-        req.on('error', e => {
-            this.log.error(`[getSnapshot] ${JSON.stringify(e)}`);
-            if (e['code'] == 'ECONNRESET') {
-                this.renewToken(true);
+                });
+            } catch (err) {
+                this.log.error(`❌ Socket konnte nicht verbunden werden: ${err.message}`);
+                this.log.debug(err.stack);
+                this.setStateChanged('info.connection', { val: false, ack: true });
+                cleanup();
+                return resolve(false);
             }
         });
-        req.end();
     }
 
-    async getSnapshotFromCam(ip, path, callback, visCompatible = false) {
-        const that = this;
-
-        const options = {
-            hostname: ip,
-            path: '/snap.jpeg',
-            method: 'GET',
-            rejectUnauthorized: false,
-            headers: {},
-        };
-
-        const req = https.request(options, res => {
-            const data = new Stream();
-            res.on('data', d => {
-                data.push(d);
-            });
-            res.on('end', () => {
-                if (res.statusCode == 200) {
-                    if (visCompatible) {
-                        this.writeFile('vis.0', path, data.read(), function () {
-                            that.log.debug(`[getSnapshotFromCam] thumb stored successfully -> /vis.0${path}`);
-                            callback(path);
-                        });
-                    } else {
-                        fs.writeFileSync(path, data.read());
-                        that.log.debug(`[getSnapshotFromCam] thumb stored successfully -> ${path}`);
-                        callback(path);
-                    }
-                } else if (res.statusCode == 401 || res.statusCode == 403) {
-                    this.log.error('[getSnapshotFromCam]: Unifi Protect reported authorization failure');
-                    this.renewToken(true);
-                } else {
-                    this.log.error(`[getSnapshotFromCam] Status Code: ${res.statusCode}`);
-                }
-            });
-        });
-
-        req.end();
-    }
-
-    changeSetting(state, val) {
-        const found = state.match(/cameras\.(?<cameraid>[a-z0-9]+)\.(?<parent>[a-z]+)\.(?<setting>[a-z]+)/i);
-        const found_root = state.match(/cameras\.(?<cameraid>[a-z0-9]+)\.(?<setting>[a-z]+)$/i);
-        let parent = '';
-        let setting = '';
-        let cameraid = '';
-        let data = '';
-
-        if (found != null && found.groups !== undefined) {
-            parent = found.groups.parent;
-            setting = found.groups.setting;
-            cameraid = found.groups.cameraid;
-            data = JSON.stringify({
-                [parent]: {
-                    [setting]: val,
-                },
-            });
-        } else if (found_root != null && found_root.groups !== undefined) {
-            setting = found_root.groups.setting;
-            cameraid = found_root.groups.cameraid;
-            parent = cameraid;
-            data = JSON.stringify({
-                [setting]: val,
-            });
-        } else {
+    async pollQuery() {
+        if (myState > 0) {
             return;
         }
 
-        const options = {
-            hostname: this.config.protectip,
-            port: this.config.protectport,
-            path: (this.isUnifiOS ? this.paths.camerasUnifiOS : this.paths.cameras) + cameraid,
-            method: 'PATCH',
-            rejectUnauthorized: false,
-            resolveWithFullResponse: true,
-            headers: {},
-        };
+        // Prüfe und ggf. setze neues Poll-Intervall
+        if (ConfOverridePollInterval !== 0) {
+            const state = await this.getState('System.OverridePoll');
+            const newPollTime = state?.val ?? 60;
 
-        if (this.isUnifiOS) {
-            options.headers = {
-                'X-CSRF-Token': this.csrfToken,
-                Cookie: this.cookies,
-                'Content-Type': 'application/json; charset=utf-8',
-                'Content-Length': Buffer.byteLength(data, 'utf8'),
+            if (confBatPollTime !== newPollTime) {
+                confBatPollTime = newPollTime;
+                clearInterval(idInterval1);
+                idInterval1 = setInterval(() => this.startPoll(), confBatPollTime * 1000);
+                this.log.info(`Poll-Intervall aktualisiert: ${confBatPollTime}s, Interval-ID: ${idInterval1}`);
+            }
+        }
+
+        myState = 1;
+        myNumberforDetails++;
+
+        this.log.debug(`myNumberforDetails: ${myNumberforDetails}`);
+        this.log.debug(`Starte Polling an IP: ${this.config.ConfIPAdress}`);
+
+        // Tower-Attribute initialisieren
+        towerAttributes = Array.from({ length: ConfBydTowerCount }, (_, i) => {
+            this.log.debug(`Initialisiere Tower ${i}`);
+            return {
+                hvsBatteryVoltsperCell: [],
+                hvsBatteryTempperCell: [],
             };
-        } else {
-            options.headers = {
-                Authorization: `Bearer ${this.apiAuthBearerToken}`,
-                'Content-Type': 'application/json; charset=utf-8',
-                'Content-Length': Buffer.byteLength(data, 'utf8'),
-            };
-        }
-
-        const req = https.request(options, res => {
-            if (res.statusCode == 200) {
-                this.log.debug(`Camera setting ${parent}.${setting} set to ${val}`);
-            } else {
-                this.log.error(`Status Code: ${res.statusCode}`);
-            }
         });
 
-        req.on('error', e => {
-            this.log.error(`changeSetting ${JSON.stringify(e)}`);
-            if (e['code'] == 'ECONNRESET') {
-                this.renewToken(true);
-            }
-        });
-        req.write(data);
-        req.end();
+        const socketConnection = await this.setupIPClientHandlers();
+        await this.setStateAsync('info.socketConnection', socketConnection, true);
     }
 
-    processStateChanges(stateArray, that, callback) {
-        if (!stateArray || stateArray.length === 0) {
-            if (typeof callback === 'function') {
-                callback();
-            }
-
-            // clear the array
-            stateArray = [];
-        } else {
-            const newState = stateArray.shift();
-            that.getState(newState.name, function (err, oldState) {
-                if (oldState === null || newState.val != oldState.val) {
-                    that.setState(newState.name, { ack: true, val: newState.val }, function () {
-                        setTimeout(that.processStateChanges, 0, stateArray, that, callback);
-                    });
-                } else {
-                    setTimeout(that.processStateChanges, 0, stateArray, that, callback);
-                }
-            });
-        }
-    }
-
-    /**
-     * Function to create a state and set its value
-     * only if it hasn't been set to this value before
-     *
-     * @param name
-     * @param value
-     * @param desc
-     * @param stateArray
-     * @param statesFilter
-     * @param onReady
+    /*
+     * Calculate default deviation / Standardabweichung
      */
-    createOwnState(name, value, desc, stateArray, statesFilter, onReady) {
-        if (typeof desc === 'undefined') {
-            desc = name;
+    calcDeviation(array) {
+        if (!Array.isArray(array) || array.length === 0) {
+            return 0;
         }
 
-        if (Array.isArray(value) && typeof value[0] === 'object' && typeof value[0].id !== 'undefined') {
-            const channelName = name.split('.').slice(2).join('.');
+        const n = array.length;
+        const mean = array.reduce((sum, val) => sum + val, 0) / n;
+        const variance = array.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / (n > 1 ? n - 1 : 1);
 
-            if (statesFilter) {
-                const channelFilter = statesFilter.filter(x => x.includes(channelName));
+        return Math.sqrt(variance);
+    }
 
-                if (channelFilter.length > 0) {
-                    // this.log.debug(`creating channel '${channelName}'`);
-                    if (onReady) {
-                        this.createOwnChannel(name);
-                    }
-
-                    for (let i = 0; i < value.length; i++) {
-                        const id = value[i].id;
-                        Object.entries(value[i]).forEach(([key, val]) => {
-                            stateArray = this.createOwnState(
-                                `${name}.${id}.${key}`,
-                                val,
-                                key,
-                                stateArray,
-                                statesFilter,
-                                onReady,
-                            );
-                        });
-                    }
-                    return stateArray;
-                }
-                if (onReady) {
-                    this.delObject(name, { recursive: true });
-                }
-                return stateArray;
-            }
+    /*
+     * Calculate the average / mean
+     */
+    calcAverage(array) {
+        if (!Array.isArray(array) || array.length === 0) {
+            return 0;
         }
+        return array.reduce((a, b) => a + b, 0) / array.length;
+    }
 
-        if (typeof value === 'object' && value !== null) {
-            let channelName = name.split('.').slice(2).join('.');
-            const channelNameSplitted = channelName.split('.');
-
-            if (!isNaN(channelNameSplitted[1])) {
-                channelName = channelNameSplitted.filter(f => isNaN(f)).join('.');
-            }
-
-            if (statesFilter) {
-                const channelFilter = statesFilter.filter(x => x.includes(channelName));
-
-                if (channelFilter.length > 0) {
-                    // this.log.debug(`creating channel '${channelName}'`);
-                    if (onReady) {
-                        this.createOwnChannel(name);
-                    }
-                    Object.entries(value).forEach(([key, value]) => {
-                        stateArray = this.createOwnState(
-                            `${name}.${key}`,
-                            value,
-                            key,
-                            stateArray,
-                            statesFilter,
-                            onReady,
-                        );
-                    });
-                    return stateArray;
-                }
-                if (onReady) {
-                    this.delObject(name, { recursive: true });
-                }
-                return stateArray;
-            }
+    decodePacket2(data) {
+        if (this.config.ConfStoreRawMessages) {
+            this.setState('System.Raw_02', data.toString('hex'), true);
         }
-
-        // remove cam id and device
-        let idForFilter = name.split('.').slice(2).join('.');
-        const idForFilterSplitted = idForFilter.split('.');
-
-        if (!isNaN(idForFilterSplitted[1]) || !isNaN(idForFilterSplitted[2])) {
-            // if we have an array - number on pos 1, e.g. 'channels.0.bitrate' transform to 'channels.bitrate' for statesFilter
-            idForFilter = idForFilterSplitted.filter(f => isNaN(f)).join('.');
+        const byteArray = new Uint8Array(data);
+        hvsBattType = byteArray[5];
+        hvsInvType = byteArray[3];
+        hvsNumCells = 0;
+        hvsNumTemps = 0;
+        switch (hvsBattType) {
+            case 0: //HVL -> unknown specification, so 0 cells and 0 temps
+                //hvsNumCells = 0;
+                //hvsNumTemps = 0;
+                //see above, is default
+                break;
+            case 1: //HVM 16 Cells per module
+                hvsNumCells = hvsModules * 16;
+                hvsNumTemps = hvsModules * 8;
+                break;
+            //crosscheck
+            // 5 modules, 80 voltages, 40 temps
+            case 2: //HVS 32 cells per module
+                hvsNumCells = hvsModules * 32;
+                hvsNumTemps = hvsModules * 12;
+                break;
+            //crosscheck:
+            //Counts from real data:
+            //mine: 2 modules, 64 voltages, 24 temps
+            //4 modules, 128 voltages, 48 temps
         }
-
-        // filter states
-        if (
-            statesFilter &&
-            (statesFilter.includes(idForFilter) ||
-                (name.includes('cameras') &&
-                    name.includes('lastMotionEvent') &&
-                    this.config.statesFilter['cameras'].includes(idForFilter))) // lastMotion -> also add to cameras
-        ) {
-            if (Array.isArray(value)) {
-                value = value.toString();
-            }
-
-            if (onReady) {
-                let write = false;
-                for (let i = 0; i < this.writeables.length; i++) {
-                    if (name.match(this.writeables[i])) {
-                        write = true;
-
-                        // only subscribe on writeable states on first run
-                        this.subscribeStates(name);
-
-                        continue;
-                    }
-                }
-
-                let common = {
-                    name: desc.toString(),
-                    type: typeof value,
-                    read: true,
-                    write: write,
-                };
-
-                if (name.match('recordingSettings.mode') != null) {
-                    common = {
-                        name: desc.toString(),
-                        type: typeof value,
-                        read: true,
-                        write: true,
-                        states: {
-                            always: 'always',
-                            never: 'never',
-                            detections: 'detections',
-                        },
-                    };
-                }
-
-                this.setObjectNotExists(name, {
-                    type: 'state',
-                    common: common,
-                    native: { id: name },
-                });
-            }
-
-            if (typeof value !== 'undefined') {
-                stateArray.push({ name: name, val: value });
-            }
+        //leider hässlich dazugestrickt, wollte in die andere Logik nicht eingreifen
+        if (hvsBattType_fromSerial == 'LVS') {
+            hvsBattType = 'LVS';
+            hvsNumCells = hvsModules * 7;
+            hvsNumTemps = 0;
+        }
+        if (hvsBattType_fromSerial == 'LVS') {
+            //unterschiedliche WR-Tabelle je nach Batt-Typ
+            hvsInvType_String = myINVsLVS[hvsInvType];
         } else {
-            if (onReady) {
-                this.delObject(name, function () {});
+            hvsInvType_String = myINVs[hvsInvType];
+        }
+        if (hvsInvType_String == undefined) {
+            hvsInvType_String = 'undefined';
+        }
+
+        if (hvsNumCells > 160) {
+            hvsNumCells = 160;
+        }
+        if (hvsNumTemps > 64) {
+            hvsNumTemps = 64;
+        }
+        if (ConfBatDetails && _firstRun) {
+            _firstRun = false;
+            this.setObjectsCells();
+        }
+        this.log.debug(`NumCells: ${hvsNumCells} Numtemps: ${hvsNumTemps} Modules: ${hvsModules}`);
+    }
+
+    setObjectsCells() {
+        //Diagnose-data only if necessary.
+        let myObjects = [];
+        let ObjTowerString = '';
+
+        for (let towerNumber = 0; towerNumber < ConfBydTowerCount; towerNumber++) {
+            if (ConfBydTowerCount > 1) {
+                ObjTowerString = `.Tower_${towerNumber + 1}`;
             }
-        }
+            myObjects = [
+                [
+                    `Diagnosis${ObjTowerString}.mVoltMax`,
+                    'state',
+                    'Max Cell Voltage (mv)',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    'mV',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.mVoltMin`,
+                    'state',
+                    'Min Cell Voltage (mv)',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    'mV',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.mVoltMaxCell`,
+                    'state',
+                    'Max Cell Volt (Cellnr)',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.mVoltMinCell`,
+                    'state',
+                    'Min Cell Volt (Cellnr)',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempMax`,
+                    'state',
+                    'Max Cell Temperature',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '°C',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempMin`,
+                    'state',
+                    'Min Cell Temperature',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '°C',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempMaxCell`,
+                    'state',
+                    'Max Cell Temp (Cellnr)',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempMinCell`,
+                    'state',
+                    'Min Cell Temp(Cellnr)',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '',
+                ],
 
-        return stateArray;
-    }
+                [
+                    `Diagnosis${ObjTowerString}.mVoltDefDeviation`,
+                    'state',
+                    'voltage std-dev of the cells',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    'mV',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempDefDeviation`,
+                    'state',
+                    'temperature std-dev of the cells',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '°C',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.mVoltMean`,
+                    'state',
+                    'mean voltage of the cells',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    'mV',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempMean`,
+                    'state',
+                    'mean temperature of the cells',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '°C',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.mVoltGt150DefVar`,
+                    'state',
+                    '#cells voltage above 150% std-dev',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.mVoltLt150DefVar`,
+                    'state',
+                    '#cells voltage below 150% std-dev',
+                    'number',
+                    'value.voltage',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempGt150DefVar`,
+                    'state',
+                    '#cells temperature above 150% std-dev',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.TempLt150DefVar`,
+                    'state',
+                    '#cells temperature below 150% std-dev',
+                    'number',
+                    'value.temperature',
+                    true,
+                    false,
+                    '',
+                ],
 
-    /**
-     * Function to create a channel
-     *
-     * @param name
-     * @param desc
-     */
-    createOwnChannel(name, desc) {
-        if (desc == null || typeof desc === 'undefined') {
-            desc = name;
-        }
+                [
+                    `Diagnosis${ObjTowerString}.ChargeTotal`,
+                    'state',
+                    'Total Charge in that tower',
+                    'number',
+                    'value.watt',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.DischargeTotal`,
+                    'state',
+                    'Total Discharge in that tower',
+                    'number',
+                    'value.watt',
+                    true,
+                    false,
+                    '',
+                ],
+                [`Diagnosis${ObjTowerString}.ETA`, 'state', 'ETA of that tower', 'number', 'value', true, false, ''],
+                [
+                    `Diagnosis${ObjTowerString}.BatteryVolt`,
+                    'state',
+                    'Voltage of that tower',
+                    'number',
+                    'value',
+                    true,
+                    false,
+                    '',
+                ],
+                [`Diagnosis${ObjTowerString}.OutVolt`, 'state', 'Output voltage', 'number', 'value', true, false, ''],
+                [
+                    `Diagnosis${ObjTowerString}.SOC`,
+                    'state',
+                    'SOC (Diagnosis)',
+                    'number',
+                    'value.battery',
+                    true,
+                    false,
+                    '%',
+                ],
 
-        this.setObjectNotExists(name, {
-            type: 'channel',
-            common: {
-                name: desc.toString(),
-            },
-            native: {},
-        });
-    }
+                [`Diagnosis${ObjTowerString}.SOH`, 'state', 'State of Health', 'number', 'value', true, false, ''],
+                [`Diagnosis${ObjTowerString}.State`, 'state', 'tower state', 'string', 'value', true, false, ''],
+                [
+                    `Diagnosis${ObjTowerString}.BalancingCells`,
+                    'state',
+                    'bitmask of balanced cells',
+                    'string',
+                    'value',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.BalancingCellsCount`,
+                    'state',
+                    'number of currently balanced cells',
+                    'number',
+                    'value',
+                    true,
+                    false,
+                    '',
+                ],
+                [`Diagnosis${ObjTowerString}.BalancingOne`, 'state', 'tower state', 'string', 'value', true, false, ''],
+                [`Diagnosis${ObjTowerString}.BalancingTwo`, 'state', 'tower state', 'string', 'value', true, false, ''],
+                [
+                    `Diagnosis${ObjTowerString}.BalancingCountOne`,
+                    'state',
+                    'tower state',
+                    'number',
+                    'value',
+                    true,
+                    false,
+                    '',
+                ],
+                [
+                    `Diagnosis${ObjTowerString}.BalancingCountTwo`,
+                    'state',
+                    'tower state',
+                    'number',
+                    'value',
+                    true,
+                    false,
+                    '',
+                ],
+            ];
 
-    /**
-     * Function to create a device
-     *
-     * @param name
-     * @param desc
-     */
-    createOwnDevice(name, desc) {
-        if (typeof desc === 'undefined') {
-            desc = name;
-        }
-
-        this.setObjectNotExists(name, {
-            type: 'device',
-            common: {
-                name: desc.toString(),
-            },
-            native: {},
-        });
-    }
-
-    async createCameraRealTimeStates(cameraId) {
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents`, {
-            type: 'channel',
-            common: {
-                name: 'realTimeEvents',
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.motion`, {
-            type: 'channel',
-            common: {
-                name: 'motion',
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.motion.timestamp`, {
-            type: 'state',
-            common: {
-                name: 'timestamp',
-                type: 'number',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.motion.raw`, {
-            type: 'state',
-            common: {
-                name: 'raw',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.motion.snapshot`, {
-            type: 'state',
-            common: {
-                name: 'snapshotUrl',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect`, {
-            type: 'channel',
-            common: {
-                name: 'smartDetect',
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.eventId`, {
-            type: 'state',
-            common: {
-                name: 'eventId',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.raw`, {
-            type: 'state',
-            common: {
-                name: 'raw',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.score`, {
-            type: 'state',
-            common: {
-                name: 'score',
-                type: 'number',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.detectTypes`, {
-            type: 'state',
-            common: {
-                name: 'detectTypes',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.timestamp`, {
-            type: 'state',
-            common: {
-                name: 'timestamp',
-                type: 'number',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.snapshot`, {
-            type: 'state',
-            common: {
-                name: 'snapshotUrl',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.thumbnail`, {
-            type: 'state',
-            common: {
-                name: 'snapshotUrl',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-        await this.setObjectNotExistsAsync(`cameras.${cameraId}.realTimeEvents.smartDetect.thumbnail_small`, {
-            type: 'state',
-            common: {
-                name: 'snapshotUrl',
-                type: 'string',
-                role: 'value',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-    }
-
-    addMotionEvents(motionEvents, onReady) {
-        try {
-            let stateArray = [];
-            const that = this;
-            const debounce = 300;
-
-            motionEvents.forEach(async motionEvent => {
-                if (onReady) {
-                    that.createOwnChannel(`motions.${motionEvent.id}`, motionEvent.score);
-                }
-
-                Object.entries(motionEvent).forEach(([key, value]) => {
-                    if (that.config.getMotions) {
-                        stateArray = that.createOwnState(
-                            `motions.${motionEvent.id}.${key}`,
-                            value,
-                            key,
-                            stateArray,
-                            that.config.statesFilter['motions'],
-                            true,
-                        );
-                    }
-                });
-
-                const counter = motionEvents.indexOf(motionEvent) + 1;
-
-                that.setTimeout(function () {
-                    that.getThumbnailBase64(
-                        `motions.${motionEvent.id}.thumbnail_image`,
-                        motionEvent.thumbnail,
-                        false,
-                        function () {
-                            // thumbnail small is only ready when thumbnail is ready
-                            that.getThumbnailBase64(
-                                `motions.${motionEvent.id}.thumbnail_image_small`,
-                                motionEvent.id,
-                                false,
-                                undefined,
-                            );
-                        },
-                    );
-                }, counter * debounce);
-
-                that.addMotionEventsCameraName(`motions.${motionEvent.id}.camera_name`, motionEvent.camera);
-            });
-            if (motionEvents.length > 0) {
-                Object.entries(motionEvents[motionEvents.length - 1]).forEach(([key, value]) => {
-                    stateArray = that.createOwnState(
-                        `motions.lastMotion.${key}`,
-                        value,
-                        key,
-                        stateArray,
-                        that.config.statesFilter['motions'],
-                        true,
-                    );
-                });
-
-                if (that.config.downloadLastMotionThumb) {
-                    that.getState(`motions.lastMotion.thumbnail_image`, function (err, thumbState) {
-                        if (thumbState && thumbState.val && thumbState.lc) {
-                            if (
-                                thumbState.lc < motionEvents[motionEvents.length - 1].end ||
-                                thumbState.lc < motionEvents[motionEvents.length - 1].timestamp ||
-                                onReady
-                            ) {
-                                that.getThumbnailBase64(
-                                    `motions.lastMotion.thumbnail_image`,
-                                    motionEvents[motionEvents.length - 1].thumbnail,
-                                    true,
-                                    function () {
-                                        // thumbnail small is only ready when thumbnail is ready
-                                        that.getThumbnailBase64(
-                                            `motions.lastMotion.thumbnail_image_small`,
-                                            motionEvents[motionEvents.length - 1].id,
-                                            true,
-                                            undefined,
-                                        );
-                                    },
-                                );
-                            } else {
-                                that.getState(`motions.lastMotion.end`, function (err, endState) {
-                                    if (endState && endState.val && endState.lc) {
-                                        if (
-                                            thumbState.ts < endState.lc ||
-                                            thumbState.ts < motionEvents[motionEvents.length - 1].timestamp
-                                        ) {
-                                            that.getThumbnailBase64(
-                                                `motions.lastMotion.thumbnail_image`,
-                                                motionEvents[motionEvents.length - 1].thumbnail,
-                                                true,
-                                                function () {
-                                                    // thumbnail small is only ready when thumbnail is ready
-                                                    that.getThumbnailBase64(
-                                                        `motions.lastMotion.thumbnail_image_small`,
-                                                        motionEvents[motionEvents.length - 1].id,
-                                                        true,
-                                                        undefined,
-                                                    );
-                                                },
-                                            );
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            that.getThumbnailBase64(
-                                `motions.lastMotion.thumbnail_image`,
-                                motionEvents[motionEvents.length - 1].thumbnail,
-                                true,
-                                function () {
-                                    // thumbnail small is only ready when thumbnail is ready
-                                    that.getThumbnailBase64(
-                                        `motions.lastMotion.thumbnail_image_small`,
-                                        motionEvents[motionEvents.length - 1].id,
-                                        true,
-                                        undefined,
-                                    );
-                                },
-                            );
-                        }
-                    });
-                }
-
-                that.addMotionEventsCameraName(
-                    'motions.lastMotion.camera_name',
-                    motionEvents[motionEvents.length - 1].camera,
-                );
-            }
-
-            that.processStateChanges(stateArray, that, () => {
-                that.motionsDone = true;
-            });
-        } catch (error) {
-            this.log.error(`[addMotionEvents] error: ${error.message}, stack: ${error.stack}`);
-        }
-    }
-
-    addMotionEventsCameraName(stateId, cameraId) {
-        const that = this;
-
-        this.getState(`cameras.${cameraId}.name`, function (error, cameraName) {
-            if (cameraName && cameraName.val) {
-                that.setObjectNotExists(
-                    stateId,
-                    {
-                        type: 'state',
-                        common: {
-                            name: 'camera name',
-                            type: 'string',
-                            read: true,
-                            write: false,
-                            role: 'value',
-                        },
-                        native: {},
-                    },
-                    function () {
-                        that.setState(stateId, cameraName, true);
-                    },
-                );
-            }
-        });
-    }
-
-    getThumbnailBase64(stateId, eventId, force, callback) {
-        try {
-            const that = this;
-
-            this.setObjectNotExists(
-                stateId,
-                {
-                    type: 'state',
+            for (let i = 0; i < myObjects.length; i++) {
+                this.setObjectNotExists(myObjects[i][0], {
+                    type: myObjects[i][1],
                     common: {
-                        name: 'motion small thumbnail image',
-                        type: 'string',
-                        read: true,
-                        write: false,
-                        role: 'value',
+                        name: myObjects[i][2],
+                        type: myObjects[i][3],
+                        role: myObjects[i][4],
+                        read: myObjects[i][5],
+                        write: myObjects[i][6],
+                        unit: myObjects[i][7],
                     },
                     native: {},
-                },
-                function () {
-                    that.getState(stateId, function (err, state) {
-                        if (force || !state || state === null || (state && (!state.val || state.val === null))) {
-                            that.log.debug(
-                                `[getThumbnailBase64] download ${eventId.startsWith('e-') ? 'thumbnail' : 'small thumbnail'} for event '${eventId}' (stateId: '${stateId}')`,
-                            );
+                });
+            }
+            for (let i = 0; i < myObjects.length; i++) {
+                //console.log("****extend " + i + " " + myObjects[i][0] + " " + myObjects[i][7]);
+                this.checkandrepairUnit(myObjects[i][0], myObjects[i][7], myObjects[i][5], myObjects[i][2]);
+            }
 
-                            that.getThumbnail(
-                                eventId,
-                                undefined,
-                                function (base64ImgString) {
-                                    const result = base64ImgString;
+            for (let i = 1; i <= hvsNumCells; i++) {
+                this.setObjectNotExists(`CellDetails${ObjTowerString}.CellVolt${this.pad(i, 3)}`, {
+                    type: 'state',
+                    common: {
+                        name: `Voltage Cell: ${this.pad(i, 3)}`,
+                        type: 'number',
+                        role: 'value.voltage',
+                        read: true,
+                        write: false,
+                        unit: 'mV',
+                    },
+                    native: {},
+                });
+                this.checkandrepairUnit(
+                    `CellDetails${ObjTowerString}.CellVolt${this.pad(i, 3)}`,
+                    'mV',
+                    'value.voltage',
+                ); //repair forgotten units in first version
 
-                                    that.log.silly(
-                                        `[getThumbnailBase64] ${eventId.startsWith('e-') ? 'thumbnail' : 'small thumbnail'} downloaded for event '${eventId}' (stateId: '${stateId}')`,
-                                    );
-                                    that.setState(stateId, result, true);
-
-                                    if (callback) {
-                                        callback(result);
-                                    }
-                                },
-                                60,
-                                that.config.downloadLastMotionThumbWidth || 640,
-                                false,
-                                true,
-                            );
-                        } else {
-                            that.log.silly(
-                                `[getThumbnailBase64] eventId: ${eventId}: ${eventId.startsWith('e-') ? 'thumbnail' : 'small thumbnail'} still downloaded for '${stateId}'`,
-                            );
-                        }
+                for (let i = 1; i <= hvsNumTemps; i++) {
+                    this.setObjectNotExists(`CellDetails${ObjTowerString}.CellTemp${this.pad(i, 3)}`, {
+                        type: 'state',
+                        common: {
+                            name: `Temp Cell: ${this.pad(i, 3)}`,
+                            type: 'number',
+                            role: 'value.temperature',
+                            read: true,
+                            write: false,
+                            unit: '°C',
+                        },
+                        native: {},
                     });
-                },
-            );
-        } catch (error) {
-            this.log.error(
-                `[getThumbnailBase64] stateId: ${stateId}, eventId: ${eventId}, error: ${error.message}, stack: ${error.stack}`,
-            );
+                    this.checkandrepairUnit(
+                        `CellDetails${ObjTowerString}.CellTemp${this.pad(i, 3)}`,
+                        '°C',
+                        'value.temperature',
+                    ); //repair forgotten units in first version
+                }
+            }
         }
     }
 
-    deleteOldMotionEvents(motionEvents) {
-        const that = this;
-        that.getStatesOf('motions', function (err, states) {
-            if (states !== undefined) {
-                states.forEach(state => {
-                    const found = state._id.match(/motions\.(?<motionid>[a-z0-9]+)(\.[a-z0-9_]*)*$/i);
+    decodePacket5(data, towerNumber = 0) {
+        const byteArray = new Uint8Array(data);
+        towerAttributes[towerNumber].hvsMaxmVolt = this.buf2int16SI(byteArray, 5);
+        towerAttributes[towerNumber].hvsMinmVolt = this.buf2int16SI(byteArray, 7);
+        towerAttributes[towerNumber].hvsMaxmVoltCell = byteArray[9];
+        towerAttributes[towerNumber].hvsMinmVoltCell = byteArray[10];
+        towerAttributes[towerNumber].hvsMaxmTemp = this.buf2int16SI(byteArray, 11);
+        towerAttributes[towerNumber].hvsMinmTemp = this.buf2int16SI(byteArray, 13);
+        towerAttributes[towerNumber].hvsMaxTempCell = byteArray[15];
+        towerAttributes[towerNumber].hvsMinTempCell = byteArray[16];
 
-                    if (found != null && found.groups !== undefined) {
-                        let isincur = false;
-                        for (let i = 0; i < motionEvents.length; i++) {
-                            if (motionEvents[i].id == found.groups.motionid) {
-                                isincur = true;
-                            }
-                        }
-                        if (!isincur && found.groups.motionid != 'lastMotion') {
-                            that.delForeignObject(state._id, {
-                                recursive: true,
-                            });
-                        }
-                    }
-                });
-            }
-        });
-        that.getChannelsOf('motions', function (err, channels) {
-            if (channels !== undefined) {
-                channels.forEach(channel => {
-                    const found = channel._id.match(/motions\.(?<motionid>[a-z0-9]+)(\.[a-z0-9_]*)*$/i);
-                    if (found != null && found.groups !== undefined) {
-                        let isincur = false;
-                        for (let i = 0; i < motionEvents.length; i++) {
-                            if (motionEvents[i].id == found.groups.motionid) {
-                                isincur = true;
-                            }
-                        }
-                        if (!isincur && found.groups.motionid != 'lastMotion') {
-                            that.delForeignObject(channel._id, {
-                                recursive: true,
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    extractCsrfTokenFromCookie(cookie) {
-        if (cookie !== '') {
-            const cookie_bits = cookie.split('=');
-            let jwt = '';
-
-            const typeCookie_bits = typeof cookie_bits[1];
-
-            if (typeCookie_bits == undefined) {
-                return false;
-            }
-
-            jwt = cookie_bits[1];
-
-            const jwt_components = jwt.split('.');
-            let jwt_payload = '';
-
-            const typeJwt_components_bits = jwt_components[1];
-            if (typeJwt_components_bits == undefined) {
-                return false;
-            }
-            jwt_payload = jwt_components[1];
-
-            return JSON.parse(Buffer.from(jwt_payload, 'base64').toString()).csrfToken;
+        //starting with byte 101, ending with 131, Cell voltage 1-16
+        const MaxCells = 16;
+        for (let i = 0; i < MaxCells; i++) {
+            this.log.silly(`Battery Voltage-${this.pad(i + 1, 3)} :${this.buf2int16SI(byteArray, i * 2 + 101)}`);
+            towerAttributes[towerNumber].hvsBatteryVoltsperCell[i + 1] = this.buf2int16SI(byteArray, i * 2 + 101);
         }
 
-        return false;
+        // Balancing Flags
+        // 17 bis 32
+        towerAttributes[towerNumber].balancing = data.slice(17, 33).toString('hex');
+        towerAttributes[towerNumber].balancingcount = this.countSetBits(data.slice(17, 33).toString('hex'));
+
+        towerAttributes[towerNumber].chargeTotal = this.buf2int32US(byteArray, 33);
+        towerAttributes[towerNumber].dischargeTotal = this.buf2int32US(byteArray, 37);
+        towerAttributes[towerNumber].eta =
+            towerAttributes[towerNumber].dischargeTotal / towerAttributes[towerNumber].chargeTotal;
+        towerAttributes[towerNumber].batteryVolt = this.buf2int16SI(byteArray, 45);
+        towerAttributes[towerNumber].outVolt = this.buf2int16SI(byteArray, 51);
+        towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat(
+            ((this.buf2int16SI(byteArray, 53) * 1.0) / 10.0).toFixed(1),
+        );
+        towerAttributes[towerNumber].soh = parseFloat((this.buf2int16SI(byteArray, 55) * 1.0).toFixed(1));
+        towerAttributes[towerNumber].state = byteArray[59].toString(16) + byteArray[60].toString(16);
     }
 
-    /**
-     * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-     * Using this method requires "common.message" property to be set to true in io-package.json
-     *
-     * @param {ioBroker.Message} obj
+    decodePacket6(data, towerNumber = 0) {
+        const byteArray = new Uint8Array(data);
+        // e.g. hvsNumCells = 80
+        // first Voltage in byte 5+6
+        // Count = 80-17 --> 63
+        let MaxCells = hvsNumCells - 16; //0 to n-1 is the same like 1 to n
+        if (MaxCells > 64) {
+            MaxCells = 64;
+        }
+        for (let i = 0; i < MaxCells; i++) {
+            this.log.silly(`Battery Voltage-${this.pad(i + 17, 3)} :${this.buf2int16SI(byteArray, i * 2 + 5)}`);
+            towerAttributes[towerNumber].hvsBatteryVoltsperCell[i + 17] = this.buf2int16SI(byteArray, i * 2 + 5);
+        }
+    }
+
+    decodePacket7(data, towerNumber = 0) {
+        const byteArray = new Uint8Array(data);
+        //starting with byte 5, ending 101, voltage for cell 81 to 128
+        //starting with byte 103, ending 132, temp for cell 1 to 30
+
+        // e.g. hvsNumCells = 128
+        // first Voltage in byte 5+6
+        // Count = 128-80 --> 48
+        let MaxCells = hvsNumCells - 80; //0 to n-1 is the same like 1 to n
+        if (MaxCells > 48) {
+            MaxCells = 48;
+        }
+        this.log.silly(`hvsModules =${hvsModules} maxCells= ${MaxCells}`);
+        for (let i = 0; i < MaxCells; i++) {
+            this.log.silly(`Battery Voltage-${this.pad(i + 81, 3)} :${this.buf2int16SI(byteArray, i * 2 + 5)}`);
+            towerAttributes[towerNumber].hvsBatteryVoltsperCell[i + 81] = this.buf2int16SI(byteArray, i * 2 + 5);
+        }
+
+        let MaxTemps = hvsNumTemps - 0; //0 to n-1 is the same like 1 to n
+        if (MaxTemps > 30) {
+            MaxTemps = 30;
+        }
+        this.log.silly(`hvsModules =${hvsModules} MaxTemps= ${MaxTemps}`);
+        for (let i = 0; i < MaxTemps; i++) {
+            this.log.silly(`Battery Temp ${this.pad(i + 1, 3)} :${byteArray[i + 103]}`);
+            towerAttributes[towerNumber].hvsBatteryTempperCell[i + 1] = byteArray[i + 103];
+        }
+    }
+
+    decodePacket8(data, towerNumber = 0) {
+        const byteArray = new Uint8Array(data);
+        let MaxTemps = hvsNumTemps - 30; //0 to n-1 is the same like 1 to n
+        if (MaxTemps > 34) {
+            MaxTemps = 34;
+        }
+        this.log.silly(`hvsModules =${hvsModules} MaxTemps= ${MaxTemps}`);
+        for (let i = 0; i < MaxTemps; i++) {
+            this.log.silly(`Battery Temp ${this.pad(i + 31, 3)} :${byteArray[i + 5]}`);
+            towerAttributes[towerNumber].hvsBatteryTempperCell[i + 31] = byteArray[i + 5];
+        }
+    }
+
+    /*
+     * decode response to request[12]
+     * @see #decodePacket5()
      */
-    onMessage(obj) {
-        if (typeof obj === 'object' && obj.message) {
-            const json = JSON.parse(JSON.stringify(obj.message));
-            const that = this;
-            if (obj.command === 'getThumbnail') {
-                if (obj.callback) {
-                    this.getThumbnail(json.thumbnail, json.path, function (thumb) {
-                        that.sendTo(obj.from, obj.command, thumb, obj.callback);
-                    });
+    decodeResponse12(data, towerNumber = 0) {
+        const byteArray = new Uint8Array(data);
+        //starting with byte 101, ending with 131, Cell voltage 129-144
+
+        // Balancing Flags
+        towerAttributes[towerNumber].balancing = data.slice(17, 33).toString('hex');
+        towerAttributes[towerNumber].balancingcount = this.countSetBits(data.slice(17, 33).toString('hex'));
+
+        const MaxCells = 16;
+        for (let i = 0; i < MaxCells; i++) {
+            this.log.silly(`Battery Voltage-${this.pad(i + 1 + 128, 3)} :${this.buf2int16SI(byteArray, i * 2 + 101)}`);
+            towerAttributes[towerNumber].hvsBatteryVoltsperCell[i + 1 + 128] = this.buf2int16SI(byteArray, i * 2 + 101);
+        }
+    }
+
+    /*
+     * decode response to request[13]
+     * @see #decodePacket6()
+     */
+    decodeResponse13(data, towerNumber = 0) {
+        const byteArray = new Uint8Array(data);
+        let MaxCells = hvsNumCells - 128 - 16; // The first round measured up to 128 cells, request[12] then get another 16
+        if (MaxCells > 16) {
+            MaxCells = 16;
+        } // With 5 HVS Modules, only 16 cells are remaining
+        for (let i = 0; i < MaxCells; i++) {
+            this.log.silly(
+                `Battery Voltage-${this.pad(i + 1 + 16 + 128, 3)} :${this.buf2int16SI(byteArray, i * 2 + 5)}`,
+            );
+            towerAttributes[towerNumber].hvsBatteryVoltsperCell[i + 1 + 16 + 128] = this.buf2int16SI(
+                byteArray,
+                i * 2 + 5,
+            );
+        }
+    }
+
+    decodePacket0(data) {
+        if (this.config.ConfStoreRawMessages) {
+            this.setState('System.Raw_00', data.toString('hex'), true);
+        }
+        const byteArray = new Uint8Array(data);
+
+        // Serialnumber
+        hvsSerial = '';
+        for (let i = 3; i < 22; i++) {
+            hvsSerial += String.fromCharCode(byteArray[i]);
+        }
+
+        // Hardwaretype
+        //leider dazugestrickt, wollte in die andere Logik nicht eingreifen
+        if (byteArray[5] == 51) {
+            hvsBattType_fromSerial = 'HVS';
+        }
+        if (byteArray[5] == 50) {
+            hvsBattType_fromSerial = 'LVS';
+        }
+        if (byteArray[5] == 49) {
+            hvsBattType_fromSerial = 'LVS';
+        }
+
+        // Firmwareversion
+        hvsBMUA = `V${byteArray[27].toString()}.${byteArray[28].toString()}`;
+        hvsBMUB = `V${byteArray[29].toString()}.${byteArray[30].toString()}`;
+        if (byteArray[33] === 0) {
+            hvsBMU = `${hvsBMUA}-A`;
+        } else {
+            hvsBMU = `${hvsBMUB}-B`;
+        }
+        hvsBMS = `V${byteArray[31].toString()}.${byteArray[32].toString()}-${String.fromCharCode(byteArray[34] + 65)}`;
+
+        // Amount of towers
+        // 1st Byte - Count of towers
+        // 2nd Byte - Amount of Modules (per Tower)
+        hvsModules = parseInt((byteArray[36] % 16).toString());
+        hvsTowers = parseInt(Math.floor(byteArray[36] / 16).toString());
+
+        // Architecture type
+        if (byteArray[38] === 0) {
+            hvsGrid = 'OffGrid';
+        }
+        if (byteArray[38] === 1) {
+            hvsGrid = 'OnGrid';
+        }
+        if (byteArray[38] === 2) {
+            hvsGrid = 'Backup';
+        }
+    }
+
+    decodePacket1(data) {
+        if (this.config.ConfStoreRawMessages) {
+            this.setState('System.Raw_01', data.toString('hex'), true);
+        }
+        const byteArray = new Uint8Array(data);
+        hvsSOC = this.buf2int16SI(byteArray, 3);
+        hvsMaxVolt = parseFloat(((this.buf2int16SI(byteArray, 5) * 1.0) / 100.0).toFixed(2));
+        hvsMinVolt = parseFloat(((this.buf2int16SI(byteArray, 7) * 1.0) / 100.0).toFixed(2));
+        hvsSOH = this.buf2int16SI(byteArray, 9);
+        hvsA = parseFloat(((this.buf2int16SI(byteArray, 11) * 1.0) / 10.0).toFixed(1));
+        hvsBattVolt = parseFloat(((this.buf2int16US(byteArray, 13) * 1.0) / 100.0).toFixed(1));
+        hvsMaxTemp = this.buf2int16SI(byteArray, 15);
+        hvsMinTemp = this.buf2int16SI(byteArray, 17);
+        hvsBatTemp = this.buf2int16SI(byteArray, 19);
+        hvsError = this.buf2int16SI(byteArray, 29);
+        hvsParamT = `${byteArray[31].toString()}.${byteArray[32].toString()}`;
+        hvsOutVolt = parseFloat(((this.buf2int16US(byteArray, 35) * 1.0) / 100.0).toFixed(1));
+        hvsPower = Math.round(hvsA * hvsOutVolt * 100) / 100;
+        hvsDiffVolt = Math.round((hvsMaxVolt - hvsMinVolt) * 100) / 100;
+        hvsErrorString = '';
+        //        hvsError = 65535;
+        for (let j = 0; j < 16; j++) {
+            if (((1 << j) & hvsError) !== 0) {
+                if (hvsErrorString.length > 0) {
+                    hvsErrorString += '; ';
                 }
-            } else if (obj.command === 'getSnapshot') {
-                if (obj.callback) {
-                    this.getSnapshot(json.cameraid, json.path, function (snap) {
-                        that.sendTo(obj.from, obj.command, snap, obj.callback);
-                    });
-                }
+                hvsErrorString += this.myErrors[j];
             }
         }
+        if (hvsErrorString.length === 0) {
+            hvsErrorString = 'no Error';
+        }
+
+        hvsChargeTotal = this.buf2int32US(byteArray, 37) / 10;
+        hvsDischargeTotal = this.buf2int32US(byteArray, 41) / 10;
+        hvsETA = hvsDischargeTotal / hvsChargeTotal;
     }
 }
 
 if (module.parent) {
-    // Export the constructor in compact mode
     /**
-     * @param {Partial<ioBroker.AdapterOptions>} [options]
+     * @param [options]
      */
-    module.exports = options => new UnifiProtect(options);
+    module.exports = options => new bydhvsControll(options);
 } else {
     // otherwise start the instance directly
-    new UnifiProtect();
+    new bydhvsControll();
 }
