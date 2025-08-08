@@ -9,7 +9,7 @@ const crc = require('crc');
 const net = require('net');
 
 const _methods = require('./lib/methods');
-const constants= require('./lib/constants');
+const constants = require('./lib/constants');
 //const byd_stat_tower = require('./lib/constants').byd_stat_tower;
 const setObj = require('./lib/crud');
 const socket = new net.Socket();
@@ -134,7 +134,7 @@ class bydhvsControll extends utils.Adapter {
             this.log.info('Adapter bluelink cleaned up everything...');
             callback();
         } catch (error) {
-            this.log.debug('Error onUnload ' + error);
+            this.log.debug(`Error onUnload ${error}`);
             callback();
         }
     }
@@ -175,8 +175,6 @@ class bydhvsControll extends utils.Adapter {
         this.log.silly(`TestMode= ${ConfTestMode}`);
     }
 
-
-
     checkPacket(data) {
         const byteArray = new Uint8Array(data);
         const packetLength = data[2] + 5; // 3 header, 2 crc
@@ -201,8 +199,6 @@ class bydhvsControll extends utils.Adapter {
         n = `${n}`;
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
     }
-
-
 
     setStates() {
         let ObjTowerString = '';
@@ -809,7 +805,6 @@ class bydhvsControll extends utils.Adapter {
         this.log.debug(`NumCells: ${hvsNumCells} Numtemps: ${hvsNumTemps} Modules: ${hvsModules}`);
     }
 
-
     decodePacket5(data, towerNumber = 0) {
         const byteArray = new Uint8Array(data);
         towerAttributes[towerNumber].hvsMaxmVolt = this.buf2int16SI(byteArray, 5);
@@ -842,7 +837,7 @@ class bydhvsControll extends utils.Adapter {
         towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat(
             ((this.buf2int16SI(byteArray, 53) * 1.0) / 10.0).toFixed(1),
         );
-        towerAttributes[towerNumber].current = parseFloat((this.buf2int16SI(byteArray, 57) * 1.0 / 10.0 ).toFixed(1));
+        towerAttributes[towerNumber].current = parseFloat(((this.buf2int16SI(byteArray, 57) * 1.0) / 10.0).toFixed(1));
         towerAttributes[towerNumber].soh = parseFloat((this.buf2int16SI(byteArray, 55) * 1.0).toFixed(1));
         towerAttributes[towerNumber].state = byteArray[59].toString(16) + byteArray[60].toString(16);
     }
