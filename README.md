@@ -44,6 +44,9 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### __WORK IN PROGRESS__
 -->
+### __WORK IN PROGRESS__
+* (arteck) add current info 
+
 ### 1.5.4 (2025-08-03)
 * (arteck) typo
 

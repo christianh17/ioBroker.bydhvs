@@ -414,6 +414,7 @@ class bydhvsControll extends utils.Adapter {
                         this.setState(`Diagnosis${ObjTowerString}.SOH`, towerAttributes[t].soh, true);
                         this.setState(`Diagnosis${ObjTowerString}.State`, towerAttributes[t].state, true);
                         this.setState(`Diagnosis${ObjTowerString}.BalancingCells`, towerAttributes[t].balancing, true);
+                        this.setState(`Diagnosis${ObjTowerString}.Current`, towerAttributes[t].current, true);
                         this.setState(
                             `Diagnosis${ObjTowerString}.BalancingCellsCount`,
                             towerAttributes[t].balancingcount,
@@ -1163,6 +1164,16 @@ class bydhvsControll extends utils.Adapter {
                     false,
                     '',
                 ],
+                [
+                    `Diagnosis${ObjTowerString}.Current`,
+                    'state',
+                    'current +from/-to battery',
+                    'number',
+                    'value',
+                    true,
+                    false,
+                    'A'
+                ],
             ];
 
             for (let i = 0; i < myObjects.length; i++) {
@@ -1258,6 +1269,7 @@ class bydhvsControll extends utils.Adapter {
         towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat(
             ((this.buf2int16SI(byteArray, 53) * 1.0) / 10.0).toFixed(1),
         );
+        towerAttributes[towerNumber].current = parseFloat((this.buf2int16SI(byteArray, 57) * 1.0 / 10.0 ).toFixed(1));
         towerAttributes[towerNumber].soh = parseFloat((this.buf2int16SI(byteArray, 55) * 1.0).toFixed(1));
         towerAttributes[towerNumber].state = byteArray[59].toString(16) + byteArray[60].toString(16);
     }
