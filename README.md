@@ -45,7 +45,8 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	### __WORK IN PROGRESS__
 -->
 ### __WORK IN PROGRESS__
-* (arteck) add current info 
+* (arteck) add current info
+* (arteck) add creates into separated file 
 
 ### 1.5.4 (2025-08-03)
 * (arteck) typo
