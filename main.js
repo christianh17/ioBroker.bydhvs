@@ -84,9 +84,9 @@ let ConfOverridePollInterval = 0;
 ];*/
 
 let idInterval1 = 0;
-
+/*
 const myBattTypes = ['HVL', 'HVM', 'HVS'];
-/* HVM: 16 cells per module
+ HVM: 16 cells per module
    HVS: 32 cells per module
    HVL: unknown so I count 0 cells per module
 */
@@ -134,6 +134,7 @@ class bydhvsControll extends utils.Adapter {
             this.log.info('Adapter bluelink cleaned up everything...');
             callback();
         } catch (error) {
+            this.log.debug('Error onUnload ' + error);
             callback();
         }
     }
