@@ -179,6 +179,15 @@
       "config": "json",
       "tab": "materialize"
     },
+    "messagebox": true,
+    "docs": {
+      "en": [
+        "docs/byd-hexstructure.md"
+      ],
+      "de": [
+        "docs/byd-hexstructure.md"
+      ]
+    },
     "globalDependencies": [
       {
         "admin": ">=7.4.10"
@@ -188,7 +197,7 @@
       {
         "js-controller": ">=5.0.19"
       }
-    ],
+    ]
   },
   "native": {
     "ConfPollInterval": "60",
