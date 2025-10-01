@@ -31,7 +31,7 @@
     "@iobroker/adapter-dev": "^1.4.0",
     "@iobroker/testing": "^5.1.1",
     "@tsconfig/node14": "^14.1.5",
-    "@iobroker/eslint-config": "^2.1.0",
+    "@iobroker/eslint-config": "^2.2.0",
     "@types/chai": "^5.2.2",
     "@types/chai-as-promised": "^8.0.1",
     "@types/mocha": "^10.0.10",
