@@ -691,13 +691,13 @@ class bydhvsControll extends utils.Adapter {
 
         // Prüfe und ggf. setze neues Poll-Intervall
         if (ConfOverridePollInterval !== 0) {
-            const state = await this.getState('System.OverridePoll');
+            const state = this.getState('System.OverridePoll');
             const newPollTime = state?.val ?? 60;
 
             if (confBatPollTime !== newPollTime) {
                 confBatPollTime = newPollTime;
                 clearInterval(idInterval1);
-                idInterval1 = setInterval(() => this.startPoll(), confBatPollTime * 1000);
+                idInterval1 = setInterval(() => this.pollQuery(), confBatPollTime * 1000);
                 this.log.info(`Poll-Intervall aktualisiert: ${confBatPollTime}s, Interval-ID: ${idInterval1}`);
             }
         }
