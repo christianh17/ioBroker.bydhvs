@@ -126,6 +126,7 @@
     "extIcon": "https://raw.githubusercontent.com/ChristianH17/ioBroker.bydhvs/master/admin/bydhvs.png",
     "readme": "https://github.com/ChristianH17/ioBroker.bydhvs/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "mode": "daemon",
     "type": "energy",
     "compact": true,
