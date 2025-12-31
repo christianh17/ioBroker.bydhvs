@@ -75,7 +75,7 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 ## License
 MIT License
 
-Copyright (c) 2025 Christian <github@familie-herrmann.de>
+Copyright (c) 2025-2026 Christian <github@familie-herrmann.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
