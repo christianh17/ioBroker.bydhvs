@@ -114,7 +114,10 @@
       "Christian <github@familie-herrmann.de>"
     ],
     "keywords": [
-      "byd hvs battery pv"
+      "byd",
+      "hvs",
+      "battery",
+      "pv"
     ],
     "licenseInformation": {
       "license": "MIT",
@@ -131,6 +134,7 @@
     "compact": true,
     "connectionType": "local",
     "dataSource": "poll",
+    "tier": 2,
     "messages": [
       {
         "condition": {
@@ -176,8 +180,7 @@
       }
     ],
     "adminUI": {
-      "config": "json",
-      "tab": "materialize"
+      "config": "json"
     },
     "messagebox": true,
     "docs": {
@@ -188,14 +191,14 @@
         "docs/byd-hexstructure.md"
       ]
     },
-    "globalDependencies": [
-      {
-        "admin": ">=7.4.10"
-      }
-    ],
     "dependencies": [
       {
-        "js-controller": ">=5.0.19"
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
       }
     ]
   },
