@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.4",
+    "version": "1.5.5",
     "news": {
+      "1.5.5": {
+        "en": "Dependencies have been updated\nadd current info\nadd creates into separated file",
+        "de": "Abhängigkeiten wurden aktualisiert\naktuelles hinzufügen\nadd erzeugt in getrennte datei",
+        "ru": "Зависимости были обновлены\nдобавить текущую информацию\nдобавить в отдельный файл",
+        "pt": "As dependências foram atualizadas\nadicionar informações atuais\nadd cria em arquivo separado",
+        "nl": "Afhankelijkheden zijn bijgewerkt\nhuidige informatie toevoegen\ntoevoegen maakt aan gescheiden bestand",
+        "fr": "Les dépendances ont été actualisées\najouter l'info actuelle\najouter des créations dans un fichier séparé",
+        "it": "Le dipendenze sono state aggiornate\naggiungere informazioni attuali\naggiungere crea in file separati",
+        "es": "Se han actualizado las dependencias\nañadir información actual\nañadir crea en archivo separado",
+        "pl": "Zaktualizowano zależności\ndodaj aktualne informacje\ndodaj tworzenie do oddzielonego pliku",
+        "uk": "Залежність було оновлено\nдодати інформацію\nдодати у відокремлений файл",
+        "zh-cn": "依赖关系已更新\n添加当前信息\n将创建添加到分隔的文件"
+      },
       "1.5.4": {
         "en": "typo",
         "de": "typo",
@@ -70,19 +83,6 @@
         "pl": "typo\n",
         "uk": "типо в номер версія виправлено\n",
         "zh-cn": "更正编号的类型\n"
-      },
-      "1.4.1": {
-        "en": "support of js-controller 5 and detection of more inverters",
-        "de": "Unterstützung js-controllers 5 und Erkennung von mehr Wechselrichtern",
-        "ru": "поддержка js-controller 5 и обнаружение более инверторов",
-        "pt": "suporte de js-controller 5 e detecção de mais inversores",
-        "nl": "quality over quantity (qoq) releases vertaling:",
-        "fr": "support de js-controller 5 et détection de plus d'invertisseurs",
-        "it": "supporto di js-controller 5 e rilevamento di più inverter",
-        "es": "soporte de js-controller 5 y detección de más inversores",
-        "pl": "poparcie sterownika 5 i wykrycie bardziej intruzatorów",
-        "uk": "підтримка js-controller 5 і виявлення більш інверторів",
-        "zh-cn": "b. 支持控制巴士5和发现更多防火器"
       }
     },
     "title": "BYD HVS Battery",

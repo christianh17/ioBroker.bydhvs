@@ -1,4 +1,9 @@
 # Older changes
+## 1.5.0 (2023-11-04)
+* Breaking change: nodejs 16 minimum required
+* automated checks and release-script repaired (thanks to mcm1957, he did the work)
+* nothing else changed in code
+
 ## 1.4.2 (2023-09-28)
 * Typo in version number removed
 

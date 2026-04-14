@@ -42,11 +42,12 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 ## Changelog
 <!--
 	Placeholder for the next version (at the beginning of the line):
-	### __WORK IN PROGRESS__
+	### **WORK IN PROGRESS**
 -->
-### __WORK IN PROGRESS__
+### 1.5.5 (2026-04-14)
+* (arteck) Dependencies have been updated
 * (arteck) add current info
-* (arteck) add creates into separated file 
+* (arteck) add creates into separated file
 
 ### 1.5.4 (2025-08-03)
 * (arteck) typo
@@ -65,17 +66,12 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 * Enable the possibility to get informations from a two tower setup
 * BREAKING CHANGE of Structure.
 
-### 1.5.0 (2023-11-04)
-* Breaking change: nodejs 16 minimum required
-* automated checks and release-script repaired (thanks to mcm1957, he did the work)
-* nothing else changed in code
-
 ###
 
 ## License
 MIT License
 
-Copyright (c) 2025 Christian <github@familie-herrmann.de>
+Copyright (c) 2026 Christian <github@familie-herrmann.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

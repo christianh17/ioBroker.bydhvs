@@ -1,6 +1,6 @@
 {
   "name": "iobroker.bydhvs",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "BYD HVS Battery poll data",
   "author": {
     "name": "Christian",
@@ -41,7 +41,7 @@
     "admin{,/!(src)/**}/!(tsconfig|tsconfig.*).json",
     "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",
     "admin/i18n/",
-    "lib/",   
+    "lib/",
     "io-package.json",
     "LICENSE",
     "main.js"
