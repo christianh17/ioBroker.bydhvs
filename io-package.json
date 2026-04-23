@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "news": {
+      "1.5.6": {
+        "en": "fix wrong package send\nrefactoring",
+        "de": "falsche paket senden\nrefaktor",
+        "ru": "отправить неправильный пакет\nрефакторинг",
+        "pt": "corrigir o envio do pacote errado\nrefatorização",
+        "nl": "foute pakket verzenden oplossen\nrefactoring",
+        "fr": "correction du mauvais paquet envoyé\nrefactoration",
+        "it": "correzione pacchetto sbagliato invio\nrefactoring",
+        "es": "arreglar paquete incorrecto enviar\nrefactoring",
+        "pl": "naprawić złe wysłanie pakietu\nrefaktoring",
+        "uk": "виправити неправильний пакет відправлення\nрефакторинг",
+        "zh-cn": "修正错误的软件包发送\n正在重构"
+      },
       "1.5.5": {
         "en": "Dependencies have been updated\nadd current info\nadd creates into separated file",
         "de": "Abhängigkeiten wurden aktualisiert\naktuelles hinzufügen\nadd erzeugt in getrennte datei",
@@ -70,19 +83,6 @@
         "pl": "Zmiana węzłów: 16 wymagane minimum wymagane jest minimum\nzautomatyzowane sprawozdania i naprawione pisownie (do mcm1957 dokonał)\nnic innego nie zmieniło się w kodie",
         "uk": "Зміна розривів: nodejs 16 мінімальний\nавтоматизовані перевірки та редакційно-регулятивно-редагувальні роботи (додатки до мкм1957 р.)\nнічого не змінився в коді",
         "zh-cn": "意外变化:不需要16个最低限度\n自动检查和释放后修理(他的工作)\n守则的任何改变"
-      },
-      "1.4.2": {
-        "en": "typo in version number corrected\n",
-        "de": "typo in versionsnummer korrigiert\n",
-        "ru": "typo в версии номер исправлен\n",
-        "pt": "typo no número da versão corrigido\n",
-        "nl": "typo in versie nummer correct\n",
-        "fr": "typo dans la version numéro corrigé\n",
-        "it": "typo nel numero di versione corretto\n",
-        "es": "typo en el número de versión corregido\n",
-        "pl": "typo\n",
-        "uk": "типо в номер версія виправлено\n",
-        "zh-cn": "更正编号的类型\n"
       }
     },
     "title": "BYD HVS Battery",

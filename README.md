@@ -44,6 +44,10 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### 1.5.6 (2026-04-23)
+* (arteck) fix wrong package send
+* (arteck) refactoring
+
 ### 1.5.5 (2026-04-14)
 * (arteck) Dependencies have been updated
 * (arteck) add current info
@@ -61,10 +65,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 * (arteck) refactoring to modern Code
 * (arteck) use direct socket connection without detour IPClient
 * first Version with two towers in NPM
-
-### 1.5.1 (2024-01-15)
-* Enable the possibility to get informations from a two tower setup
-* BREAKING CHANGE of Structure.
 
 ###
 

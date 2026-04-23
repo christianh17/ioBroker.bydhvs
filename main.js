@@ -12,7 +12,6 @@ const _methods = require('./lib/methods');
 const constants = require('./lib/constants');
 //const byd_stat_tower = require('./lib/constants').byd_stat_tower;
 const setObj = require('./lib/crud');
-const socket = new net.Socket();
 /**
  * The adapter instance
  *
@@ -114,9 +113,10 @@ class bydhvsControll extends utils.Adapter {
         this.decodePacketNOP = _methods.decodePacketNOP.bind(this);
         this.countSetBits = _methods.countSetBits.bind(this);
 
-        this.setStateAsync(`info.socketConnection`, false, true);
+        // Fix: myErrors an this binden (sonst TypeError in decodePacket1)
+        this.myErrors = constants.myErrors;
 
-        this.initData();
+        await this.initData();
 
         this.log.info('starte polling');
         this.startQuery();
@@ -130,7 +130,9 @@ class bydhvsControll extends utils.Adapter {
     onUnload(callback) {
         try {
             clearTimeout(idInterval1);
-            socket.destroy();
+            if (this._socket) {
+ this._socket.destroy(); this._socket = null; 
+}
             this.log.info('Adapter bluelink cleaned up everything...');
             callback();
         } catch (error) {
@@ -139,18 +141,18 @@ class bydhvsControll extends utils.Adapter {
         }
     }
 
-    initData() {
+    async initData() {
         setObj.setObjects(this);
 
         myState = 0;
 
         ConfOverridePollInterval = this.config.ConfOverridePollInterval ? this.config.ConfOverridePollInterval : 0;
 
-        if (ConfOverridePollInterval == 0) {
+        if (ConfOverridePollInterval === 0) {
             confBatPollTime = parseInt(this.config.ConfPollInterval);
         } else {
-            const OverridePollState = this.getState('System.OverridePoll');
-            confBatPollTime = OverridePollState ? OverridePollState.val : 60;
+            const OverridePollState = await this.getStateAsync('System.OverridePoll');
+            confBatPollTime = OverridePollState?.val ?? 60;
         }
 
         if (confBatPollTime < 30) {
@@ -158,10 +160,10 @@ class bydhvsControll extends utils.Adapter {
             this.log.warn('poll to often - recommendation is not more than every 30 seconds');
         }
 
-        ConfBydTowerCount = this.config.ConfBydTowerCount ? this.config.ConfBydTowerCount : 1;
-        ConfBatDetails = this.config.ConfBatDetails ? true : false;
+        ConfBydTowerCount = this.config.ConfBydTowerCount || 1;
+        ConfBatDetails = !!this.config.ConfBatDetails;
         ConfBatDetailshowoften = parseInt(this.config.ConfDetailshowoften);
-        ConfTestMode = this.config.ConfTestMode ? true : false;
+        ConfTestMode = !!this.config.ConfTestMode;
         myNumberforDetails = ConfBatDetailshowoften;
 
         this.log.info(`BYD IP Adress: ${this.config.ConfIPAdress}`);
@@ -178,16 +180,15 @@ class bydhvsControll extends utils.Adapter {
     checkPacket(data) {
         const byteArray = new Uint8Array(data);
         const packetLength = data[2] + 5; // 3 header, 2 crc
-        if (byteArray[0] != 1) {
+        if (byteArray[0] !== 1) {
             return false;
         }
         if (byteArray[1] === 3) {
-            //habe die Kodierung der Antwort mit 1 an zweiter Stelle nicht verstanden, daher hier keine Längenprüfung
-            if (packetLength != byteArray.length) {
+            if (packetLength !== byteArray.length) {
                 return false;
             }
         } else {
-            if (byteArray[1] != 16) {
+            if (byteArray[1] !== 16) {
                 return false;
             }
         }
@@ -266,7 +267,7 @@ class bydhvsControll extends utils.Adapter {
         this.setState('System.DischargeTotal', hvsDischargeTotal, true);
         this.setState('System.ETA', hvsETA, true);
 
-        if (myNumberforDetails == 0) {
+        if (myNumberforDetails === 0) {
             // For every tower
             this.log.silly(`Tower attributes: ${JSON.stringify(towerAttributes)}`);
             for (let t = 0; t < towerAttributes.length; t++) {
@@ -324,7 +325,7 @@ class bydhvsControll extends utils.Adapter {
                         this.log.debug(`Tower_${t + 1} balancing     >${towerAttributes[t].balancing}<`);
                         this.log.debug(`Tower_${t + 1} balcount      >${towerAttributes[t].balancingcount}<`);
 
-                        if (t == 0) {
+                        if (t === 0) {
                             this.setState(
                                 `Diagnosis${ObjTowerString}.BalancingOne`,
                                 towerAttributes[t].balancing ? towerAttributes[t].balancing : '',
@@ -453,10 +454,14 @@ class bydhvsControll extends utils.Adapter {
 
         this.log.debug('Starte Datenabfrage via TCP-Client...');
 
+        const socket = new net.Socket();
+        this._socket = socket;
+
         return new Promise(resolve => {
             const cleanup = () => {
                 this.log.debug('Schließe Socket-Verbindung und setze State zurück');
                 socket.destroy();
+                this._socket = null;
                 myState = 0;
             };
 
@@ -483,6 +488,15 @@ class bydhvsControll extends utils.Adapter {
             };
 
             socket.setTimeout(timeout);
+
+            // Fix: error-Handler VOR connect registrieren, damit ECONNREFUSED/ETIMEDOUT
+            // nicht als unhandled error den Prozess crashen
+            socket.once('error', err => {
+                this.log.error(`❌ Socket-Fehler: ${err.message}`);
+                this.setStateChanged('info.connection', { val: false, ack: true });
+                cleanup();
+                resolve(false);
+            });
 
             try {
                 socket.connect(8080, this.config.ConfIPAdress, async () => {
@@ -691,7 +705,7 @@ class bydhvsControll extends utils.Adapter {
 
         // Prüfe und ggf. setze neues Poll-Intervall
         if (ConfOverridePollInterval !== 0) {
-            const state = this.getState('System.OverridePoll');
+            const state = await this.getStateAsync('System.OverridePoll');
             const newPollTime = state?.val ?? 60;
 
             if (confBatPollTime !== newPollTime) {
@@ -776,19 +790,16 @@ class bydhvsControll extends utils.Adapter {
             //mine: 2 modules, 64 voltages, 24 temps
             //4 modules, 128 voltages, 48 temps
         }
-        //leider hässlich dazugestrickt, wollte in die andere Logik nicht eingreifen
-        if (hvsBattType_fromSerial == 'LVS') {
+        // Fix: Doppelte LVS-Prüfung in einen Block zusammengeführt
+        if (hvsBattType_fromSerial === 'LVS') {
             hvsBattType = 'LVS';
             hvsNumCells = hvsModules * 7;
             hvsNumTemps = 0;
-        }
-        if (hvsBattType_fromSerial == 'LVS') {
-            //unterschiedliche WR-Tabelle je nach Batt-Typ
             hvsInvType_String = constants.myINVsLVS[hvsInvType];
         } else {
             hvsInvType_String = constants.myINVs[hvsInvType];
         }
-        if (hvsInvType_String == undefined) {
+        if (hvsInvType_String === undefined) {
             hvsInvType_String = 'undefined';
         }
 
@@ -830,8 +841,11 @@ class bydhvsControll extends utils.Adapter {
 
         towerAttributes[towerNumber].chargeTotal = this.buf2int32US(byteArray, 33);
         towerAttributes[towerNumber].dischargeTotal = this.buf2int32US(byteArray, 37);
+        // Fix: Division durch Null abfangen
         towerAttributes[towerNumber].eta =
-            towerAttributes[towerNumber].dischargeTotal / towerAttributes[towerNumber].chargeTotal;
+            towerAttributes[towerNumber].chargeTotal > 0
+                ? towerAttributes[towerNumber].dischargeTotal / towerAttributes[towerNumber].chargeTotal
+                : 0;
         towerAttributes[towerNumber].batteryVolt = this.buf2int16SI(byteArray, 45);
         towerAttributes[towerNumber].outVolt = this.buf2int16SI(byteArray, 51);
         towerAttributes[towerNumber].hvsSOCDiagnosis = parseFloat(
@@ -951,15 +965,12 @@ class bydhvsControll extends utils.Adapter {
             hvsSerial += String.fromCharCode(byteArray[i]);
         }
 
-        // Hardwaretype
-        //leider dazugestrickt, wollte in die andere Logik nicht eingreifen
-        if (byteArray[5] == 51) {
+        // Hardwaretype – Bytes sind ASCII-Zeichen: 51='3'=HVS, 50='2'=LVS, 49='1'=LVS
+        // Fix: Initialisierung, damit kein alter Wert vom letzten Polling-Zyklus hängen bleibt
+        hvsBattType_fromSerial = 'HVM'; // default
+        if (byteArray[5] === 51) {       // ASCII '3'
             hvsBattType_fromSerial = 'HVS';
-        }
-        if (byteArray[5] == 50) {
-            hvsBattType_fromSerial = 'LVS';
-        }
-        if (byteArray[5] == 49) {
+        } else if (byteArray[5] === 50 || byteArray[5] === 49) { // ASCII '2' oder '1'
             hvsBattType_fromSerial = 'LVS';
         }
 
@@ -1026,11 +1037,12 @@ class bydhvsControll extends utils.Adapter {
 
         hvsChargeTotal = this.buf2int32US(byteArray, 37) / 10;
         hvsDischargeTotal = this.buf2int32US(byteArray, 41) / 10;
-        hvsETA = hvsDischargeTotal / hvsChargeTotal;
+        // Fix: Division durch Null abfangen
+        hvsETA = hvsChargeTotal > 0 ? hvsDischargeTotal / hvsChargeTotal : 0;
     }
 }
 
-if (module.parent) {
+if (require.main !== module) {
     /**
      * @param [options]
      */

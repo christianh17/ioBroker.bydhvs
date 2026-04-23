@@ -1,4 +1,8 @@
 # Older changes
+## 1.5.1 (2024-01-15)
+* Enable the possibility to get informations from a two tower setup
+* BREAKING CHANGE of Structure.
+
 ## 1.5.0 (2023-11-04)
 * Breaking change: nodejs 16 minimum required
 * automated checks and release-script repaired (thanks to mcm1957, he did the work)
