@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.6",
+    "version": "1.5.7",
     "news": {
+      "1.5.7": {
+        "en": "fix tower count > 1",
+        "de": "turmzahl > 1",
+        "ru": "высота башни 1",
+        "pt": "fixar contagem de torre > 1",
+        "nl": "fix tower count > 1",
+        "fr": "nombre de tours fixes > 1",
+        "it": "torre di fissaggio conteggio > 1",
+        "es": "fijación torre cont",
+        "pl": "liczba wież > 1",
+        "uk": "число кріплення вежі > 1",
+        "zh-cn": "固定塔数 > 1"
+      },
       "1.5.6": {
         "en": "fix wrong package send\nrefactoring",
         "de": "falsche paket senden\nrefaktor",
@@ -67,9 +80,6 @@
         "pl": "dodaj socketConnection DP\nużyj jsconConfig\nrefaktoring do nowoczesnego kodu\nkorzystanie z bezpośredniego połączenia gniazdka bez złącza IPClient\npierwsza wersja z dwiema wieżami w NPM",
         "uk": "додати розеткиConnection DP\nвикористовуйте jsconConfig\nрефакторинг сучасного коду\nвикористовувати прямий з'єднання роз'єму без скидання IPClient\nперша версія з двома вежами в NPM",
         "zh-cn": "添加套接字 DP\n使用 jscon 配置\n重构现代代码\n使用不绕路的直插座连接\n第一版,国家预防机制有两个塔"
-      },
-      "1.5.1": {
-        "en": "Working with parallel towers. you can setup it in admin page."
       },
       "1.5.0": {
         "en": "Breaking change: nodejs 16 minimum required  \nautomated checks and release-script repaired (thanks to mcm1957, he did the work)\nnothing else changed in code",
@@ -171,7 +181,18 @@
           "zh-cn": "已改变的诊断和细胞分类的结构。 我们为每座塔增加了一层 例:旧结构:bydhvs.0.Diagnosis.SOC;新结构:bydhvs.0.Diagnosis.Tower_1.SOC; 您应该检查您的数据库/ Influx/... 订阅 ."
         },
         "link": "https://github.com/christianh17/ioBroker.bydhvs/pull/262",
-        "linkText": "Reiew SourceCode of that change or report an issue",
+        "linkText": {
+          "en": "Readme",
+          "de": "Liesmich",
+          "ru": "Прочти меня",
+          "pt": "Leia-me",
+          "nl": "Leesmij",
+          "fr": "Lisez-moi",
+          "it": "Leggimi",
+          "es": "Léame",
+          "pl": "Readme",
+          "zh-cn": "自述文件"
+        },
         "level": "warn",
         "buttons": [
           "agree",

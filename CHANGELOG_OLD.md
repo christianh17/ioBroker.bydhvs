@@ -1,4 +1,11 @@
 # Older changes
+## 1.5.2 (2025-08-02)
+* (arteck) add socketConnection DP
+* (arteck) use jsconConfig
+* (arteck) refactoring to modern Code
+* (arteck) use direct socket connection without detour IPClient
+* first Version with two towers in NPM
+
 ## 1.5.1 (2024-01-15)
 * Enable the possibility to get informations from a two tower setup
 * BREAKING CHANGE of Structure.
