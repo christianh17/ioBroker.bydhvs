@@ -44,6 +44,10 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### 1.5.8 (2026-04-23)
+* (arteck) typo
+*
+
 ### 1.5.7 (2026-04-23)
 * (arteck) fix tower count > 1
 
@@ -58,9 +62,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 
 ### 1.5.4 (2025-08-03)
 * (arteck) typo
-
-### 1.5.3 (2025-08-02)
-* (arteck) update dependecy
 
 ###
 

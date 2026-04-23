@@ -130,7 +130,9 @@ class bydhvsControll extends utils.Adapter {
     onUnload(callback) {
         try {
             clearTimeout(idInterval1);
-            if (this._socket) { this._socket.destroy(); this._socket = null; }
+            if (this._socket) {
+ this._socket.destroy(); this._socket = null; 
+}
             this.log.info('Adapter bluelink cleaned up everything...');
             callback();
         } catch (error) {

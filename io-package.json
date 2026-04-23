@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.7",
+    "version": "1.5.8",
     "news": {
+      "1.5.8": {
+        "en": "typo\n",
+        "de": "typo\n",
+        "ru": "опечатка\n",
+        "pt": "erro de digitação\n",
+        "nl": "type\n",
+        "fr": "typo\n",
+        "it": "tipo\n",
+        "es": "typo\n",
+        "pl": "typo\n",
+        "uk": "типо\n",
+        "zh-cn": "类型\n"
+      },
       "1.5.7": {
         "en": "fix tower count > 1",
         "de": "turmzahl > 1",
@@ -80,19 +93,6 @@
         "pl": "dodaj socketConnection DP\nużyj jsconConfig\nrefaktoring do nowoczesnego kodu\nkorzystanie z bezpośredniego połączenia gniazdka bez złącza IPClient\npierwsza wersja z dwiema wieżami w NPM",
         "uk": "додати розеткиConnection DP\nвикористовуйте jsconConfig\nрефакторинг сучасного коду\nвикористовувати прямий з'єднання роз'єму без скидання IPClient\nперша версія з двома вежами в NPM",
         "zh-cn": "添加套接字 DP\n使用 jscon 配置\n重构现代代码\n使用不绕路的直插座连接\n第一版,国家预防机制有两个塔"
-      },
-      "1.5.0": {
-        "en": "Breaking change: nodejs 16 minimum required  \nautomated checks and release-script repaired (thanks to mcm1957, he did the work)\nnothing else changed in code",
-        "de": "Breaking change: nodejs 16 minimum erforderlich\nautomatisierte kontrollen und release-script repariert (dank mcm1957, er tat die arbeit)\nnichts anders geändert in code",
-        "ru": "Разбивка изменения: nodejs 16 минимум требуется\nавтоматизированные проверки и релиз-скрипты отремонтированы (спасибо mcm1957, он сделал работу)\nничего не изменилось в коде",
-        "pt": "Alteração de ruptura: nodejs 16 mínimo necessário\nverificações automatizadas e release-script reparado (graças a mcm1957, ele fez o trabalho)\nnada mais mudou no código",
-        "nl": "Verandering: Nodej 16 minimum vereist\ngeautomatiseerde cheques en uitgave gerepareerd (danks aan mcm1957, hij deed het werk\nniets anders veranderd in code",
-        "fr": "Changement de rupture: nodejs 16 minimum requis\nvérifications automatisées et relevage-script réparé (merci à mcm1957, il a fait le travail)\nrien d'autre n'a changé de code",
-        "it": "Cambiamento di rottura: nodejs 16 minimo richiesto\ncontrolli automatizzati e release-script riparato (grazie a mcm1957, ha fatto il lavoro)\nniente altro cambiato in codice",
-        "es": "Cambio de ruptura: nodejs 16 mínimo requerido\ncheques automatizados y desbloqueo reparados (gracias a mcm1957, hizo el trabajo)\nnada más cambió en código",
-        "pl": "Zmiana węzłów: 16 wymagane minimum wymagane jest minimum\nzautomatyzowane sprawozdania i naprawione pisownie (do mcm1957 dokonał)\nnic innego nie zmieniło się w kodie",
-        "uk": "Зміна розривів: nodejs 16 мінімальний\nавтоматизовані перевірки та редакційно-регулятивно-редагувальні роботи (додатки до мкм1957 р.)\nнічого не змінився в коді",
-        "zh-cn": "意外变化:不需要16个最低限度\n自动检查和释放后修理(他的工作)\n守则的任何改变"
       }
     },
     "titleLang": {

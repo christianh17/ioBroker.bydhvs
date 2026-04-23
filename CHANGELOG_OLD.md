@@ -1,4 +1,7 @@
 # Older changes
+## 1.5.3 (2025-08-02)
+* (arteck) update dependecy
+
 ## 1.5.2 (2025-08-02)
 * (arteck) add socketConnection DP
 * (arteck) use jsconConfig
