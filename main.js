@@ -6,7 +6,7 @@
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const crc = require('crc');
-const net = require('net');
+const net = require('node:net');
 
 const _methods = require('./lib/methods');
 const constants = require('./lib/constants');
