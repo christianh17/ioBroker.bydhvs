@@ -16,32 +16,6 @@
         "uk": "виправити неправильний пакет\nфіксація Modbus-RTU",
         "zh-cn": "修正错误的软件包\n修补 Modbus-RTU"
       },
-      "1.5.8": {
-        "en": "typo\n",
-        "de": "typo\n",
-        "ru": "опечатка\n",
-        "pt": "erro de digitação\n",
-        "nl": "type\n",
-        "fr": "typo\n",
-        "it": "tipo\n",
-        "es": "typo\n",
-        "pl": "typo\n",
-        "uk": "типо\n",
-        "zh-cn": "类型\n"
-      },
-      "1.5.7": {
-        "en": "fix tower count > 1",
-        "de": "turmzahl > 1",
-        "ru": "высота башни 1",
-        "pt": "fixar contagem de torre > 1",
-        "nl": "fix tower count > 1",
-        "fr": "nombre de tours fixes > 1",
-        "it": "torre di fissaggio conteggio > 1",
-        "es": "fijación torre cont",
-        "pl": "liczba wież > 1",
-        "uk": "число кріплення вежі > 1",
-        "zh-cn": "固定塔数 > 1"
-      },
       "1.5.6": {
         "en": "fix wrong package send\nrefactoring",
         "de": "falsche paket senden\nrefaktor",
