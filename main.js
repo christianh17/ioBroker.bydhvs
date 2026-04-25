@@ -103,9 +103,8 @@ class bydhvsControll extends utils.Adapter {
     }
 
     async onReady() {
-        //first check account settings
-        this.setState('info.connection', false, true);
-        this.setState('info.socketConnection', false, true);
+        await this.setStateAsync('info.connection', false, true);
+        await this.setStateAsync('info.socketConnection', false, true);
 
         this.buf2int16SI = _methods.buf2int16SI.bind(this);
         this.buf2int16US = _methods.buf2int16US.bind(this);
@@ -129,10 +128,12 @@ class bydhvsControll extends utils.Adapter {
      */
     onUnload(callback) {
         try {
-            clearTimeout(idInterval1);
+            clearInterval(idInterval1);
+            idInterval1 = null;
             if (this._socket) {
- this._socket.destroy(); this._socket = null; 
-}
+                this._socket.destroy();
+                this._socket = null;
+            }
             this.log.info('Adapter bluelink cleaned up everything...');
             callback();
         } catch (error) {
@@ -179,20 +180,40 @@ class bydhvsControll extends utils.Adapter {
 
     checkPacket(data) {
         const byteArray = new Uint8Array(data);
-        const packetLength = data[2] + 5; // 3 header, 2 crc
         if (byteArray[0] !== 1) {
+            this.log.debug(`checkPacket FAIL: byte[0]=${byteArray[0]} erwartet 1, Länge=${data.length}`);
+            return false;
+        }
+        // Modbus Exception: byte[1] = fc | 0x80 (z.B. 0x83=Read-Exception, 0x90=Write-Exception)
+        if (byteArray[1] & 0x80) {
+            const fc = byteArray[1] & 0x7F;
+            const exCode = byteArray[2];
+            this.log.warn(`checkPacket: Modbus Exception – fc=0x${fc.toString(16)} exCode=0x${exCode.toString(16)} in State ${myState} (BMS evtl. beschäftigt/aktualisiert)`);
             return false;
         }
         if (byteArray[1] === 3) {
+            // Read-Response: Länge muss stimmen
+            const packetLength = data[2] + 5;
             if (packetLength !== byteArray.length) {
+                this.log.debug(`checkPacket FAIL: cmd=3, Paketlänge erwartet=${packetLength} erhalten=${byteArray.length}`);
+                return false;
+            }
+        } else if (byteArray[1] === 16) {
+            // Write-Multiple-Registers-Response: immer exakt 8 Bytes
+            if (byteArray.length !== 8) {
+                this.log.debug(`checkPacket FAIL: cmd=16 (write), Länge=${byteArray.length} erwartet 8`);
                 return false;
             }
         } else {
-            if (byteArray[1] !== 16) {
-                return false;
-            }
+            this.log.debug(`checkPacket FAIL: byte[1]=${byteArray[1]} weder 3 noch 16`);
+            return false;
         }
-        return crc.crc16modbus(byteArray) === 0;
+        const crcResult = crc.crc16modbus(byteArray);
+        if (crcResult !== 0) {
+            this.log.debug(`checkPacket FAIL: CRC=${crcResult} erwartet 0`);
+            return false;
+        }
+        return true;
     }
 
     pad(n, width, z) {
@@ -407,7 +428,10 @@ class bydhvsControll extends utils.Adapter {
     }
 
     startQuery() {
-        //erster Start sofort (500ms), dann entsprechend der Config - dann muss man nicht beim Entwickeln warten bis der erste Timer durch ist.
+        if (idInterval1) {
+            clearInterval(idInterval1);
+            idInterval1 = null;
+        }
         _firstRun = true;
 
         const runPoll = () => this.pollQuery();
@@ -417,7 +441,7 @@ class bydhvsControll extends utils.Adapter {
 
         // Danach zyklisch gemäß Konfiguration
         idInterval1 = setInterval(runPoll, confBatPollTime * 1000);
-        this.log.info(`gestartet pollTime :${confBatPollTime} intervalId :${idInterval1}`);
+        this.log.info(`gestartet pollTime :${confBatPollTime}s intervalId :${idInterval1}`);
     }
 
     async setupIPClientHandlers() {
@@ -450,12 +474,60 @@ class bydhvsControll extends utils.Adapter {
 
             const waitForData = () => {
                 return new Promise((res, rej) => {
-                    socket.once('data', data => {
-                        this.log.debug(`← Daten empfangen (Länge: ${data.length}) in State ${myState}`);
-                        res(data);
-                    });
-                    socket.once('timeout', () => rej(new Error('Socket Timeout')));
-                    socket.once('error', err => rej(err));
+                    let buffer = Buffer.alloc(0);
+
+                    const onData = (chunk) => {
+                        buffer = Buffer.concat([buffer, chunk]);
+                        this.log.debug(`← Chunk empfangen (${chunk.length} Bytes, Buffer gesamt: ${buffer.length}) in State ${myState}`);
+
+                        // Mindestens 2 Header-Bytes nötig um Funktionscode zu lesen
+                        if (buffer.length < 2) {
+return;
+}
+
+                        let expectedLength;
+                        if (buffer[1] & 0x80) {
+                            // Modbus Exception Response: [addr][fc|0x80][exCode][CRC_lo][CRC_hi] = 5 Bytes
+                            // Beispiel aus BYD-Protokoll: 01 90 04 4d c3 (Exception auf Write während BMS-Update)
+                            expectedLength = 5;
+                        } else if (buffer[1] === 16) {
+                            // Modbus Write-Multiple-Registers Response: immer exakt 8 Bytes
+                            // Struktur: [addr][0x10][regHi][regLo][qtyHi][qtyLo][CRC_lo][CRC_hi]
+                            // byte[2] ist NICHT die Datenlänge, sondern der obere Teil der Registeradresse!
+                            expectedLength = 8;
+                        } else {
+                            // Modbus Read-Response (cmd=3): [addr][0x03][dataLen][...data...][CRC_lo][CRC_hi]
+                            if (buffer.length < 3) {
+return;
+}
+                            expectedLength = buffer[2] + 5;
+                        }
+
+                        if (buffer.length >= expectedLength) {
+                            socket.removeListener('data', onData);
+                            socket.removeListener('timeout', onTimeout);
+                            socket.removeListener('error', onError);
+                            const packet = buffer.slice(0, expectedLength);
+                            this.log.debug(`← Vollständiges Paket (${packet.length} Bytes, cmd=0x${buffer[1].toString(16)}) in State ${myState}`);
+                            res(packet);
+                        }
+                    };
+
+                    const onTimeout = () => {
+                        socket.removeListener('data', onData);
+                        socket.removeListener('error', onError);
+                        rej(new Error(`Socket Timeout – Buffer hatte ${buffer.length} Bytes, State: ${myState}`));
+                    };
+
+                    const onError = (err) => {
+                        socket.removeListener('data', onData);
+                        socket.removeListener('timeout', onTimeout);
+                        rej(err);
+                    };
+
+                    socket.on('data', onData);
+                    socket.once('timeout', onTimeout);
+                    socket.once('error', onError);
                 });
             };
 
@@ -672,6 +744,7 @@ class bydhvsControll extends utils.Adapter {
 
     async pollQuery() {
         if (myState > 0) {
+            this.log.debug(`pollQuery übersprungen – vorheriger Zyklus läuft noch (State=${myState})`);
             return;
         }
 
