@@ -103,8 +103,8 @@ class bydhvsControll extends utils.Adapter {
     }
 
     async onReady() {
-        await this.setStateAsync('info.connection', false, true);
-        await this.setStateAsync('info.socketConnection', false, true);
+        this.setState('info.connection', false, true);
+        this.setState('info.socketConnection', false, true);
 
         this.buf2int16SI = _methods.buf2int16SI.bind(this);
         this.buf2int16US = _methods.buf2int16US.bind(this);
@@ -150,7 +150,7 @@ class bydhvsControll extends utils.Adapter {
                 idInterval1 = setInterval(() => this.pollQuery(), confBatPollTime * 1000);
                 this.log.info(`Poll-Intervall via stateChange aktualisiert: ${confBatPollTime}s`);
             }
-            this.setStateAsync('System.OverridePoll', { val: newPollTime, ack: true });
+            this.setState('System.OverridePoll', { val: newPollTime, ack: true });
         }
     }
 
@@ -878,7 +878,7 @@ return;
         });
 
         const socketConnection = await this.setupIPClientHandlers();
-        await this.setStateAsync('info.socketConnection', socketConnection, true);
+        this.setState('info.socketConnection', socketConnection, true);
     }
 
     /*

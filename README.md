@@ -40,10 +40,9 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 [Link zur nativen deutschen Readme:](README-German.md)
 
 ## Changelog
-<!--
-	Placeholder for the next version (at the beginning of the line):
-	### **WORK IN PROGRESS**
--->
+### 1.5.11 (2026-04-26)
+* (arteck) del deprectated setStateAsync
+
 ### 1.5.10 (2026-04-26)
 * (arteck) fix Modbus Exception – fc=0x3 exCode=0x4 in State 7
 * (arteck) add Max retry attempts after error into settings
@@ -57,10 +56,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 
 ### 1.5.7 (2026-04-23)
 * (arteck) fix tower count > 1
-
-### 1.5.6 (2026-04-23)
-* (arteck) fix wrong package send
-* (arteck) refactoring
 
 ###
 

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.10",
+    "version": "1.5.11",
     "news": {
+      "1.5.11": {
+        "en": "del deprectated setStateAsync",
+        "de": "del deprected setStateAsync",
+        "ru": "обсуждение StateAsync",
+        "pt": "del deprectated setStateAsync",
+        "nl": "del deprectated setStateAsync",
+        "fr": "set dépréciéStateAsync",
+        "it": "del set deprettatoStateAsync",
+        "es": "del deprectated setStateAsync",
+        "pl": "del deprectated setStateAsync",
+        "uk": "deprectated setStateAsync",
+        "zh-cn": "已贬值的设置"
+      },
       "1.5.10": {
         "en": "fix Modbus Exception – fc=0x3 exCode=0x4 in State 7\nadd Max retry attempts after error into settings",
         "de": "fix Modbus Ausnahme – fc=0x3 exCode=0x4 in Staat 7\nmax Retry Versuche nach Fehler in Einstellungen hinzufügen",
