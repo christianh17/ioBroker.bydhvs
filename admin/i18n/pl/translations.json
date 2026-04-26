@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "Tryb testowy: pokaż dane w dzienniku błędów",
   "Battery-details - every ... cycles": "Szczegóły baterii: co ... cykli",
   "Count of towers": "Liczba wież",
-  "Enable to store the raw messages": "Włącz, aby zapisać surowe wiadomości"
+  "Enable to store the raw messages": "Włącz, aby zapisać surowe wiadomości",
+  "Error handling": "Obsługa błędów",
+  "Max retry attempts after error": "Maksymalna liczba prób po błędzie"
 }

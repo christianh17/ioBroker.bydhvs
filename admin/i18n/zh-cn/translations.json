@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "测试模式 - 在错误日志中显示数据",
   "Battery-details - every ... cycles": "电池详细信息 - 每...个周期",
   "Count of towers": "塔的数量",
-  "Enable to store the raw messages": "启用以存储原始消息"
+  "Enable to store the raw messages": "启用以存储原始消息",
+  "Error handling": "错误处理",
+  "Max retry attempts after error": "错误后最大重试次数"
 }

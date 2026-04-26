@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.9",
+    "version": "1.5.10",
     "news": {
+      "1.5.10": {
+        "en": "fix Modbus Exception – fc=0x3 exCode=0x4 in State 7\nadd Max retry attempts after error into settings",
+        "de": "fix Modbus Ausnahme – fc=0x3 exCode=0x4 in Staat 7\nmax Retry Versuche nach Fehler in Einstellungen hinzufügen",
+        "ru": "исправление исключения Modbus - fc=0x3 exCode=0x4 в состоянии 7\nдобавьте в настройки попытки Max retry после ошибки",
+        "pt": "corrigir Modbus Exception – fc=0x3 exCode=0x4 no Estado 7\nadicionar tentativas máximas de repetição após erro nas configurações",
+        "nl": "fix Modbus Exception Fc=0x3 exCode=0x4 in State 7\nmax opnieuw proberen na fout toevoegen aan instellingen",
+        "fr": "correction de l'exception Modbus – fc=0x3 exCode=0x4 dans l'État 7\najouter Max réessayer tentatives après erreur dans les paramètres",
+        "it": "correzione Eccezione Modbus – fc=0x3 exCode=0x4 in Stato 7\naggiungere Max retry tentativi dopo errore nelle impostazioni",
+        "es": "fijar la Excepción Modbus – fc=0x3 exCode=0x4 en el Estado 7\nañadir Max retry intentos después del error en la configuración",
+        "pl": "fix Modbus Exception - fc = 0x3 exCode = 0x4 w stanie 7\ndodaj ponownie próby Max po błędzie do ustawień",
+        "uk": "fix Modbus Exception – fc=0x3 exCode=0x4 в Держ. 7\nadd Max retry спроби після помилки в налаштуваннях",
+        "zh-cn": "校正 Modbus 例外 – fc=0x3 exCode=0x4 第7国道\n将错误后的最大重试尝试添加到设置中"
+      },
       "1.5.9": {
         "en": "fix wrong package\nfix Modbus-RTU",
         "de": "falsches paket\nfix Modbus-RTU",

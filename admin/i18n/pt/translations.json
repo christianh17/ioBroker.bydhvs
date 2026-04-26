@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "Modo de teste: mostrar dados no log de erros",
   "Battery-details - every ... cycles": "Detalhes da bateria: a cada ... ciclos",
   "Count of towers": "Número de torres",
-  "Enable to store the raw messages": "Habilitar para armazenar as mensagens brutas"
+  "Enable to store the raw messages": "Habilitar para armazenar as mensagens brutas",
+  "Error handling": "Tratamento de erros",
+  "Max retry attempts after error": "Máximo de tentativas após erro"
 }

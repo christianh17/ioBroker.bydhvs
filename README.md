@@ -44,6 +44,10 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### 1.5.10 (2026-04-26)
+* (arteck) fix Modbus Exception – fc=0x3 exCode=0x4 in State 7
+* (arteck) add Max retry attempts after error into settings
+
 ### 1.5.9 (2026-04-25)
 * (arteck) fix wrong package
 * (arteck) fix Modbus-RTU
@@ -57,11 +61,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 ### 1.5.6 (2026-04-23)
 * (arteck) fix wrong package send
 * (arteck) refactoring
-
-### 1.5.5 (2026-04-14)
-* (arteck) Dependencies have been updated
-* (arteck) add current info
-* (arteck) add creates into separated file
 
 ###
 

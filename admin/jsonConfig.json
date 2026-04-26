@@ -53,7 +53,6 @@
             "lg": 4,
             "xl": 4
         },
-
         "ConfTestMode": {
             "type": "checkbox",
             "label": "Test Mode - show data in error log",
@@ -64,7 +63,6 @@
             "lg": 4,
             "xl": 4
         },
-
         "ConfDetailshowoften": {
             "newLine": true,
             "type": "number",
@@ -95,7 +93,24 @@
                 }
             ]
         },
-        "ConfStoreRawMessages": {
+
+         "ErrorHandling": {
+            "type": "header",
+            "text": "Error handling",
+            "size": 2,
+            "newLine": true
+        },
+         "ConfTestMode": {
+            "type": "checkbox",
+            "label": "Test Mode - show data in error log",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 8,
+            "lg": 4,
+            "xl": 4
+        },
+         "ConfStoreRawMessages": {
             "type": "checkbox",
             "label": "Enable to store the raw messages",
             "xs": 12,
@@ -103,6 +118,19 @@
             "md": 8,
             "lg": 4,
             "xl": 4
+        },
+         "ConfMaxRetries": {
+            "newLine": true,
+            "type": "number",
+            "label": "Max retry attempts after error",
+            "default": 3,
+            "min": 3,
+            "max": 10,
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 3,
+            "xl": 3
         }
     }
 }

@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "Testmodus: gegevens weergeven in foutlogboek",
   "Battery-details - every ... cycles": "Batterijdetails: elke ... cycli",
   "Count of towers": "Aantal torens",
-  "Enable to store the raw messages": "Inschakelen om de ruwe berichten op te slaan"
+  "Enable to store the raw messages": "Inschakelen om de ruwe berichten op te slaan",
+  "Error handling": "Foutafhandeling",
+  "Max retry attempts after error": "Maximale pogingen na fout"
 }

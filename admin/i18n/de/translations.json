@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "Testmodus - Daten im Fehlerprotokoll anzeigen",
   "Battery-details - every ... cycles": "Batteriedetails - alle ... Zyklen",
   "Count of towers": "Anzahl der Türme",
-  "Enable to store the raw messages": "Aktivieren, um die Rohmeldungen zu speichern"
+  "Enable to store the raw messages": "Aktivieren, um die Rohmeldungen zu speichern",
+  "Error handling": "Fehlerbehandlung",
+  "Max retry attempts after error": "Maximale Wiederholungsversuche nach Fehler"
 }

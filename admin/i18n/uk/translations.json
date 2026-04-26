@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "Тестовий режим: показувати дані в журналі помилок",
   "Battery-details - every ... cycles": "Деталі батареї: кожні ... цикли",
   "Count of towers": "Кількість веж",
-  "Enable to store the raw messages": "Увімкнути для збереження необроблених повідомлень"
+  "Enable to store the raw messages": "Увімкнути для збереження необроблених повідомлень",
+  "Error handling": "Обробка помилок",
+  "Max retry attempts after error": "Максимальна кількість повторних спроб після помилки"
 }

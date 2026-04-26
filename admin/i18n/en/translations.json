@@ -7,5 +7,7 @@
   "Test Mode - show data in error log": "Test Mode - show data in error log",
   "Battery-details - every ... cycles": "Battery-details - every ... cycles",
   "Count of towers": "Count of towers",
-  "Enable to store the raw messages": "Enable to store the raw messages"
+  "Enable to store the raw messages": "Enable to store the raw messages",
+  "Error handling": "Error handling",
+  "Max retry attempts after error": "Max retry attempts after error"
 }

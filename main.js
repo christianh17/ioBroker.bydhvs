@@ -98,7 +98,7 @@ class bydhvsControll extends utils.Adapter {
         });
 
         this.on('ready', this.onReady.bind(this));
-        //      this.on('stateChange', this.onStateChange.bind(this));
+        this.on('stateChange', this.onStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
     }
 
@@ -117,8 +117,41 @@ class bydhvsControll extends utils.Adapter {
 
         await this.initData();
 
+        // Wenn OverridePoll aktiv, das State abonnieren statt jede Runde zu pollen
+        if (ConfOverridePollInterval !== 0) {
+            await this.subscribeStatesAsync('System.OverridePoll');
+        }
+
         this.log.info('starte polling');
         this.startQuery();
+    }
+
+    /**
+     * stateChange: reagiere auf User-Änderung von System.OverridePoll
+     *
+     * @param id  Volle State-ID
+     * @param state  State-Objekt mit val/ack
+     */
+    onStateChange(id, state) {
+        if (!id || !state || state.ack) {
+            return;
+        }
+        if (id.endsWith('.System.OverridePoll')) {
+            const newPollTime = parseInt(state.val, 10);
+            if (!Number.isFinite(newPollTime) || newPollTime < 30) {
+                this.log.warn(`OverridePoll ignoriert – ungültiger Wert ${state.val} (min. 30s)`);
+                return;
+            }
+            if (newPollTime !== confBatPollTime) {
+                confBatPollTime = newPollTime;
+                if (idInterval1) {
+                    clearInterval(idInterval1);
+                }
+                idInterval1 = setInterval(() => this.pollQuery(), confBatPollTime * 1000);
+                this.log.info(`Poll-Intervall via stateChange aktualisiert: ${confBatPollTime}s`);
+            }
+            this.setStateAsync('System.OverridePoll', { val: newPollTime, ack: true });
+        }
     }
 
     /**
@@ -130,11 +163,15 @@ class bydhvsControll extends utils.Adapter {
         try {
             clearInterval(idInterval1);
             idInterval1 = null;
+            if (this._startTimeout) {
+                clearTimeout(this._startTimeout);
+                this._startTimeout = null;
+            }
             if (this._socket) {
                 this._socket.destroy();
                 this._socket = null;
             }
-            this.log.info('Adapter bluelink cleaned up everything...');
+            this.log.info('Adapter bydhvs cleaned up everything...');
             callback();
         } catch (error) {
             this.log.debug(`Error onUnload ${error}`);
@@ -150,7 +187,7 @@ class bydhvsControll extends utils.Adapter {
         ConfOverridePollInterval = this.config.ConfOverridePollInterval ? this.config.ConfOverridePollInterval : 0;
 
         if (ConfOverridePollInterval === 0) {
-            confBatPollTime = parseInt(this.config.ConfPollInterval);
+            confBatPollTime = parseInt(this.config.ConfPollInterval, 10);
         } else {
             const OverridePollState = await this.getStateAsync('System.OverridePoll');
             confBatPollTime = OverridePollState?.val ?? 60;
@@ -163,7 +200,7 @@ class bydhvsControll extends utils.Adapter {
 
         ConfBydTowerCount = this.config.ConfBydTowerCount || 1;
         ConfBatDetails = !!this.config.ConfBatDetails;
-        ConfBatDetailshowoften = parseInt(this.config.ConfDetailshowoften);
+        ConfBatDetailshowoften = parseInt(this.config.ConfDetailshowoften, 10);
         ConfTestMode = !!this.config.ConfTestMode;
         myNumberforDetails = ConfBatDetailshowoften;
 
@@ -250,44 +287,43 @@ class bydhvsControll extends utils.Adapter {
                         BattType        >${hvsBattType_fromSerial}<,
                         Invert. Type    >${hvsInvType_String}, Nr: ${hvsInvType}<`);
 
-        this.setState('System.Serial', hvsSerial, true);
-        this.setState('System.BMU', hvsBMU, true);
-        this.setState('System.BMUBankA', hvsBMUA, true);
-        this.setState('System.BMUBankB', hvsBMUB, true);
-        this.setState('System.BMS', hvsBMS, true);
-        this.setState('System.Modules', hvsModules, true);           // Module pro Tower (Low-Nibble)
-        this.setState('System.ModulesTotal', hvsModules * hvsTowers, true); // Gesamt-Module im System
-        this.setState('System.Towers', hvsTowers, true);
-        this.setState('System.Grid', hvsGrid, true);
-        this.setState('State.SOC', hvsSOC, true);
-        this.setState('State.VoltMax', hvsMaxVolt, true);
-        this.setState('State.VoltMin', hvsMinVolt, true);
-        this.setState('State.SOH', hvsSOH, true);
-        this.setState('State.Current', hvsA, true);
-        this.setState('State.VoltBatt', hvsBattVolt, true);
-        this.setState('State.TempMax', hvsMaxTemp, true);
-        this.setState('State.TempMin', hvsMinTemp, true);
-        this.setState('State.VoltDiff', hvsDiffVolt, true);
-        this.setState('State.Power', hvsPower, true /*ack*/);
-        this.setState('System.ParamT', hvsParamT, true);
-        this.setState('State.TempBatt', hvsBatTemp, true);
-        this.setState('State.VoltOut', hvsOutVolt, true);
-        this.setState('System.ErrorNum', hvsError, true);
-        this.setState('System.ErrorStr', hvsErrorString, true);
-
-        if (hvsPower >= 0) {
-            this.setState('State.Power_Consumption', hvsPower, true);
-            this.setState('State.Power_Delivery', 0, true);
-        } else {
-            this.setState('State.Power_Consumption', 0, true);
-            this.setState('State.Power_Delivery', -hvsPower, true);
+        // R3: zentrale State-Map – einfacher zu pflegen, weniger doppelter Code
+        const stateMap = [
+            ['System.Serial',         hvsSerial],
+            ['System.BMU',            hvsBMU],
+            ['System.BMUBankA',       hvsBMUA],
+            ['System.BMUBankB',       hvsBMUB],
+            ['System.BMS',            hvsBMS],
+            ['System.Modules',        hvsModules],                  // Module pro Tower (Low-Nibble)
+            ['System.ModulesTotal',   hvsModules * hvsTowers],      // Gesamt-Module im System
+            ['System.Towers',         hvsTowers],
+            ['System.Grid',           hvsGrid],
+            ['State.SOC',             hvsSOC],
+            ['State.VoltMax',         hvsMaxVolt],
+            ['State.VoltMin',         hvsMinVolt],
+            ['State.SOH',             hvsSOH],
+            ['State.Current',         hvsA],
+            ['State.VoltBatt',        hvsBattVolt],
+            ['State.TempMax',         hvsMaxTemp],
+            ['State.TempMin',         hvsMinTemp],
+            ['State.VoltDiff',        hvsDiffVolt],
+            ['State.Power',           hvsPower],
+            ['System.ParamT',         hvsParamT],
+            ['State.TempBatt',        hvsBatTemp],
+            ['State.VoltOut',         hvsOutVolt],
+            ['System.ErrorNum',       hvsError],
+            ['System.ErrorStr',       hvsErrorString],
+            ['State.Power_Consumption', hvsPower >= 0 ? hvsPower : 0],
+            ['State.Power_Delivery',    hvsPower >= 0 ? 0 : -hvsPower],
+            ['System.BattType',       hvsBattType_fromSerial],
+            ['System.InvType',        hvsInvType_String],
+            ['System.ChargeTotal',    hvsChargeTotal],
+            ['System.DischargeTotal', hvsDischargeTotal],
+            ['System.ETA',            hvsETA],
+        ];
+        for (const [id, val] of stateMap) {
+            this.setState(id, val, true);
         }
-
-        this.setState('System.BattType', hvsBattType_fromSerial, true);
-        this.setState('System.InvType', hvsInvType_String, true);
-        this.setState('System.ChargeTotal', hvsChargeTotal, true);
-        this.setState('System.DischargeTotal', hvsDischargeTotal, true);
-        this.setState('System.ETA', hvsETA, true);
 
         if (myNumberforDetails === 0) {
             // For every tower
@@ -436,8 +472,8 @@ class bydhvsControll extends utils.Adapter {
 
         const runPoll = () => this.pollQuery();
 
-        // Start direkt nach 500ms
-        setTimeout(runPoll, 500);
+        // Start direkt nach 500ms (gespeichert für sauberes onUnload)
+        this._startTimeout = setTimeout(runPoll, 500);
 
         // Danach zyklisch gemäß Konfiguration
         idInterval1 = setInterval(runPoll, confBatPollTime * 1000);
@@ -454,14 +490,33 @@ class bydhvsControll extends utils.Adapter {
         this._socket = socket;
 
         return new Promise(resolve => {
+            let _settled = false;
+            const safeResolve = (v) => {
+                if (_settled) {
+                    return;
+                }
+                _settled = true;
+                resolve(v);
+            };
+
             const cleanup = () => {
                 this.log.debug('Schließe Socket-Verbindung und setze State zurück');
-                socket.destroy();
+                try {
+                    socket.destroy();
+                } catch (_e) { /* ignore */ }
                 this._socket = null;
                 myState = 0;
             };
 
+            let _lastRequestIndex = 0;
+            let _lastNextState = 2;
+            let _retryCount = 0;
+            const MAX_RETRIES = this.config.ConfMaxRetries ? parseInt(this.config.ConfMaxRetries, 10) : 3;
+            const RETRY_DELAY_MS = 5000;
+
             const sendRequest = (requestIndex, nextState, delay = 200) => {
+                _lastRequestIndex = requestIndex;
+                _lastNextState = nextState;
                 return new Promise(res => {
                     setTimeout(() => {
                         this.log.debug(`→ Sende Request [${requestIndex}] und wechsle in State ${nextState}`);
@@ -516,18 +571,28 @@ return;
                     const onTimeout = () => {
                         socket.removeListener('data', onData);
                         socket.removeListener('error', onError);
+                        socket.removeListener('close', onClose);
                         rej(new Error(`Socket Timeout – Buffer hatte ${buffer.length} Bytes, State: ${myState}`));
                     };
 
                     const onError = (err) => {
                         socket.removeListener('data', onData);
                         socket.removeListener('timeout', onTimeout);
+                        socket.removeListener('close', onClose);
                         rej(err);
+                    };
+
+                    const onClose = (hadError) => {
+                        socket.removeListener('data', onData);
+                        socket.removeListener('timeout', onTimeout);
+                        socket.removeListener('error', onError);
+                        rej(new Error(`Socket vom Peer geschlossen (hadError=${hadError}) in State ${myState}`));
                     };
 
                     socket.on('data', onData);
                     socket.once('timeout', onTimeout);
                     socket.once('error', onError);
+                    socket.once('close', onClose);
                 });
             };
 
@@ -537,9 +602,9 @@ return;
             // nicht als unhandled error den Prozess crashen
             socket.once('error', err => {
                 this.log.error(`❌ Socket-Fehler: ${err.message}`);
-                this.setStateChanged('info.connection', { val: false, ack: true });
+                this.setStateChangedAsync('info.connection', { val: false, ack: true }).catch(() => {});
                 cleanup();
-                resolve(false);
+                safeResolve(false);
             });
 
             try {
@@ -553,13 +618,32 @@ return;
                             const data = await waitForData();
 
                             if (!this.checkPacket(data)) {
+                                // Modbus Exception? → Retry, BMS evtl. gerade beschäftigt
+                                const ba = new Uint8Array(data);
+                                if (ba.length >= 3 && (ba[1] & 0x80)) {
+                                    if (_retryCount < MAX_RETRIES) {
+                                        _retryCount++;
+                                        this.log.warn(
+                                            `⚠️ Modbus Exception in State ${myState} – Retry ${_retryCount}/${MAX_RETRIES} in ${RETRY_DELAY_MS / 1000}s …`,
+                                        );
+                                        socket.setTimeout(RETRY_DELAY_MS + waitTime);
+                                        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+                                        socket.setTimeout(timeout);
+                                        await sendRequest(_lastRequestIndex, _lastNextState);
+                                        continue;
+                                    }
+                                    this.log.error(
+                                        `❌ Modbus Exception in State ${myState} – maximale Retries (${MAX_RETRIES}) erreicht`,
+                                    );
+                                }
                                 this.log.warn(`⚠️ Ungültiges Paket empfangen in State ${myState}`);
-                                this.setStateChanged('info.connection', { val: false, ack: true });
+                                this.setStateChangedAsync('info.connection', { val: false, ack: true }).catch(() => {});
                                 cleanup();
-                                return resolve(false);
+                                return safeResolve(false);
                             }
+                            _retryCount = 0; // Erfolg → Zähler zurücksetzen
 
-                            this.setStateChanged('info.connection', { val: true, ack: true });
+                            this.setStateChangedAsync('info.connection', { val: true, ack: true }).catch(() => {});
 
                             switch (myState) {
                                 case 2:
@@ -583,7 +667,7 @@ return;
                                         this.log.debug('⚡ Details nicht notwendig – beende Zyklus');
                                         this.setStates();
                                         cleanup();
-                                        return resolve(true);
+                                        return safeResolve(true);
                                     }
                                     myNumberforDetails = 0;
                                     socket.setTimeout(timeout);
@@ -635,7 +719,7 @@ return;
                                         this.log.debug('Alle Daten empfangen, beende...');
                                         this.setStates();
                                         cleanup();
-                                        return resolve(true);
+                                        return safeResolve(true);
                                     }
                                     break;
 
@@ -674,7 +758,7 @@ return;
                                         this.log.debug('Beende nach Response13');
                                         this.setStates();
                                         cleanup();
-                                        return resolve(true);
+                                        return safeResolve(true);
                                     }
                                     break;
 
@@ -716,37 +800,54 @@ return;
                                     this.log.debug('✅ Alle Daten erfolgreich verarbeitet');
                                     this.setStates();
                                     cleanup();
-                                    return resolve(true);
+                                    return safeResolve(true);
 
                                 default:
                                     this.log.warn(`❓ Unerwarteter Zustand: ${myState}`);
                                     cleanup();
-                                    return resolve(false);
+                                    return safeResolve(false);
                             }
                         }
                     } catch (err) {
                         this.log.error(`❌ Fehler im Ablauf: ${err.message}`);
                         this.log.debug(err.stack);
-                        this.setStateChanged('info.connection', { val: false, ack: true });
+                        this.setStateChangedAsync('info.connection', { val: false, ack: true }).catch(() => {});
                         cleanup();
-                        return resolve(false);
+                        return safeResolve(false);
                     }
                 });
             } catch (err) {
                 this.log.error(`❌ Socket konnte nicht verbunden werden: ${err.message}`);
                 this.log.debug(err.stack);
-                this.setStateChanged('info.connection', { val: false, ack: true });
+                this.setStateChangedAsync('info.connection', { val: false, ack: true }).catch(() => {});
                 cleanup();
-                return resolve(false);
+                return safeResolve(false);
             }
         });
     }
 
     async pollQuery() {
         if (myState > 0) {
-            this.log.debug(`pollQuery übersprungen – vorheriger Zyklus läuft noch (State=${myState})`);
-            return;
+            // Stuck-Watchdog: wenn ein vorheriger Zyklus seit > 3*pollTime hängt → forciert resetten
+            const stuckSince = Date.now() - (this._pollStartedAt || 0);
+            const maxStuck = Math.max(60_000, confBatPollTime * 3 * 1000);
+            if (stuckSince > maxStuck) {
+                this.log.warn(
+                    `pollQuery: erkannter Stuck-State (myState=${myState}, seit ${Math.round(stuckSince / 1000)}s) – forciere Reset`,
+                );
+                if (this._socket) {
+                    try {
+                        this._socket.destroy();
+                    } catch (_e) { /* ignore */ }
+                    this._socket = null;
+                }
+                myState = 0;
+            } else {
+                this.log.debug(`pollQuery übersprungen – vorheriger Zyklus läuft noch (State=${myState})`);
+                return;
+            }
         }
+        this._pollStartedAt = Date.now();
 
         // Prüfe und ggf. setze neues Poll-Intervall
         if (ConfOverridePollInterval !== 0) {
