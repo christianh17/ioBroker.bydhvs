@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "bydhvs",
-    "version": "1.5.11",
+    "version": "1.5.12",
     "news": {
+      "1.5.12": {
+        "en": "fix exCode 0x04",
+        "de": "exCode 0x04",
+        "ru": "исправить ex-code 0x04",
+        "pt": "corrigir o exCode 0x04",
+        "nl": "fix exCode 0x04",
+        "fr": "correction exCode 0x04",
+        "it": "correzione exCode 0x04",
+        "es": "exCode 0x04",
+        "pl": "fix exCode 0x04",
+        "uk": "javaScript licenses API Веб-сайт Go1.13.8",
+        "zh-cn": "修复 exCode 0x04"
+      },
       "1.5.11": {
         "en": "del deprectated setStateAsync",
         "de": "del deprected setStateAsync",
@@ -80,19 +93,6 @@
         "pl": "typo",
         "uk": "типи",
         "zh-cn": "类型"
-      },
-      "1.5.3": {
-        "en": "update dependecy",
-        "de": "aktualisierung abhängigkeit",
-        "ru": "обновление dependecy",
-        "pt": "atualizar dependência",
-        "nl": "afhankelijkheid bijwerken",
-        "fr": "mettre à jour la dépendance",
-        "it": "aggiornamento dipendenza",
-        "es": "dependencia de actualización",
-        "pl": "aktualizacja zależności",
-        "uk": "оновлення залежності",
-        "zh-cn": "更新依赖性"
       }
     },
     "titleLang": {

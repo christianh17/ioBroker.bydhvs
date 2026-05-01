@@ -1,4 +1,7 @@
 # Older changes
+## 1.5.7 (2026-04-23)
+* (arteck) fix tower count > 1
+
 ## 1.5.6 (2026-04-23)
 * (arteck) fix wrong package send
 * (arteck) refactoring

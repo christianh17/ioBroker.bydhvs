@@ -40,6 +40,9 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 [Link zur nativen deutschen Readme:](README-German.md)
 
 ## Changelog
+### 1.5.12 (2026-05-01)
+* (arteck) fix exCode 0x04
+
 ### 1.5.11 (2026-04-26)
 * (arteck) del deprectated setStateAsync
 
@@ -53,9 +56,6 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 
 ### 1.5.8 (2026-04-23)
 * (arteck) typo
-
-### 1.5.7 (2026-04-23)
-* (arteck) fix tower count > 1
 
 ###
 

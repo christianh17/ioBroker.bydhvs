@@ -626,15 +626,27 @@ return;
                                         this.log.warn(
                                             `⚠️ Modbus Exception in State ${myState} – Retry ${_retryCount}/${MAX_RETRIES} in ${RETRY_DELAY_MS / 1000}s …`,
                                         );
-                                        socket.setTimeout(RETRY_DELAY_MS + waitTime);
+                                        // Nach Exception 0x04 braucht das BMS mehr Zeit → Timeout erhöhen
+                                        const exceptionRecoveryTimeout = Math.max(timeout * 3, 6000);
+                                        socket.setTimeout(RETRY_DELAY_MS + exceptionRecoveryTimeout);
                                         await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
-                                        socket.setTimeout(timeout);
+                                        socket.setTimeout(exceptionRecoveryTimeout);
                                         await sendRequest(_lastRequestIndex, _lastNextState);
                                         continue;
                                     }
                                     this.log.error(
                                         `❌ Modbus Exception in State ${myState} – maximale Retries (${MAX_RETRIES}) erreicht`,
                                     );
+                                    // Graceful Degradation: States >= 11 betreffen nur Zellen > 128
+                                    // Basis-Daten (SOC, Volt, Temp etc.) sind bereits vollständig vorhanden
+                                    if (myState >= 11) {
+                                        this.log.warn(
+                                            `⚠️ Überspringe erweiterte Zelldaten (State ${myState}) – Zellen >128 nicht verfügbar. Fahre mit vorhandenen Teildaten fort.`,
+                                        );
+                                        this.setStates();
+                                        cleanup();
+                                        return safeResolve(true);
+                                    }
                                 }
                                 this.log.warn(`⚠️ Ungültiges Paket empfangen in State ${myState}`);
                                 this.setStateChangedAsync('info.connection', { val: false, ack: true }).catch(() => {});
