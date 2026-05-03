@@ -59,6 +59,8 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 
 ###
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 
