@@ -40,6 +40,9 @@ Copy and Paste does not work - the data is cut at the end. You will have to down
 [Link zur nativen deutschen Readme:](README-German.md)
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 1.5.12 (2026-05-01)
 * (arteck) fix exCode 0x04
 
